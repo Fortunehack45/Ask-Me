@@ -1,17 +1,28 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore, initializeFirestore } from "firebase/firestore";
+import { initializeFirestore } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getMessaging, isSupported as isMessagingSupported } from "firebase/messaging";
 
 // Helper to get env vars safely (supports Vite and CRA/Next)
 const getEnv = (key: string) => {
+  // Check for Vite import.meta.env
   // @ts-ignore
   if (typeof import.meta !== 'undefined' && import.meta.env) {
     // @ts-ignore
     return import.meta.env[key] || import.meta.env[`VITE_${key}`];
   }
-  return process.env[key] || process.env[`REACT_APP_${key}`];
+  
+  // Check for Node.js process.env safely
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env[key] || process.env[`REACT_APP_${key}`];
+    }
+  } catch (e) {
+    // Ignore error if process is accessed in strict browser env
+  }
+
+  return undefined;
 };
 
 const firebaseConfig = {

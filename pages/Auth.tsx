@@ -180,13 +180,13 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-6 font-sans">
+    <div className="min-h-[100dvh] w-full flex items-center justify-center relative overflow-hidden px-6 font-sans bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
       
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-[420px] glass-card rounded-[32px] p-8 md:p-10 relative z-10 shadow-2xl shadow-black/80 ring-1 ring-white/10"
+        className="w-full max-w-[420px] mx-auto glass-card rounded-[32px] p-8 md:p-10 relative z-10 shadow-2xl shadow-black/80 ring-1 ring-white/10"
       >
         <div className="text-center mb-10">
           <div className="w-16 h-16 bg-gradient-to-tr from-pink-600 to-orange-500 rounded-2xl mx-auto mb-6 shadow-[0_10px_30px_-10px_rgba(236,72,153,0.5)] flex items-center justify-center">
