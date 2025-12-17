@@ -86,7 +86,7 @@ const Feed = () => {
   const profileLink = username ? `/u/${username}` : '#';
 
   return (
-    <div className="space-y-8 relative pb-24 lg:pb-0">
+    <div className="space-y-8 relative pb-24 md:pb-0">
       
       {/* Toast Notification */}
       <AnimatePresence>
@@ -117,10 +117,10 @@ const Feed = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
         
         {/* Left Col */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
+        <div className="md:col-span-5 flex flex-col gap-6">
             {/* Hero Card */}
             <motion.div 
                 initial={{ opacity: 0, scale: 0.98 }}
@@ -174,8 +174,8 @@ const Feed = () => {
                </div>
             </div>
 
-            {/* Quick Access Links - Now using Grid for better fill */}
-            <div className="hidden lg:grid grid-cols-2 gap-4">
+            {/* Quick Access Links */}
+            <div className="hidden md:grid grid-cols-2 gap-4">
                 <Link to="/inbox" className="group block h-full">
                   <motion.div 
                       whileHover={{ scale: 1.02 }}
@@ -208,8 +208,8 @@ const Feed = () => {
             </div>
         </div>
 
-        {/* Right Col: Personal Feed - Full width cards to fill space */}
-        <div className="lg:col-span-7 pt-4 lg:pt-0">
+        {/* Right Col: Personal Feed */}
+        <div className="md:col-span-7 pt-4 md:pt-0">
             <div className="flex items-center gap-4 mb-6">
                 <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">Your History</h3>
                 <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div>

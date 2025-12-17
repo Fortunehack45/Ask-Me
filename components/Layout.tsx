@@ -103,15 +103,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
 
       {/* --- MOBILE & TABLET HEADER (Centered Logo, No Logout) --- */}
-      <header className="lg:hidden fixed top-0 inset-x-0 z-40 px-6 py-4 flex justify-center items-center backdrop-blur-xl bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-white/5 transition-all duration-300">
+      <header className="md:hidden fixed top-0 inset-x-0 z-40 px-6 py-4 flex justify-center items-center backdrop-blur-xl bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-white/5 transition-all duration-300">
         <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-2 group">
           <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black text-lg shadow-[0_0_15px_rgba(236,72,153,0.3)]">A</span>
           <span className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Ask Me</span>
         </Link>
       </header>
 
-      {/* --- DESKTOP SIDEBAR --- */}
-      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 dark:border-white/5 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-xl z-40 flex-col justify-between py-8 px-6 transition-colors duration-300">
+      {/* --- DESKTOP SIDEBAR (Switches to desktop at md breakpoint) --- */}
+      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 dark:border-white/5 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-xl z-40 flex-col justify-between py-8 px-6 transition-colors duration-300">
         <div>
           <Link to="/" className="flex items-center gap-3 px-2 mb-12 group">
              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black text-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] group-hover:scale-105 transition-transform">A</div>
@@ -174,15 +174,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </aside>
 
-      {/* --- MAIN CONTENT (Ensured Desktop pl-64) --- */}
-      <main className="w-full lg:pl-64 min-h-screen relative z-10">
-        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-40 lg:py-12">
+      {/* --- MAIN CONTENT (Ensured Desktop pl-64, switches at md breakpoint) --- */}
+      <main className="w-full md:pl-64 min-h-screen relative z-10">
+        <div className="w-full mx-auto px-4 sm:px-6 md:px-8 pt-24 pb-40 md:py-12">
            {children}
         </div>
       </main>
 
-      {/* --- MOBILE & TABLET BOTTOM NAV (FLOATING) --- */}
-      <nav className="lg:hidden fixed bottom-8 left-6 right-6 z-50 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-[32px] shadow-2xl shadow-black/20 pb-safe">
+      {/* --- MOBILE & TABLET BOTTOM NAV (FLOATING, Hidden at md breakpoint) --- */}
+      <nav className="md:hidden fixed bottom-8 left-6 right-6 z-50 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-[32px] shadow-2xl shadow-black/20 pb-safe">
         <div className="flex justify-around items-center h-[70px] px-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
