@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { Inbox, User, Sparkles, Check, MessageSquare, Heart, Copy, Shield } from '../components/Icons';
+import { Share2, Inbox, User, Loader2, ExternalLink, Shield, Flame, Sparkles, Check, MessageSquare, Heart, Copy } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getUserFeed, getUserStats } from '../services/db';
 import { Answer } from '../types';
 import { timeAgo, copyToClipboard } from '../utils';
 
 const Feed = () => {
-  const { user, userProfile } = useAuth(); // Removed unused authLoading
+  const { user, userProfile, loading: authLoading } = useAuth();
   const [myAnswers, setMyAnswers] = useState<Answer[]>([]);
   const [stats, setStats] = useState({ answers: 0, likes: 0 });
   const [loading, setLoading] = useState(true);
@@ -40,7 +40,7 @@ const Feed = () => {
       }
     };
     loadMyContent();
-  }, [user?.uid]); // Added proper dependency
+  }, [user]);
 
   // Construct absolute URL safely
   const shareUrl = userProfile?.username 
@@ -80,6 +80,8 @@ const Feed = () => {
     setTimeout(() => setShowToast(false), 3000);
   };
 
+  if (authLoading) return null;
+
   const username = userProfile?.username;
   const profileLink = username ? `/u/${username}` : '#';
 
@@ -107,7 +109,7 @@ const Feed = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between px-1 mb-4 gap-4">
         <div>
           <h1 className="text-3xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-3">
-            Feed <Sparkles className="text-yellow-500 hidden md:block" size={32} />
+            Dashboard <Sparkles className="text-yellow-500 hidden md:block" size={32} />
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 font-medium text-sm md:text-lg mt-2 max-w-md">
             Welcome back, <span className="text-zinc-900 dark:text-white font-bold">{userProfile?.fullName}</span>. Here is your overview.

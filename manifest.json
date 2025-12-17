@@ -2,17 +2,18 @@
   "name": "Ask Me",
   "short_name": "Ask Me",
   "description": "Premium Anonymous Q&A Platform",
-  "id": "/ask-me-pwa",
-  "start_url": "./",
+  "id": "ask-me-v1",
+  "start_url": "/#/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay"],
   "background_color": "#09090b",
   "theme_color": "#ec4899",
   "orientation": "portrait",
-  "prefer_related_applications": false,
+  "categories": ["social", "entertainment"],
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg width='192' height='192' viewBox='0 0 192 192' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='192' height='192' rx='0' fill='%23ec4899' /%3E%3Crect width='192' height='192' rx='0' fill='url(%23grad)' /%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0' y1='0' x2='192' y2='192' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23db2777' /%3E%3Cstop offset='1' stop-color='%23f97316' /%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-size='120'%3EA%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg width='192' height='192' viewBox='0 0 192 192' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='192' height='192' fill='%23ec4899' /%3E%3Crect width='192' height='192' fill='url(%23grad)' /%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0' y1='0' x2='192' y2='192' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23db2777' /%3E%3Cstop offset='1' stop-color='%23f97316' /%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-size='120'%3EA%3C/text%3E%3C/svg%3E",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any"
@@ -24,7 +25,7 @@
       "purpose": "maskable"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg width='512' height='512' viewBox='0 0 512 512' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='512' height='512' rx='0' fill='%23ec4899' /%3E%3Crect width='512' height='512' rx='0' fill='url(%23grad)' /%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0' y1='0' x2='512' y2='512' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23db2777' /%3E%3Cstop offset='1' stop-color='%23f97316' /%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-size='300'%3EA%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg width='512' height='512' viewBox='0 0 512 512' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='512' height='512' fill='%23ec4899' /%3E%3Crect width='512' height='512' fill='url(%23grad)' /%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0' y1='0' x2='512' y2='512' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23db2777' /%3E%3Cstop offset='1' stop-color='%23f97316' /%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-size='300'%3EA%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any"
