@@ -2,44 +2,43 @@
 
 Ask Me is a premium, high-performance anonymous Q&A platform (NGL Clone) designed for seamless social sharing and engagement. It allows users to create professional profiles, receive anonymous questions, and publish stylishly rendered answers directly to their feed or social media stories.
 
-## ✨ Features
+## ✨ Key Features
 
-- **Anonymous Messaging**: Send and receive messages without revealing your identity.
-- **Stylish Themes**: Multiple vibrant gradients and "Noir" themes for question cards.
-- **Story Generator**: One-click "Save for Story" feature that generates perfectly sized 9:16 images for Instagram, Snapchat, and TikTok.
-- **Real-time Feed**: A dynamic dashboard showing answered questions and engagement stats.
-- **Adaptive UI**: Full support for Light and Dark modes with a professional "billion-dollar" aesthetic.
-- **Admin Analytics**: Comprehensive dashboard for platform owners to track user growth and activity.
-- **Push Notifications**: (Configurable) Stay updated when new questions arrive.
-- **Security First**: Built with Firebase Auth and Firestore security rules to ensure data privacy.
+- **Anonymous Messaging**: Secure messaging system that preserves sender anonymity.
+- **Dynamic Story Generator**: Instantly generate 9:16 high-resolution images for Instagram, Snapchat, and TikTok stories.
+- **Stylish Theming**: Choose from a variety of aesthetic gradients (Fiery, Ocean, Jungle, Love, Midnight) or a sleek Noir default.
+- **Billion-Dollar UI/UX**: A meticulously crafted interface featuring glassmorphism, fluid animations with Framer Motion, and full Light/Dark mode responsiveness.
+- **Real-time Analytics**: Built-in dashboard to track your engagement, likes, and question volume.
+- **Admin Command Center**: Advanced management tools for platform administrators to monitor user growth and activity.
+- **Push Notifications**: Integrated Firebase Cloud Messaging (FCM) support to notify users of new questions.
 
-## 🚀 Tech Stack
+## 🛠️ Technology Stack
 
-- **Frontend**: React 19, TypeScript, Tailwind CSS 4.
-- **Animations**: Framer Motion for fluid transitions.
-- **Backend**: Firebase (Authentication, Firestore, Analytics, Messaging).
-- **Imaging**: `html-to-image` for high-resolution story generation.
-- **Icons**: Lucide React.
-- **Charts**: Recharts for administrative analytics.
+- **Frontend**: React 19, TypeScript, Tailwind CSS (Vite-optimized).
+- **Backend**: Firebase (Authentication, Firestore, Analytics, Cloud Messaging).
+- **Imaging**: `html-to-image` for on-the-fly social media asset generation.
+- **Visuals**: Lucide React for iconography, Recharts for analytics visualization.
+- **Hosting**: Optimized for Vercel/Netlify with deep-link routing support.
 
-## 🛠️ Getting Started
+## 🚀 Getting Started
 
-1. **Environment Variables**:
-   Ensure you have your Firebase configuration set up in your environment or `firebase.ts`.
-   
+1. **Prerequisites**: Ensure you have a Firebase project set up.
 2. **Installation**:
    ```bash
    npm install
    ```
-
-3. **Development**:
+3. **Environment**: Update `firebase.ts` with your credentials.
+4. **Run Dev**:
    ```bash
    npm run dev
    ```
 
-## 🎨 Design Philosophy
+## 📐 Architecture & Layout
 
-Ask Me utilizes a "Glassmorphic" design language with deep zinc tones in dark mode and crisp, airy surfaces in light mode. The UI is designed to be "filled up" on all screen sizes, ensuring no wasted space and a professional feel on both mobile and desktop.
+Ask Me uses an adaptive layout that "fills the screen" to ensure professional density on all devices. 
+- **Desktop**: Persistent glass-blurred sidebar for navigation and user context.
+- **Mobile**: Floating bottom navigation bar and a centered branding header.
+- **Contrast**: Intelligent color management (Zinc-900 on Light / White on Dark) for maximum accessibility and readability.
 
 ---
 Built with ❤️ by [Esho Fortune Adebayo](https://wa.me/2349167689200)

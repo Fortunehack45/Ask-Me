@@ -181,7 +181,6 @@ const Settings = () => {
          <div className="space-y-8">
             {/* Professional Developer Card */}
             <section className="h-full bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[32px] overflow-hidden shadow-sm transition-colors duration-300 relative group flex flex-col justify-between">
-                {/* Subtle Background Accent */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/5 to-purple-500/5 dark:from-blue-500/10 dark:to-purple-500/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
                 
                 <div className="p-8 relative z-10">
@@ -209,7 +208,6 @@ const Settings = () => {
                             </p>
                         </div>
                         
-                        {/* Contact Action */}
                         <div className="flex flex-col gap-3 shrink-0 pt-4">
                             <a 
                                 href="https://wa.me/2349167689200" 
@@ -224,7 +222,6 @@ const Settings = () => {
                     </div>
                 </div>
                 
-                {/* Decorative Footer */}
                 <div className="bg-zinc-50 dark:bg-black/20 border-t border-zinc-100 dark:border-zinc-800 p-4 flex justify-between items-center">
                     <span className="text-xs font-bold text-zinc-400 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>

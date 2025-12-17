@@ -20,7 +20,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [loadingNotifs, setLoadingNotifs] = useState(false);
 
   useEffect(() => {
-    // Check permission on mount
     if ('Notification' in window) {
       setNotificationPermission(Notification.permission);
     }
@@ -70,7 +69,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return (
       <main className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white font-sans selection:bg-pink-500/30 overflow-hidden relative transition-colors duration-300">
         <div className="bg-noise"></div>
-         {/* Ambient Lights */}
         <div className="fixed inset-0 pointer-events-none z-0">
           <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-pink-500/20 dark:bg-pink-900/20 rounded-full blur-[120px] mix-blend-screen opacity-40"></div>
           <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-orange-500/20 dark:bg-orange-900/20 rounded-full blur-[120px] mix-blend-screen opacity-40"></div>
@@ -94,7 +92,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans flex flex-col lg:flex-row relative selection:bg-pink-500/30">
+    <div className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans relative transition-colors duration-300">
       
       {/* Background Elements - Fixed z-0 */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -104,9 +102,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="absolute bottom-[-10%] left-[20%] w-[800px] h-[800px] bg-orange-400/10 dark:bg-orange-600/5 rounded-full blur-[140px] mix-blend-screen animate-blob animation-delay-4000 opacity-30"></div>
       </div>
 
-      {/* --- MOBILE & TABLET HEADER --- */}
-      <header className="lg:hidden fixed top-0 inset-x-0 z-40 px-6 py-4 flex justify-between items-center backdrop-blur-xl bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-white/5 transition-all duration-300">
-        <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-2 group mx-auto">
+      {/* --- MOBILE & TABLET HEADER (Centered Logo, No Logout) --- */}
+      <header className="lg:hidden fixed top-0 inset-x-0 z-40 px-6 py-4 flex justify-center items-center backdrop-blur-xl bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-white/5 transition-all duration-300">
+        <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-2 group">
           <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black text-lg shadow-[0_0_15px_rgba(236,72,153,0.3)]">A</span>
           <span className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Ask Me</span>
         </Link>
@@ -115,13 +113,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* --- DESKTOP SIDEBAR --- */}
       <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 dark:border-white/5 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-xl z-40 flex-col justify-between py-8 px-6 transition-colors duration-300">
         <div>
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-3 px-2 mb-12 group">
              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black text-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] group-hover:scale-105 transition-transform">A</div>
              <span className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight group-hover:text-pink-600 dark:group-hover:text-pink-100 transition-colors">Ask Me</span>
           </Link>
 
-          {/* Navigation */}
           <nav className="space-y-3">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
@@ -143,7 +139,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               );
             })}
 
-            {/* Notification Button (Desktop) */}
             {notificationPermission === 'default' && (
               <button 
                 onClick={enableNotifications}
@@ -161,7 +156,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </nav>
         </div>
 
-        {/* User Mini Profile */}
         <div className="mt-auto">
           <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-white/5 hover:border-pink-500/30 transition-all cursor-pointer group hover:bg-white/80 dark:hover:bg-zinc-900/60 shadow-sm dark:shadow-none">
              <img 
@@ -173,16 +167,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                <p className="text-sm font-bold text-zinc-900 dark:text-white truncate">{userProfile.fullName}</p>
                <p className="text-xs text-zinc-500 truncate group-hover:text-zinc-600 dark:group-hover:text-zinc-400">@{userProfile.username}</p>
              </div>
-             <button onClick={handleLogout} className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-white p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors">
+             <button onClick={handleLogout} title="Logout" className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-white p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors">
                 <LogOut size={18} />
              </button>
           </div>
         </div>
       </aside>
 
-      {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 w-full lg:pl-64 min-h-screen relative z-10">
-        <div className="w-full h-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-40 lg:py-8">
+      {/* --- MAIN CONTENT (Ensured Desktop pl-64) --- */}
+      <main className="w-full lg:pl-64 min-h-screen relative z-10">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-40 lg:py-12">
            {children}
         </div>
       </main>
