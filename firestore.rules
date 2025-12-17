@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check authentication
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user is accessing their own data
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // Check if user is the specific admin
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.email == 'fortunedomination@gmail.com';
+    }
+
+    // Users: 
+    // - Read: Public (to see profiles)
+    // - Write: Own data only
+    // - Admin: Can list users for stats (if strictly queried, but we handle stats via count aggregations in client or cloud functions mainly. 
+    //   However, for this app, we are using count() which requires list permissions or simple read permissions on collection).
+    match /users/{uid} {
+      allow read: if true;
+      allow write: if isOwner(uid);
+    }
+
+    // Questions:
+    // - Create: Public (Anonymous users can send questions)
+    // - Read: Only the receiver can read their inbox
+    // - Update: Receiver can mark as answered
+    match /questions/{questionId} {
+      allow create: if true;
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.receiverId || isAdmin());
+      allow update: if isAuthenticated() && request.auth.uid == resource.data.receiverId;
+    }
+
+    // Answers:
+    // - Create: User can answer questions sent to them
+    // - Read: Public (Feed)
+    match /answers/{answerId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.userId;
+      allow update: if isOwner(resource.data.userId);
+    }
+  }
+}

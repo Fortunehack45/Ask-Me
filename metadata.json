@@ -1,0 +1,5 @@
+{
+  "name": "Ask Me",
+  "description": "A premium anonymous Q&A platform allowing users to receive questions and answer them publicly. Built with Firebase and React.",
+  "requestFramePermissions": []
+}
