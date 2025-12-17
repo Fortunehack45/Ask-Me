@@ -91,20 +91,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     navItems.push({ name: 'Admin', path: '/admin', icon: LayoutDashboard });
   }
 
-  // --- REUSABLE LOGO COMPONENT ---
+  // --- REUSABLE LOGO COMPONENT (Matches Manifest Exactly) ---
   const Logo = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
     const sizeClasses = {
       sm: 'w-8 h-8 rounded-lg text-base',
-      md: 'w-9 h-9 rounded-xl text-lg',
-      lg: 'w-10 h-10 rounded-xl text-xl'
+      md: 'w-10 h-10 rounded-xl text-xl',
+      lg: 'w-12 h-12 rounded-2xl text-2xl'
     }[size];
 
     return (
       <div className={clsx(
-        "bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black shadow-[0_5px_15px_rgba(236,72,153,0.3)]",
+        "bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black shadow-lg",
         sizeClasses
       )}>
-        A
+        <span className="translate-y-[5%]">A</span>
       </div>
     );
   };
@@ -122,18 +122,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* --- MOBILE & TABLET HEADER --- */}
       <header className="md:hidden fixed top-0 inset-x-0 z-40 px-6 py-4 flex justify-center items-center backdrop-blur-xl bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-white/5 transition-all duration-300">
-        <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-2 group">
+        <Link to="/" className="flex items-center gap-3">
           <Logo size="md" />
-          <span className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Ask Me</span>
+          <span className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">Ask Me</span>
         </Link>
       </header>
 
       {/* --- DESKTOP SIDEBAR --- */}
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 dark:border-white/5 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-xl z-40 flex-col justify-between py-8 px-6 transition-colors duration-300">
         <div>
-          <Link to="/" className="flex items-center gap-3 px-2 mb-12 group">
+          <Link to="/" className="flex items-center gap-4 px-2 mb-12 group">
              <Logo size="lg" />
-             <span className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight group-hover:text-pink-600 dark:group-hover:text-pink-100 transition-colors">Ask Me</span>
+             <span className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight group-hover:text-pink-600 dark:group-hover:text-pink-100 transition-colors">Ask Me</span>
           </Link>
 
           <nav className="space-y-3">
