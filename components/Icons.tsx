@@ -38,7 +38,8 @@ import {
   TrendingUp,
   Users,
   Clock,
-  ArrowUpRight
+  ArrowUpRight,
+  Image
 } from 'lucide-react';
 
 export {
@@ -80,5 +81,6 @@ export {
   TrendingUp,
   Users,
   Clock,
-  ArrowUpRight
+  ArrowUpRight,
+  Image
 };
