@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserByUsername, sendQuestion, getUserFeed } from '../services/db';
 import { UserProfile, Answer } from '../types';
@@ -174,6 +174,7 @@ const ProfileHeader = ({ profile }: { profile: UserProfile }) => {
 };
 
 const VisitorView = ({ profile }: { profile: UserProfile }) => {
+    const { user } = useAuth();
     const [text, setText] = useState('');
     const [theme, setTheme] = useState(THEMES[0]);
     const [sending, setSending] = useState(false);
@@ -211,7 +212,7 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
     };
 
     return (
-        <div className="w-full relative min-h-[400px]">
+        <div className="w-full relative min-h-[500px]">
             <AnimatePresence mode='wait'>
                 {!sent ? (
                     <motion.div
@@ -326,6 +327,28 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* CTA for Visitors */}
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
+                className="mt-12 flex flex-col items-center text-center"
+            >
+                <div className="mb-4">
+                    <p className="text-xs font-bold text-zinc-400 uppercase tracking-[0.2em] mb-1">Join the fun</p>
+                    <p className="text-zinc-900 dark:text-white font-bold text-lg">👇 Want to receive secret messages?</p>
+                </div>
+                
+                <Link 
+                    to={user ? "/" : "/auth"}
+                    className="group relative inline-flex items-center gap-3 bg-zinc-900 dark:bg-white text-white dark:text-black font-black text-lg px-8 py-4 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 overflow-hidden"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 opacity-0 group-hover:opacity-10 dark:group-hover:opacity-20 transition-opacity"></div>
+                    <Sparkles size={20} className="text-yellow-400 fill-yellow-400 animate-pulse" />
+                    <span className="relative z-10">Get your own link</span>
+                </Link>
+            </motion.div>
         </div>
     );
 };
