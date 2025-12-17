@@ -16,7 +16,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { userProfile, isAdmin } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [notificationPermission, setNotificationPermission] = useState(Notification.permission);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
+    'Notification' in window ? Notification.permission : 'default'
+  );
   const [loadingNotifs, setLoadingNotifs] = useState(false);
 
   useEffect(() => {
@@ -91,18 +93,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     navItems.push({ name: 'Admin', path: '/admin', icon: LayoutDashboard });
   }
 
-  // --- REUSABLE LOGO COMPONENT (Matches Manifest Exactly) ---
+  // --- REUSABLE LOGO COMPONENT (TS Robust) ---
   const Logo = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
-    const sizeClasses = {
+    const sizeClasses: Record<string, string> = {
       sm: 'w-8 h-8 rounded-lg text-base',
       md: 'w-10 h-10 rounded-xl text-xl',
       lg: 'w-12 h-12 rounded-2xl text-2xl'
-    }[size];
+    };
+    const currentClass = sizeClasses[size] || sizeClasses.md;
 
     return (
       <div className={clsx(
         "bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black shadow-lg",
-        sizeClasses
+        currentClass
       )}>
         <span className="translate-y-[5%]">A</span>
       </div>
@@ -150,7 +153,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   {isActive && <div className="absolute inset-0 bg-white/80 dark:bg-white/5 rounded-[24px] shadow-sm dark:shadow-none border border-zinc-200 dark:border-transparent"></div>}
                   <div className={clsx("relative z-10", isActive ? "text-pink-600 dark:text-pink-500" : "group-hover:text-zinc-900 dark:group-hover:text-white transition-colors")}>
-                    <item.icon size={26} strokeWidth={isActive ? 2.5 : 2} />
+                    <item.icon size={26} />
                   </div>
                   <span className={clsx("text-lg font-medium relative z-10", isActive ? "font-bold" : "")}>{item.name}</span>
                 </Link>
@@ -214,7 +217,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   "transition-all duration-300 p-3 rounded-2xl flex items-center justify-center",
                   isActive ? "text-white bg-zinc-900 dark:bg-white dark:text-zinc-900 shadow-lg scale-110" : "text-zinc-400 dark:text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/5"
                 )}>
-                  <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                  <item.icon size={22} />
                 </div>
               </Link>
             );
