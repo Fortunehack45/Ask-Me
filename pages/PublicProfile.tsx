@@ -407,7 +407,7 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                             <div className="pl-4">
                                 <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1 block">Anonymous Asked</span>
                                 <h3 className="text-xl font-black text-zinc-900 dark:text-white leading-tight">
-                                    "{ans.questionText}"
+                                    {ans.questionText}
                                 </h3>
                             </div>
                         </div>
@@ -476,7 +476,7 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                                         </div>
                                     </div>
                                     <h2 className="text-4xl font-black leading-tight drop-shadow-lg mb-2">
-                                        "{downloadItem.answer.questionText}"
+                                        {downloadItem.answer.questionText}
                                     </h2>
                                 </div>
                                 <div className="mt-8 flex items-center justify-center gap-3">
@@ -491,7 +491,7 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                                 <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-3xl mb-6 shadow-xl relative overflow-hidden">
                                      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-pink-500 to-orange-500"></div>
                                      <span className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3 block">Question</span>
-                                     <p className="text-3xl font-bold leading-tight">"{downloadItem.answer.questionText}"</p>
+                                     <p className="text-3xl font-bold leading-tight">{downloadItem.answer.questionText}</p>
                                 </div>
 
                                 <div className="flex gap-5 mt-8 px-2">

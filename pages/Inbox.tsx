@@ -222,7 +222,7 @@ const Inbox = () => {
                     </div>
                     
                     <p className="text-lg font-bold text-white leading-relaxed group-hover:text-pink-100 transition-colors relative z-10 line-clamp-4">
-                    "{q.text}"
+                    {q.text}
                     </p>
                 </div>
                 
@@ -290,7 +290,7 @@ const Inbox = () => {
                          {/* The Question Card */}
                          <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/30 p-8 rounded-[32px] shadow-2xl w-full rotate-1">
                              <p className="text-white font-black text-2xl drop-shadow-sm leading-snug break-words">
-                                "{selectedQuestion.text}"
+                                {selectedQuestion.text}
                              </p>
                          </div>
 
