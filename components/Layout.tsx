@@ -91,6 +91,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     navItems.push({ name: 'Admin', path: '/admin', icon: LayoutDashboard });
   }
 
+  // --- REUSABLE LOGO COMPONENT ---
+  const Logo = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
+    const sizeClasses = {
+      sm: 'w-8 h-8 rounded-lg text-base',
+      md: 'w-9 h-9 rounded-xl text-lg',
+      lg: 'w-10 h-10 rounded-xl text-xl'
+    }[size];
+
+    return (
+      <div className={clsx(
+        "bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black shadow-[0_5px_15px_rgba(236,72,153,0.3)]",
+        sizeClasses
+      )}>
+        A
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans relative transition-colors duration-300">
       
@@ -102,19 +120,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="absolute bottom-[-10%] left-[20%] w-[800px] h-[800px] bg-orange-400/10 dark:bg-orange-600/5 rounded-full blur-[140px] mix-blend-screen animate-blob animation-delay-4000 opacity-30"></div>
       </div>
 
-      {/* --- MOBILE & TABLET HEADER (Centered Logo, No Logout) --- */}
+      {/* --- MOBILE & TABLET HEADER --- */}
       <header className="md:hidden fixed top-0 inset-x-0 z-40 px-6 py-4 flex justify-center items-center backdrop-blur-xl bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-white/5 transition-all duration-300">
         <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-2 group">
-          <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black text-lg shadow-[0_0_15px_rgba(236,72,153,0.3)]">A</span>
+          <Logo size="md" />
           <span className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Ask Me</span>
         </Link>
       </header>
 
-      {/* --- DESKTOP SIDEBAR (Switches to desktop at md breakpoint) --- */}
+      {/* --- DESKTOP SIDEBAR --- */}
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 dark:border-white/5 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-xl z-40 flex-col justify-between py-8 px-6 transition-colors duration-300">
         <div>
           <Link to="/" className="flex items-center gap-3 px-2 mb-12 group">
-             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black text-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] group-hover:scale-105 transition-transform">A</div>
+             <Logo size="lg" />
              <span className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight group-hover:text-pink-600 dark:group-hover:text-pink-100 transition-colors">Ask Me</span>
           </Link>
 
@@ -174,14 +192,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </aside>
 
-      {/* --- MAIN CONTENT (Ensured Desktop pl-64, switches at md breakpoint) --- */}
+      {/* --- MAIN CONTENT --- */}
       <main className="w-full md:pl-64 min-h-screen relative z-10">
         <div className="w-full mx-auto px-4 sm:px-6 md:px-8 pt-24 pb-40 md:py-12">
            {children}
         </div>
       </main>
 
-      {/* --- MOBILE & TABLET BOTTOM NAV (FLOATING, Hidden at md breakpoint) --- */}
+      {/* --- MOBILE & TABLET BOTTOM NAV --- */}
       <nav className="md:hidden fixed bottom-8 left-6 right-6 z-50 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-[32px] shadow-2xl shadow-black/20 pb-safe">
         <div className="flex justify-around items-center h-[70px] px-2">
           {navItems.map((item) => {
