@@ -106,16 +106,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* --- MOBILE & TABLET HEADER --- */}
       <header className="lg:hidden fixed top-0 inset-x-0 z-40 px-6 py-4 flex justify-between items-center backdrop-blur-xl bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-white/5 transition-all duration-300">
-        <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-2 group">
+        <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-2 group mx-auto">
           <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black text-lg shadow-[0_0_15px_rgba(236,72,153,0.3)]">A</span>
           <span className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Ask Me</span>
         </Link>
-        <button 
-          onClick={handleLogout}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 active:scale-95 transition-transform"
-        >
-          <LogOut size={18} />
-        </button>
       </header>
 
       {/* --- DESKTOP SIDEBAR --- */}

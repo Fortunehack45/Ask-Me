@@ -3,14 +3,16 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { auth } from '../firebase';
+import { useNavigate } from 'react-router-dom';
 import { 
-  Sun, Moon, Lock, Check, Shield, Loader2, Code2, GraduationCap, Eye, EyeOff, MessageCircle, ExternalLink 
+  Sun, Moon, Lock, Check, Shield, Loader2, Code2, GraduationCap, Eye, EyeOff, MessageCircle, ExternalLink, LogOut 
 } from '../components/Icons';
 import { motion } from 'framer-motion';
 
 const Settings = () => {
   const { user, userProfile } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
   
   // Password Change State
   const [currentPassword, setCurrentPassword] = useState('');
@@ -19,6 +21,11 @@ const Settings = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
+
+  const handleLogout = async () => {
+    await auth.signOut();
+    navigate('/auth');
+  };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,6 +154,27 @@ const Settings = () => {
                         </button>
                     </div>
                 </form>
+            </section>
+            
+            {/* Account Management Card */}
+            <section className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-8 shadow-sm transition-colors duration-300">
+                <div className="flex items-center gap-5 mb-8">
+                    <div className="w-14 h-14 rounded-2xl bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center transition-colors">
+                    <LogOut size={28} />
+                    </div>
+                    <div>
+                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Account</h3>
+                    <p className="text-base text-zinc-500 dark:text-zinc-400 font-medium">Manage your session.</p>
+                    </div>
+                </div>
+
+                <button 
+                    onClick={handleLogout}
+                    className="w-full bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-black text-lg py-4 rounded-[20px] hover:bg-red-100 dark:hover:bg-red-900/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
+                >
+                    <LogOut size={22} className="group-hover:-translate-x-1 transition-transform" />
+                    Log Out of Ask Me
+                </button>
             </section>
          </div>
 

@@ -43,7 +43,7 @@ const THEME_STYLES: Record<string, { card: string, gradient: string, text: strin
     subtext: 'text-white/70'
   },
   default: {
-    card: 'bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-pink-500/40',
+    card: 'bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-pink-500/40 shadow-md dark:shadow-none',
     gradient: 'bg-gradient-to-bl from-zinc-800 via-zinc-900 to-black',
     text: 'text-zinc-900 dark:text-white',
     subtext: 'text-zinc-500 dark:text-zinc-400'
@@ -86,7 +86,6 @@ const Inbox = () => {
       if (permission === 'granted') {
         const vapidKey = 'REPLACE_WITH_YOUR_VAPID_KEY'; // IMPORTANT: Replace with actual key
         if (vapidKey === 'REPLACE_WITH_YOUR_VAPID_KEY') {
-             // Silently fail or log in prod, alert in dev
              console.warn("VAPID Key missing");
              setEnablingNotifs(false);
              return;
@@ -212,8 +211,6 @@ const Inbox = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {questions.map((q, i) => {
              const styles = THEME_STYLES[q.theme || 'default'] || THEME_STYLES['default'];
-             // Determine if we need to invert icon colors based on the theme
-             // Default theme uses dark text in light mode, so icons should be dark there
              const isDefault = !q.theme || q.theme === 'default';
              
              return (
@@ -245,7 +242,7 @@ const Inbox = () => {
                 <div className="mt-6 flex justify-end relative z-10">
                    <span className={clsx(
                      "text-xs font-bold transition-transform flex items-center gap-1 px-4 py-2 rounded-full border",
-                     "group-hover:scale-105 active:scale-95",
+                     "group-hover:scale-105 active:scale-95 shadow-sm",
                      isDefault 
                        ? "bg-zinc-900 text-white dark:bg-white dark:text-black border-transparent" 
                        : "bg-white/10 text-white border-white/20 hover:bg-white/20"
@@ -286,7 +283,6 @@ const Inbox = () => {
               <div className="flex-1 bg-zinc-100 dark:bg-black/50 relative flex items-center justify-center p-8 overflow-hidden">
                  <div className="absolute inset-0 opacity-5 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
                  
-                 {/* The Actual Capture Target - 9:16 Ratio */}
                  <div className="relative shadow-2xl shadow-black/20 dark:shadow-black rounded-[32px] overflow-hidden ring-1 ring-black/5 dark:ring-white/10" style={{ height: '560px', aspectRatio: '9/16' }}>
                     <div 
                         ref={cardRef} 
@@ -295,12 +291,10 @@ const Inbox = () => {
                             (THEME_STYLES[selectedQuestion.theme || 'default'] || THEME_STYLES.default).gradient
                         )}
                     >
-                         {/* Background Effects */}
                          <div className="absolute inset-0 opacity-10 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
                          <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-[60px] pointer-events-none"></div>
                          <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-[80px] pointer-events-none"></div>
 
-                         {/* Header */}
                          <div className="absolute top-12 flex flex-col items-center gap-2 opacity-90">
                             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20">
                                 <Shield size={18} className="text-white" fill="white" fillOpacity={0.5} />
@@ -308,14 +302,12 @@ const Inbox = () => {
                             <span className="text-white/80 font-bold uppercase tracking-widest text-xs">Anonymous Q&A</span>
                          </div>
 
-                         {/* The Question Card */}
                          <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/30 p-8 rounded-[32px] shadow-2xl w-full rotate-1">
                              <p className="text-white font-black text-2xl drop-shadow-sm leading-snug break-words">
                                 {selectedQuestion.text}
                              </p>
                          </div>
 
-                         {/* Footer */}
                          <div className="absolute bottom-12 flex flex-col items-center gap-2">
                              <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Send me messages at</p>
                              <div className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
@@ -327,7 +319,6 @@ const Inbox = () => {
                     </div>
                  </div>
 
-                 {/* Download Action overlay on mobile, or bottom on desktop */}
                  <div className="absolute bottom-8 z-20">
                      <button 
                       onClick={handleDownloadImage}
