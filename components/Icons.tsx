@@ -39,7 +39,8 @@ import {
   Users,
   Clock,
   ArrowUpRight,
-  Image
+  Image,
+  Zap
 } from 'lucide-react';
 
 export {
@@ -82,5 +83,6 @@ export {
   Users,
   Clock,
   ArrowUpRight,
-  Image
+  Image,
+  Zap
 };
