@@ -197,7 +197,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* --- MOBILE & TABLET BOTTOM NAV (FLOATING) --- */}
       <nav className="lg:hidden fixed bottom-8 left-6 right-6 z-50 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-[32px] shadow-2xl shadow-black/20 pb-safe">
         <div className="flex justify-around items-center h-[70px] px-2">
-          {navItems.filter(i => i.name !== 'Admin').map((item) => {
+          {navItems.map((item) => {
             const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
             return (
               <Link 

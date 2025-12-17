@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const isAdmin = user?.email === 'fortunedomination@gmail.com';
+  const isAdmin = user?.email?.toLowerCase() === 'fortunedomination@gmail.com';
 
   return (
     <AuthContext.Provider value={{ user, userProfile, loading, refreshProfile, isAdmin }}>
