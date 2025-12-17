@@ -4,46 +4,37 @@ import { getInboxQuestions, publishAnswer, saveFCMToken } from '../services/db';
 import { getMessagingInstance } from '../firebase';
 import { getToken } from 'firebase/messaging';
 import { Question } from '../types';
-import { Loader2, MessageSquare, Share2, X, Shield, Check, Copy, Download, Bell } from '../components/Icons';
+import { Loader2, MessageSquare, Share2, X, Shield, Check, Copy, Download, Bell, Image as ImageIcon } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { timeAgo, copyToClipboard } from '../utils';
 import { toPng } from 'html-to-image';
 import clsx from 'clsx';
 
-// Theme Mapper
-const getThemeStyles = (theme?: string) => {
-  switch (theme) {
-    case 'fiery':
-      return {
-        card: 'bg-gradient-to-br from-pink-900/30 to-orange-900/30 border-pink-500/30 hover:border-pink-500',
-        download: 'bg-gradient-to-bl from-pink-500 via-rose-500 to-orange-500'
-      };
-    case 'ocean':
-      return {
-        card: 'bg-gradient-to-br from-blue-900/30 to-cyan-900/30 border-cyan-500/30 hover:border-cyan-500',
-        download: 'bg-gradient-to-bl from-blue-600 via-sky-500 to-cyan-400'
-      };
-    case 'jungle':
-      return {
-        card: 'bg-gradient-to-br from-green-900/30 to-emerald-900/30 border-emerald-500/30 hover:border-emerald-500',
-        download: 'bg-gradient-to-bl from-green-600 via-emerald-500 to-teal-400'
-      };
-    case 'love':
-      return {
-        card: 'bg-gradient-to-br from-rose-900/30 to-pink-900/30 border-rose-500/30 hover:border-rose-500',
-        download: 'bg-gradient-to-bl from-rose-600 via-pink-500 to-red-400'
-      };
-    case 'midnight':
-      return {
-        card: 'bg-gradient-to-br from-indigo-900/40 via-purple-900/40 to-slate-900/40 border-indigo-500/30 hover:border-indigo-500',
-        download: 'bg-gradient-to-bl from-indigo-900 via-purple-800 to-slate-900'
-      };
-    case 'default':
-    default:
-      return {
-        card: 'bg-zinc-900/60 border-zinc-800/80 hover:border-pink-500/40',
-        download: 'bg-gradient-to-bl from-zinc-800 via-zinc-700 to-zinc-600'
-      };
+// Vibrant Gradients for the Image Download
+const THEME_STYLES: Record<string, { card: string, gradient: string }> = {
+  fiery: {
+    card: 'bg-gradient-to-br from-pink-900/30 to-orange-900/30 border-pink-500/30 hover:border-pink-500',
+    gradient: 'bg-gradient-to-bl from-rose-600 via-pink-600 to-orange-500'
+  },
+  ocean: {
+    card: 'bg-gradient-to-br from-blue-900/30 to-cyan-900/30 border-cyan-500/30 hover:border-cyan-500',
+    gradient: 'bg-gradient-to-bl from-blue-600 via-indigo-600 to-cyan-500'
+  },
+  jungle: {
+    card: 'bg-gradient-to-br from-green-900/30 to-emerald-900/30 border-emerald-500/30 hover:border-emerald-500',
+    gradient: 'bg-gradient-to-bl from-emerald-600 via-green-600 to-teal-500'
+  },
+  love: {
+    card: 'bg-gradient-to-br from-rose-900/30 to-pink-900/30 border-rose-500/30 hover:border-rose-500',
+    gradient: 'bg-gradient-to-bl from-rose-500 via-red-500 to-pink-600'
+  },
+  midnight: {
+    card: 'bg-gradient-to-br from-indigo-900/40 via-purple-900/40 to-slate-900/40 border-indigo-500/30 hover:border-indigo-500',
+    gradient: 'bg-gradient-to-bl from-slate-900 via-indigo-900 to-black'
+  },
+  default: {
+    card: 'bg-zinc-900/60 border-zinc-800/80 hover:border-pink-500/40',
+    gradient: 'bg-gradient-to-bl from-zinc-800 via-zinc-900 to-black'
   }
 };
 
@@ -83,7 +74,8 @@ const Inbox = () => {
       if (permission === 'granted') {
         const vapidKey = 'REPLACE_WITH_YOUR_VAPID_KEY'; // IMPORTANT: Replace with actual key
         if (vapidKey === 'REPLACE_WITH_YOUR_VAPID_KEY') {
-             alert("VAPID Key missing in code.");
+             // Silently fail or log in prod, alert in dev
+             console.warn("VAPID Key missing");
              setEnablingNotifs(false);
              return;
         }
@@ -122,8 +114,6 @@ const Inbox = () => {
     if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } else {
-      alert(`Could not copy link automatically. Please copy it manually:\n${url}`);
     }
   };
 
@@ -131,15 +121,14 @@ const Inbox = () => {
     if (!cardRef.current) return;
     setDownloading(true);
     try {
-      // Use toPng to generate a data URL
       const dataUrl = await toPng(cardRef.current, { 
         cacheBust: true, 
-        pixelRatio: 3, // High resolution for social media
-        backgroundColor: 'transparent'
+        pixelRatio: 3, 
+        backgroundColor: 'transparent',
       });
       
       const link = document.createElement('a');
-      link.download = `askme-question-${Date.now()}.png`;
+      link.download = `askme-story-${Date.now()}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
@@ -162,7 +151,6 @@ const Inbox = () => {
         </div>
       </header>
 
-      {/* Mobile Notification Banner */}
       {notificationPermission === 'default' && (
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -209,10 +197,9 @@ const Inbox = () => {
           </button>
         </motion.div>
       ) : (
-        /* Grid updated to be 3 columns on XL and 4 on 2XL */
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
           {questions.map((q, i) => {
-             const styles = getThemeStyles(q.theme);
+             const styles = THEME_STYLES[q.theme || 'default'] || THEME_STYLES['default'];
              return (
               <motion.div
                 key={q.id}
@@ -256,91 +243,113 @@ const Inbox = () => {
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/90 backdrop-blur-md"
+              className="absolute inset-0 bg-zinc-950/90 backdrop-blur-md"
               onClick={() => setSelectedQuestion(null)}
             />
             
             <motion.div 
-              initial={{ scale: 0.9, y: 100, opacity: 0 }}
+              initial={{ scale: 0.95, y: 50, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: 100, opacity: 0 }}
-              className="w-full max-w-sm relative z-10"
+              exit={{ scale: 0.95, y: 50, opacity: 0 }}
+              className="w-full max-w-4xl h-[90vh] md:h-[80vh] flex flex-col md:flex-row bg-zinc-900 border border-zinc-800 rounded-[32px] overflow-hidden shadow-2xl relative z-10"
             >
               <button 
                   onClick={() => setSelectedQuestion(null)}
-                  className="absolute -top-14 right-0 text-zinc-400 hover:text-white bg-zinc-900/50 rounded-full p-2 border border-zinc-700"
+                  className="absolute top-4 right-4 z-50 text-white/50 hover:text-white bg-black/40 rounded-full p-2 backdrop-blur-md"
               >
                   <X size={24} />
               </button>
 
-              {/* Story Style Card - The Downloadable Area */}
-              <div className="bg-zinc-950 rounded-[32px] overflow-hidden border border-zinc-800 shadow-2xl">
-                
-                {/* Ref applied here for capture. Uses theme gradient. */}
-                <div 
-                  ref={cardRef} 
-                  className={clsx(
-                    "p-8 min-h-[300px] flex flex-col items-center justify-center relative select-none",
-                    getThemeStyles(selectedQuestion.theme).download
-                  )}
-                >
-                   {/* Background Noise for Texture in Image */}
-                   <div className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")' }}></div>
-                   
-                   <div className="glass bg-white/20 backdrop-blur-xl border border-white/40 p-6 rounded-2xl shadow-xl w-full text-center transform rotate-1 mb-6 relative z-10">
-                      <div className="flex justify-center mb-2 opacity-70">
-                        <div className="w-8 h-8 rounded-full bg-black/20 flex items-center justify-center">
-                          <Shield size={14} className="text-white" />
-                        </div>
-                      </div>
-                      <p className="text-white font-black text-xl drop-shadow-md leading-tight break-words">
-                        {selectedQuestion.text}
-                      </p>
-                   </div>
-                   
-                   {/* Branding Footer for the Image */}
-                   <div className="absolute bottom-4 flex flex-col items-center gap-1 opacity-90">
-                      <p className="text-[10px] font-bold text-white/80 uppercase tracking-widest">Sent via</p>
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-md bg-black flex items-center justify-center text-white font-black text-[10px]">A</span>
-                        <span className="text-white font-bold text-sm tracking-tight">Ask Me</span>
-                      </div>
-                   </div>
-                </div>
+              {/* LEFT: Image Preview / Generator */}
+              <div className="flex-1 bg-black/50 relative flex items-center justify-center p-8 overflow-hidden">
+                 <div className="absolute inset-0 opacity-30 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
+                 
+                 {/* The Actual Capture Target - 9:16 Ratio */}
+                 {/* We transform scale it to fit, but it renders large */}
+                 <div className="relative shadow-2xl shadow-black rounded-[32px] overflow-hidden ring-1 ring-white/10" style={{ height: '560px', aspectRatio: '9/16' }}>
+                    <div 
+                        ref={cardRef} 
+                        className={clsx(
+                            "w-full h-full flex flex-col items-center justify-center relative p-8 text-center",
+                            (THEME_STYLES[selectedQuestion.theme || 'default'] || THEME_STYLES.default).gradient
+                        )}
+                    >
+                         {/* Background Effects */}
+                         <div className="absolute inset-0 opacity-10 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+                         <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-[60px] pointer-events-none"></div>
+                         <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-[80px] pointer-events-none"></div>
 
-                <div className="p-6 bg-zinc-900">
-                  {/* Action Buttons Row */}
-                  <div className="flex gap-3 mb-6">
-                    <button 
+                         {/* Header */}
+                         <div className="absolute top-12 flex flex-col items-center gap-2 opacity-90">
+                            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20">
+                                <Shield size={18} className="text-white" fill="white" fillOpacity={0.5} />
+                            </div>
+                            <span className="text-white/80 font-bold uppercase tracking-widest text-xs">Anonymous Q&A</span>
+                         </div>
+
+                         {/* The Question Card */}
+                         <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/30 p-8 rounded-[32px] shadow-2xl w-full rotate-1">
+                             <p className="text-white font-black text-2xl drop-shadow-sm leading-snug break-words">
+                                "{selectedQuestion.text}"
+                             </p>
+                         </div>
+
+                         {/* Footer */}
+                         <div className="absolute bottom-12 flex flex-col items-center gap-2">
+                             <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Send me messages at</p>
+                             <div className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+                                <p className="text-white font-bold text-sm tracking-wide">
+                                    askme.app<span className="text-white/50">/u/{userProfile?.username}</span>
+                                </p>
+                             </div>
+                         </div>
+                    </div>
+                 </div>
+
+                 {/* Download Action overlay on mobile, or bottom on desktop */}
+                 <div className="absolute bottom-8 z-20">
+                     <button 
                       onClick={handleDownloadImage}
                       disabled={downloading}
-                      className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 border border-zinc-700"
+                      className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white text-sm font-bold px-6 py-3 rounded-full shadow-lg transition-all flex items-center gap-2 hover:scale-105 active:scale-95"
                     >
-                       {downloading ? <Loader2 className="animate-spin" size={14} /> : <Download size={14} />}
-                       Save Image
+                       {downloading ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
+                       Save for Story
                     </button>
-                  </div>
-
-                  <div className="relative">
-                    <textarea
-                      value={answerText}
-                      onChange={(e) => setAnswerText(e.target.value)}
-                      placeholder="Type your answer..."
-                      autoFocus
-                      className="w-full bg-black/40 border border-zinc-700 rounded-xl p-4 text-white placeholder-zinc-600 focus:ring-1 focus:ring-pink-500 focus:border-pink-500 outline-none resize-none text-lg mb-6"
-                      rows={3}
-                    />
-                  </div>
-                  
-                  <button
-                    onClick={handlePublish}
-                    disabled={!answerText.trim() || publishing}
-                    className="w-full bg-white text-black font-black text-lg py-3.5 rounded-xl hover:bg-zinc-200 transition-colors flex justify-center items-center gap-2 active:scale-95"
-                  >
-                    {publishing ? <Loader2 className="animate-spin" /> : 'Share Answer'}
-                  </button>
-                </div>
+                 </div>
               </div>
+
+              {/* RIGHT: Answer Input */}
+              <div className="flex-1 bg-zinc-900 p-8 flex flex-col justify-center">
+                 <div className="max-w-md mx-auto w-full">
+                    <h3 className="text-2xl font-black text-white mb-2">Reply to this</h3>
+                    <p className="text-zinc-500 mb-6 text-sm">Your answer will be posted to your public feed.</p>
+                    
+                    <div className="relative">
+                        <textarea
+                        value={answerText}
+                        onChange={(e) => setAnswerText(e.target.value)}
+                        placeholder="Type your answer here..."
+                        autoFocus
+                        className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl p-5 text-white placeholder-zinc-600 focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 outline-none resize-none text-lg leading-relaxed min-h-[160px] shadow-inner"
+                        />
+                        <div className="absolute bottom-4 right-4 text-xs font-bold text-zinc-600">
+                            {answerText.length} chars
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex flex-col gap-3">
+                        <button
+                            onClick={handlePublish}
+                            disabled={!answerText.trim() || publishing}
+                            className="w-full bg-white text-black font-black text-lg py-4 rounded-xl hover:bg-zinc-200 transition-all flex justify-center items-center gap-2 active:scale-[0.98] shadow-lg shadow-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {publishing ? <Loader2 className="animate-spin" /> : 'Post Answer'}
+                        </button>
+                    </div>
+                 </div>
+              </div>
+
             </motion.div>
           </div>
         )}

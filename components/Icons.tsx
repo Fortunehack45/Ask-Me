@@ -40,7 +40,9 @@ import {
   Clock,
   ArrowUpRight,
   Image,
-  Zap
+  Zap,
+  Search,
+  ChevronRight
 } from 'lucide-react';
 
 export {
@@ -84,5 +86,7 @@ export {
   Clock,
   ArrowUpRight,
   Image,
-  Zap
+  Zap,
+  Search,
+  ChevronRight
 };

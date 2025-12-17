@@ -5,9 +5,9 @@ import { getAdminAnalytics } from '../services/db';
 import { UserProfile } from '../types';
 import { 
   LayoutDashboard, User, Activity, Loader2, Calendar, 
-  TrendingUp, Users, Clock, ArrowUpRight 
+  TrendingUp, Users, Clock, ArrowUpRight, Search, X, ChevronRight, Check
 } from '../components/Icons';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar
@@ -19,6 +19,10 @@ const Admin = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d' | 'all'>('7d');
+  
+  // User Modal State
+  const [showAllUsers, setShowAllUsers] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const loadData = async () => {
@@ -39,19 +43,15 @@ const Admin = () => {
     const oneWeek = 7 * oneDay;
     const oneMonth = 30 * oneDay;
 
-    // Active Users (Last 24h)
     const active24h = users.filter(u => u.lastActive && (now - u.lastActive) < oneDay).length;
     
-    // New Users (In current time range)
-    let rangeMillis = oneWeek; // default 7d
+    let rangeMillis = oneWeek;
     if (timeRange === '24h') rangeMillis = oneDay;
     if (timeRange === '30d') rangeMillis = oneMonth;
-    if (timeRange === 'all') rangeMillis = now; // roughly all time
+    if (timeRange === 'all') rangeMillis = now;
 
     const newUsersInRange = users.filter(u => (now - u.createdAt) < rangeMillis).length;
     
-    // Growth % (Simulated for demo if not enough history, typically requires separate historical DB)
-    // Here we just compare to the previous period of same length
     const prevUsersInRange = users.filter(u => {
         const age = now - u.createdAt;
         return age >= rangeMillis && age < (rangeMillis * 2);
@@ -72,28 +72,22 @@ const Admin = () => {
     const dataPoints: any[] = [];
     
     if (timeRange === '24h') {
-        // Hourly buckets
         for (let i = 23; i >= 0; i--) {
             const start = now - (i + 1) * 3600000;
             const end = now - i * 3600000;
             const count = users.filter(u => u.createdAt >= start && u.createdAt < end).length;
-            const active = users.filter(u => u.lastActive >= start && u.lastActive < end).length;
             const label = new Date(start).getHours() + ':00';
-            dataPoints.push({ name: label, 'New Users': count, 'Active': active });
+            dataPoints.push({ name: label, 'New Users': count });
         }
     } else if (timeRange === '7d') {
-        // Daily buckets (last 7 days)
         for (let i = 6; i >= 0; i--) {
             const start = now - (i + 1) * 86400000;
             const end = now - i * 86400000;
             const count = users.filter(u => u.createdAt >= start && u.createdAt < end).length;
-            // For daily active, we count unique users active on that day? 
-            // Simplified: users active since that day start.
             const label = new Date(start).toLocaleDateString('en-US', { weekday: 'short' });
             dataPoints.push({ name: label, 'New Users': count });
         }
     } else if (timeRange === '30d') {
-         // Daily buckets (last 30 days) - Show every 3rd day label
          for (let i = 29; i >= 0; i--) {
             const start = now - (i + 1) * 86400000;
             const end = now - i * 86400000;
@@ -103,26 +97,33 @@ const Admin = () => {
             dataPoints.push({ name: label, 'New Users': count });
         }
     } else {
-        // Monthly buckets (Last 12 months)
         for (let i = 11; i >= 0; i--) {
              const d = new Date();
              d.setMonth(d.getMonth() - i);
              d.setDate(1);
              d.setHours(0,0,0,0);
              const start = d.getTime();
-             
              const nextM = new Date(d);
              nextM.setMonth(nextM.getMonth() + 1);
              const end = nextM.getTime();
-
              const count = users.filter(u => u.createdAt >= start && u.createdAt < end).length;
              const label = d.toLocaleDateString('en-US', { month: 'short' });
              dataPoints.push({ name: label, 'New Users': count });
         }
     }
-
     return dataPoints;
   }, [users, timeRange]);
+
+  // Filtered Users for Modal
+  const filteredUsers = useMemo(() => {
+      if (!searchQuery) return users;
+      const lowerQ = searchQuery.toLowerCase();
+      return users.filter(u => 
+          u.username.toLowerCase().includes(lowerQ) || 
+          u.fullName.toLowerCase().includes(lowerQ) ||
+          u.email?.toLowerCase().includes(lowerQ)
+      );
+  }, [users, searchQuery]);
 
   if (authLoading) return null;
   if (!isAdmin) return <Navigate to="/" />;
@@ -168,7 +169,7 @@ const Admin = () => {
             title="Total Users" 
             value={stats.total} 
             icon={Users} 
-            trend="+12%" // Simulated
+            trend="+12%" 
             trendUp={true}
             color="blue"
         />
@@ -258,7 +259,7 @@ const Admin = () => {
             </div>
         </motion.div>
 
-        {/* Activity Bar Chart (Simulated distribution) */}
+        {/* Activity Bar Chart */}
         <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -283,12 +284,6 @@ const Admin = () => {
                     </BarChart>
                 </ResponsiveContainer>
             </div>
-            <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                <div className="flex items-center justify-between text-sm">
-                    <span className="text-zinc-500">Peak Hour</span>
-                    <span className="font-bold text-zinc-900 dark:text-white">8:00 PM</span>
-                </div>
-            </div>
         </motion.div>
       </div>
 
@@ -301,7 +296,12 @@ const Admin = () => {
       >
           <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
             <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Recent Users</h3>
-            <button className="text-sm font-bold text-pink-600 hover:text-pink-500 transition-colors">View All</button>
+            <button 
+                onClick={() => setShowAllUsers(true)}
+                className="flex items-center gap-1 text-sm font-bold text-pink-600 hover:text-pink-500 transition-colors bg-pink-500/10 px-4 py-2 rounded-full"
+            >
+                View All <ChevronRight size={14} />
+            </button>
           </div>
           
           <div className="overflow-x-auto">
@@ -311,7 +311,6 @@ const Admin = () => {
                         <th className="px-8 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">User</th>
                         <th className="px-8 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Status</th>
                         <th className="px-8 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Joined</th>
-                        <th className="px-8 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider text-right">Activity</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -341,11 +340,6 @@ const Admin = () => {
                                 <td className="px-8 py-4 text-sm text-zinc-500 dark:text-zinc-400 font-medium">
                                     {new Date(u.createdAt).toLocaleDateString()}
                                 </td>
-                                <td className="px-8 py-4 text-right">
-                                     <button className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                                        <ArrowUpRight size={18} />
-                                     </button>
-                                </td>
                             </tr>
                         );
                     })}
@@ -353,6 +347,104 @@ const Admin = () => {
             </table>
           </div>
       </motion.div>
+
+      {/* --- ALL USERS MODAL --- */}
+      <AnimatePresence>
+        {showAllUsers && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <motion.div 
+                    initial={{ opacity: 0 }} 
+                    animate={{ opacity: 1 }} 
+                    exit={{ opacity: 0 }}
+                    onClick={() => setShowAllUsers(false)}
+                    className="absolute inset-0 bg-zinc-950/80 backdrop-blur-sm"
+                />
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                    className="relative w-full max-w-4xl max-h-[85vh] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-[32px] shadow-2xl flex flex-col overflow-hidden"
+                >
+                    {/* Modal Header */}
+                    <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-900 z-10">
+                        <div>
+                            <h2 className="text-2xl font-black text-zinc-900 dark:text-white">All Users</h2>
+                            <p className="text-sm text-zinc-500">Managing {filteredUsers.length} accounts</p>
+                        </div>
+                        <button 
+                            onClick={() => setShowAllUsers(false)}
+                            className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                        >
+                            <X size={24} className="text-zinc-500" />
+                        </button>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="p-6 pb-2 shrink-0">
+                        <div className="relative group">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-pink-500 transition-colors" size={20} />
+                            <input 
+                                type="text"
+                                placeholder="Search by name, username or email..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-lg font-medium outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Users List */}
+                    <div className="flex-1 overflow-y-auto p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {filteredUsers.map(u => (
+                                <div key={u.uid} className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/30 border border-zinc-100 dark:border-zinc-800 hover:border-pink-500/30 transition-all group">
+                                    <div className="relative shrink-0">
+                                        <img src={u.avatar} alt={u.username} className="w-14 h-14 rounded-full bg-zinc-200 object-cover" />
+                                        {u.premiumStatus && (
+                                            <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-white p-0.5 rounded-full border-2 border-white dark:border-zinc-900">
+                                                <Check size={10} strokeWidth={4} />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-center justify-between mb-0.5">
+                                            <p className="font-bold text-zinc-900 dark:text-white truncate">{u.fullName}</p>
+                                            {(u.lastActive && (Date.now() - u.lastActive) < 86400000) && (
+                                                <div className="w-2.5 h-2.5 bg-green-500 rounded-full shrink-0" title="Online" />
+                                            )}
+                                        </div>
+                                        <p className="text-sm text-zinc-500 font-medium truncate">@{u.username}</p>
+                                        <div className="flex items-center gap-3 mt-2 text-xs text-zinc-400">
+                                            <span className="flex items-center gap-1 bg-zinc-200 dark:bg-zinc-700/50 px-2 py-0.5 rounded text-zinc-600 dark:text-zinc-400">
+                                                Joined {new Date(u.createdAt).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <a 
+                                        href={`#/u/${u.username}`} 
+                                        target="_blank" 
+                                        className="p-2 rounded-xl text-zinc-300 hover:text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-colors opacity-0 group-hover:opacity-100"
+                                    >
+                                        <ArrowUpRight size={20} />
+                                    </a>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        {filteredUsers.length === 0 && (
+                            <div className="flex flex-col items-center justify-center py-20 text-center">
+                                <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4 text-zinc-400">
+                                    <Search size={32} />
+                                </div>
+                                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">No users found</h3>
+                                <p className="text-zinc-500">Try adjusting your search terms.</p>
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
+            </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
