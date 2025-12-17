@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { 
   Inbox, User, Loader2, Sparkles, Check, 
-  MessageSquare, Heart, Copy, Shield, TrendingUp 
+  MessageSquare, Heart, Copy, Shield 
 } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getUserFeed, getUserStats } from '../services/db';
@@ -23,7 +23,6 @@ const Feed: React.FC = () => {
       if (user?.uid) {
         setLoading(true);
         try {
-          // Parallel loading
           const [feedData, statsData] = await Promise.all([
             getUserFeed(user.uid),
             getUserStats(user.uid)
@@ -31,7 +30,7 @@ const Feed: React.FC = () => {
           setMyAnswers(feedData);
           setStats(statsData);
         } catch (e) {
-          console.error("Failed to load dashboard data", e);
+          console.error("Dashboard error", e);
         } finally {
           setLoading(false);
         }
@@ -56,7 +55,7 @@ const Feed: React.FC = () => {
         });
         return; 
       } catch (err) { 
-        console.log("Native share failed", err);
+        console.log("Share skipped", err);
       }
     }
 

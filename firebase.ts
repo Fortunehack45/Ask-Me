@@ -4,12 +4,11 @@ import { initializeFirestore } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getMessaging, isSupported as isMessagingSupported } from "firebase/messaging";
 
-// Helper to get env vars safely using Vite's standard import.meta.env
+// Standardize env access for Vite/ESM environments
 const getEnv = (key: string) => {
-  // Cast import.meta to any to allow access to env property without type definition issues
-  const meta = import.meta as any;
-  if (meta && meta.env) {
-    return meta.env[key] || meta.env[`VITE_${key}`];
+  const env = (import.meta as any).env;
+  if (env) {
+    return env[key] || env[`VITE_${key}`];
   }
   return undefined;
 };
@@ -27,22 +26,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
-// Use initializeFirestore with experimentalForceLongPolling to improve connection stability
 export const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
 });
 
 export const googleProvider = new GoogleAuthProvider();
 
-// Initialize analytics only if supported (client-side)
-let analytics = null;
+// Initialize analytics
 isSupported().then(supported => {
   if (supported) {
-    analytics = getAnalytics(app);
+    getAnalytics(app);
   }
 });
 
-// Initialize Messaging
 export const getMessagingInstance = async () => {
   try {
     const supported = await isMessagingSupported();
@@ -51,9 +47,7 @@ export const getMessagingInstance = async () => {
     }
     return null;
   } catch (err) {
-    console.log("Messaging not supported", err);
+    console.warn("Messaging initialization skipped", err);
     return null;
   }
 };
-
-export { analytics };
