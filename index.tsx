@@ -5,35 +5,49 @@ import './index.css';
 
 /**
  * Robust Service Worker Registration
- * Handles edge cases like 'Invalid State' by ensuring the document is fully stable.
+ * Handles edge cases like 'Invalid State' and 'Origin Mismatch'
+ * especially in sandboxed/proxied development environments.
  */
 const registerServiceWorker = async () => {
+  // Check if Service Worker is supported
   if (!('serviceWorker' in navigator)) return;
 
+  // Detect if we're in a sandboxed preview environment (e.g. *.usercontent.goog)
+  const isProxied = window.location.hostname.includes('usercontent.goog');
+
   try {
-    // Wait for the document to be fully loaded if it isn't already
+    // 1. Wait for document to be fully loaded
     if (document.readyState !== 'complete') {
       await new Promise((resolve) => window.addEventListener('load', resolve));
     }
 
-    /**
-     * In some sandboxed or frame-based environments, the document can 
-     * briefly be in an 'invalid state' immediately after load.
-     * A small delay ensures the context is fully active.
-     */
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    // 2. Add a stability delay to prevent "Invalid State" errors in iframes
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    const swUrl = `${window.location.origin}/firebase-messaging-sw.js`;
-    
-    const registration = await navigator.serviceWorker.register(swUrl, {
-      scope: '/',
-    });
+    /**
+     * 3. Register using a relative path and NO explicit scope.
+     * By omitting 'scope', the browser defaults the scope to the script's directory.
+     * By using a relative URL, we avoid origin-mismatch issues where the browser
+     * might get confused between the preview domain and the editor domain.
+     */
+    const registration = await navigator.serviceWorker.register('firebase-messaging-sw.js');
     
     console.log('SW Registration Success:', registration.scope);
-  } catch (err) {
-    // Gracefully handle the error - PWA features might be unavailable, 
-    // but the main app should still function.
-    console.warn('SW Registration failed (PWA features disabled):', err);
+  } catch (err: any) {
+    /**
+     * 4. Graceful Error Handling
+     * In many development environments, PWA features are blocked by security policies.
+     * We filter out "expected" errors to keep the console clean while the app runs.
+     */
+    const message = err?.message || '';
+    const ignorePatterns = ['invalid state', 'origin', 'cross-origin', 'security'];
+    const isExpectedError = ignorePatterns.some(p => message.toLowerCase().includes(p));
+    
+    if (!isExpectedError && !isProxied) {
+      console.warn('PWA Service Worker could not be registered:', err);
+    } else {
+      console.log('PWA features are limited in this environment.');
+    }
   }
 };
 
