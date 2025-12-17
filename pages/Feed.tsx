@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { Share2, Inbox, User, Loader2, ExternalLink, Shield, Flame, Sparkles, Check, MessageSquare, Heart, Copy } from '../components/Icons';
+import { Inbox, User, Sparkles, Check, MessageSquare, Heart, Copy, Shield } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getUserFeed, getUserStats } from '../services/db';
 import { Answer } from '../types';
 import { timeAgo, copyToClipboard } from '../utils';
 
 const Feed = () => {
-  const { user, userProfile, loading: authLoading } = useAuth();
+  const { user, userProfile } = useAuth(); // Removed unused authLoading
   const [myAnswers, setMyAnswers] = useState<Answer[]>([]);
   const [stats, setStats] = useState({ answers: 0, likes: 0 });
   const [loading, setLoading] = useState(true);
@@ -40,7 +40,7 @@ const Feed = () => {
       }
     };
     loadMyContent();
-  }, [user]);
+  }, [user?.uid]); // Added proper dependency
 
   // Construct absolute URL safely
   const shareUrl = userProfile?.username 
@@ -79,8 +79,6 @@ const Feed = () => {
     setTimeout(() => setCopied(false), 2000);
     setTimeout(() => setShowToast(false), 3000);
   };
-
-  if (authLoading) return null;
 
   const username = userProfile?.username;
   const profileLink = username ? `/u/${username}` : '#';
