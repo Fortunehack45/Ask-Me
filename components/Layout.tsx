@@ -188,8 +188,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* --- MAIN CONTENT --- */}
       <main className="flex-1 w-full lg:pl-64 min-h-screen relative z-10">
-        {/* Added pb-40 to ensure content is fully visible above the floating nav */}
-        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 pt-24 pb-40 lg:py-10">
+        <div className="w-full h-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-40 lg:py-8">
            {children}
         </div>
       </main>

@@ -53,7 +53,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto pb-32 lg:pb-20">
+    <div className="w-full pb-32 lg:pb-20">
       <div className="mb-8">
         <h1 className="text-4xl font-black text-zinc-900 dark:text-white tracking-tight">Settings</h1>
         <p className="text-zinc-600 dark:text-zinc-400 font-medium text-lg mt-2">Manage your account and preferences.</p>

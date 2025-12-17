@@ -81,7 +81,7 @@ const PublicProfile = () => {
       {/* Ambient Background Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-pink-500/5 dark:bg-pink-500/10 rounded-full blur-[120px] pointer-events-none -z-10" />
       
-      <div className="w-full max-w-xl flex flex-col gap-10 pt-16 md:pt-20 relative z-10">
+      <div className="w-full max-w-4xl flex flex-col gap-10 pt-16 md:pt-20 relative z-10">
         <ProfileHeader profile={profile} />
 
         <div className="transition-all duration-500 ease-out">
@@ -401,7 +401,7 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
     if (loading) return <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-zinc-400" /></div>;
 
     if (answers.length === 0) return (
-        <div className="py-16 text-center bg-zinc-50/50 dark:bg-zinc-900/30 rounded-[32px] border-2 border-dashed border-zinc-200 dark:border-zinc-800">
+        <div className="py-16 text-center bg-zinc-50/50 dark:bg-zinc-900/30 rounded-[32px] border-2 border-dashed border-zinc-200 dark:border-zinc-800 w-full">
             <p className="text-zinc-500 font-bold mb-2 text-lg">No answered questions yet</p>
             <p className="text-sm text-zinc-400 max-w-xs mx-auto">When you answer questions in your inbox, they will appear publicly here.</p>
         </div>

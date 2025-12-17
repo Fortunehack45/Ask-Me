@@ -86,7 +86,7 @@ const Feed = () => {
   const profileLink = username ? `/u/${username}` : '#';
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto relative pb-24 lg:pb-0">
+    <div className="space-y-8 relative pb-24 lg:pb-0">
       
       {/* Toast Notification */}
       <AnimatePresence>
@@ -158,14 +158,14 @@ const Feed = () => {
 
             {/* Stats Row */}
             <div className="grid grid-cols-2 gap-4">
-               <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[24px] flex flex-col justify-center">
+               <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[24px] flex flex-col justify-center h-full">
                   <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 mb-1">
                     <MessageSquare size={16} />
                     <span className="text-xs font-bold uppercase tracking-wider">Answered</span>
                   </div>
                   <span className="text-3xl font-black text-zinc-900 dark:text-white">{loading ? '...' : stats.answers}</span>
                </div>
-               <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[24px] flex flex-col justify-center">
+               <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-[24px] flex flex-col justify-center h-full">
                   <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 mb-1">
                     <Heart size={16} />
                     <span className="text-xs font-bold uppercase tracking-wider">Likes</span>
@@ -174,47 +174,41 @@ const Feed = () => {
                </div>
             </div>
 
-            {/* Quick Access Links - HIDDEN ON MOBILE to fix overlap */}
-            <div className="hidden lg:block space-y-3">
-                <Link to="/inbox" className="group block">
+            {/* Quick Access Links - Now using Grid for better fill */}
+            <div className="hidden lg:grid grid-cols-2 gap-4">
+                <Link to="/inbox" className="group block h-full">
                   <motion.div 
-                      whileHover={{ x: 4 }}
-                      className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-5 rounded-[24px] flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                      whileHover={{ scale: 1.02 }}
+                      className="h-full bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-5 rounded-[24px] flex flex-col justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                   >
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center">
-                            <Inbox size={20} />
-                        </div>
-                        <div>
-                           <h3 className="font-bold text-zinc-900 dark:text-white">Inbox</h3>
-                           <p className="text-xs text-zinc-500">Check new questions</p>
-                        </div>
+                      <div className="w-10 h-10 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center mb-3">
+                          <Inbox size={20} />
                       </div>
-                      <ExternalLink size={16} className="text-zinc-400" />
+                      <div>
+                         <h3 className="font-bold text-zinc-900 dark:text-white">Inbox</h3>
+                         <p className="text-xs text-zinc-500">Check messages</p>
+                      </div>
                   </motion.div>
                 </Link>
                 
-                <Link to={profileLink} className="group block">
+                <Link to={profileLink} className="group block h-full">
                   <motion.div 
-                      whileHover={{ x: 4 }}
-                      className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-5 rounded-[24px] flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                      whileHover={{ scale: 1.02 }}
+                      className="h-full bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-5 rounded-[24px] flex flex-col justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                   >
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center">
-                            <User size={20} />
-                        </div>
-                        <div>
-                           <h3 className="font-bold text-zinc-900 dark:text-white">Public Profile</h3>
-                           <p className="text-xs text-zinc-500">View how others see you</p>
-                        </div>
+                      <div className="w-10 h-10 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center mb-3">
+                          <User size={20} />
                       </div>
-                      <ExternalLink size={16} className="text-zinc-400" />
+                      <div>
+                         <h3 className="font-bold text-zinc-900 dark:text-white">Profile</h3>
+                         <p className="text-xs text-zinc-500">Public view</p>
+                      </div>
                   </motion.div>
                 </Link>
             </div>
         </div>
 
-        {/* Right Col: Personal Feed */}
+        {/* Right Col: Personal Feed - Full width cards to fill space */}
         <div className="lg:col-span-7 pt-4 lg:pt-0">
             <div className="flex items-center gap-4 mb-6">
                 <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">Your History</h3>
@@ -226,7 +220,7 @@ const Feed = () => {
                    {[1,2,3].map(i => <div key={i} className="h-32 bg-zinc-200 dark:bg-zinc-900 rounded-[24px] animate-pulse"></div>)}
                 </div>
             ) : myAnswers.length === 0 ? (
-            <div className="text-center py-20 bg-zinc-100 dark:bg-zinc-900/30 rounded-[32px] border border-dashed border-zinc-300 dark:border-zinc-800">
+            <div className="text-center py-20 bg-zinc-100 dark:bg-zinc-900/30 rounded-[32px] border border-dashed border-zinc-300 dark:border-zinc-800 h-[400px] flex flex-col items-center justify-center">
                 <div className="w-16 h-16 bg-zinc-200 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-400">
                    <Inbox size={32} />
                 </div>
@@ -234,35 +228,36 @@ const Feed = () => {
                 <Link to="/inbox" className="text-pink-500 font-bold text-sm mt-2 hover:underline">Go to Inbox</Link>
             </div>
             ) : (
-            <div className="flex flex-col md:grid md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
                 {myAnswers.map((item, i) => (
                 <motion.div 
                     key={item.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 + (Math.min(i, 10) * 0.05) }}
-                    className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/60 rounded-[28px] p-6 hover:shadow-lg transition-all group relative overflow-hidden"
+                    className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/60 rounded-[28px] p-8 hover:shadow-lg transition-all group relative overflow-hidden"
                 >
-                    <div className="flex items-center gap-2 mb-3 opacity-60">
+                    <div className="flex items-center gap-2 mb-4 opacity-60">
                         <Shield size={12} className="text-zinc-400" />
                         <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Question</span>
                     </div>
                     
-                    <p className="text-zinc-900 dark:text-white text-lg font-bold leading-tight mb-4">
-                        {item.questionText}
+                    <p className="text-zinc-900 dark:text-white text-2xl font-black leading-tight mb-6">
+                        "{item.questionText}"
                     </p>
 
-                    <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                        <p className="text-zinc-600 dark:text-zinc-300 text-sm font-medium leading-relaxed">
+                    <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800">
+                        <span className="text-[10px] font-bold text-pink-500 uppercase tracking-widest mb-2 block">You Answered</span>
+                        <p className="text-zinc-600 dark:text-zinc-300 text-lg font-medium leading-relaxed">
                           {item.answerText}
                         </p>
                     </div>
                     
-                    <div className="mt-4 flex justify-between items-center text-xs text-zinc-400 font-medium">
+                    <div className="mt-6 flex justify-between items-center text-xs text-zinc-400 font-medium bg-zinc-50 dark:bg-zinc-950/30 p-3 rounded-xl">
                        <span>{timeAgo(item.timestamp)}</span>
-                       <span className="flex items-center gap-1">
-                           <Heart size={12} className={item.likes > 0 ? "text-pink-500 fill-pink-500" : ""} /> 
-                           {item.likes}
+                       <span className="flex items-center gap-2">
+                           <Heart size={14} className={item.likes > 0 ? "text-pink-500 fill-pink-500" : ""} /> 
+                           {item.likes} Likes
                        </span>
                     </div>
                 </motion.div>
