@@ -33,7 +33,12 @@ import {
   Info,
   GraduationCap,
   Code2,
-  MessageCircle
+  MessageCircle,
+  Calendar,
+  TrendingUp,
+  Users,
+  Clock,
+  ArrowUpRight
 } from 'lucide-react';
 
 export {
@@ -70,5 +75,10 @@ export {
   Info,
   GraduationCap,
   Code2,
-  MessageCircle
+  MessageCircle,
+  Calendar,
+  TrendingUp,
+  Users,
+  Clock,
+  ArrowUpRight
 };

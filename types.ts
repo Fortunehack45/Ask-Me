@@ -9,6 +9,7 @@ export interface UserProfile {
   bio?: string;
   premiumStatus?: boolean;
   createdAt: number;
+  lastActive?: any; // Firestore Timestamp or number
 }
 
 export interface Question {

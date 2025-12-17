@@ -218,6 +218,38 @@ export const getGlobalFeed = async (): Promise<Answer[]> => {
 };
 
 // Admin Services
+export const getAdminAnalytics = async () => {
+    try {
+        // Fetch last 1000 users for client-side aggregation
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, orderBy("createdAt", "desc"), limit(1000));
+        const snap = await getDocs(q);
+        
+        return snap.docs.map(doc => {
+            const data = doc.data();
+            // Convert Firestore timestamps to number if necessary
+            let lastActive = 0;
+            if (data.lastActive) {
+                if (data.lastActive.toMillis) {
+                    lastActive = data.lastActive.toMillis();
+                } else if (typeof data.lastActive === 'number') {
+                    lastActive = data.lastActive;
+                }
+            }
+
+            return {
+                uid: doc.id,
+                ...data,
+                createdAt: data.createdAt || 0,
+                lastActive: lastActive
+            } as UserProfile;
+        });
+    } catch (e) {
+        console.error("Failed to fetch admin analytics", e);
+        return [];
+    }
+};
+
 export const getAdminStats = async () => {
   try {
     const usersColl = collection(db, "users");
