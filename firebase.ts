@@ -4,24 +4,13 @@ import { initializeFirestore } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getMessaging, isSupported as isMessagingSupported } from "firebase/messaging";
 
-// Helper to get env vars safely (supports Vite and CRA/Next)
+// Helper to get env vars safely using Vite's standard import.meta.env
 const getEnv = (key: string) => {
-  // Check for Vite import.meta.env
-  // @ts-ignore
-  if (typeof import.meta !== 'undefined' && import.meta.env) {
-    // @ts-ignore
-    return import.meta.env[key] || import.meta.env[`VITE_${key}`];
+  // Cast import.meta to any to allow access to env property without type definition issues
+  const meta = import.meta as any;
+  if (meta && meta.env) {
+    return meta.env[key] || meta.env[`VITE_${key}`];
   }
-  
-  // Check for Node.js process.env safely
-  try {
-    if (typeof process !== 'undefined' && process.env) {
-      return process.env[key] || process.env[`REACT_APP_${key}`];
-    }
-  } catch (e) {
-    // Ignore error if process is accessed in strict browser env
-  }
-
   return undefined;
 };
 
