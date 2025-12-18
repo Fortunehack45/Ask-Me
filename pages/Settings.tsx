@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 // Consolidated modular auth imports to fix resolution issues with named exports and types
-import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential, User } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Sun, Moon, Lock, Check, Shield, Loader2, Code2, GraduationCap, Eye, EyeOff, MessageCircle, ExternalLink, LogOut, Camera, User, RefreshCcw, Info
+  Sun, Moon, Lock, Check, Shield, Loader2, Code2, GraduationCap, Eye, EyeOff, MessageCircle, ExternalLink, LogOut, Camera, RefreshCcw, Info
 } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { updateUserProfile, isUsernameTaken } from '../services/db';
@@ -151,7 +151,7 @@ const Settings = () => {
             <section className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-8 shadow-sm transition-all duration-300">
                 <div className="flex items-center gap-5 mb-8">
                     <div className="w-14 h-14 rounded-2xl bg-pink-500/10 dark:bg-pink-500/20 text-pink-600 dark:text-pink-400 flex items-center justify-center transition-colors">
-                      <User size={28} />
+                      <div className="w-7 h-7 bg-pink-500 rounded-full" />
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Profile Customizer</h3>

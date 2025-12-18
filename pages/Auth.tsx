@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
-// Consolidated modular auth imports to fix resolution issues with named exports
+// Consolidated modular auth imports to fix resolution issues with named exports and types
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signInWithPopup, 
   updateProfile, 
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  User
 } from 'firebase/auth';
-import type { User } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { createUserProfile, getUserProfile, isUsernameTaken, getEmailByUsername } from '../services/db';

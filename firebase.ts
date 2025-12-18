@@ -1,10 +1,9 @@
 
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
-// Separated named exports and types for Firebase Auth to fix resolution errors
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import type { Auth } from "firebase/auth";
+// Consolidated named exports and types for Firebase Auth to fix resolution errors
+import { getAuth, GoogleAuthProvider, Auth } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
-// Separated named exports and types for Firebase Analytics to fix resolution errors
+// Consolidated named exports and types for Firebase Analytics to fix resolution errors
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
