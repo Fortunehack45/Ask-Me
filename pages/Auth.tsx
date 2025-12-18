@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-// Cleaned up and consolidated Firebase Auth imports to resolve modular resolution issues
+// Using consolidated modular imports to fix resolution issues with the Firebase SDK
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signInWithPopup, 
   updateProfile, 
   sendPasswordResetEmail,
-  User
+  type User
 } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
 import { useNavigate } from 'react-router-dom';

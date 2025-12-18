@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Consolidated imports to resolve modular resolution issues in various TS environments
-import { onAuthStateChanged, User } from 'firebase/auth';
+// Grouping auth imports to resolve modular resolution issues in various environments
+import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '../firebase';
 import { getUserProfile, updateUserLastActive } from '../services/db';
 import { UserProfile } from '../types';

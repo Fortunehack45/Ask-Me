@@ -147,32 +147,6 @@ export const updateAnswerVisibility = async (answerId: string, isPublic: boolean
   await updateDoc(aRef, { isPublic });
 };
 
-export const toggleAnswerLike = async (answerId: string, userId: string): Promise<boolean> => {
-  const answerRef = doc(db, "answers", answerId);
-  const answerSnap = await getDoc(answerRef);
-
-  if (answerSnap.exists()) {
-    const data = answerSnap.data();
-    const likedBy = data.likedBy || [];
-    const isLiked = likedBy.includes(userId);
-
-    if (isLiked) {
-      await updateDoc(answerRef, {
-        likedBy: arrayRemove(userId),
-        likes: increment(-1)
-      });
-      return false; 
-    } else {
-      await updateDoc(answerRef, {
-        likedBy: arrayUnion(userId),
-        likes: increment(1)
-      });
-      return true; 
-    }
-  }
-  return false;
-};
-
 export const getUserFeed = async (uid: string): Promise<Answer[]> => {
   const q = query(
     collection(db, "answers"),
@@ -198,25 +172,6 @@ export const getUserStats = async (uid: string) => {
   }
 };
 
-export const getGlobalFeed = async (): Promise<Answer[]> => {
-  try {
-    const q = query(
-        collection(db, "answers"),
-        where("isPublic", "==", true),
-        orderBy("timestamp", "desc"),
-        limit(20)
-    );
-    const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Answer));
-  } catch (e) {
-      const q = query(collection(db, "answers"), where("isPublic", "==", true), limit(50));
-      const snap = await getDocs(q);
-      const answers = snap.docs.map(d => ({ id: d.id, ...d.data() } as Answer));
-      return answers.sort((a, b) => b.timestamp - a.timestamp).slice(0, 20);
-  }
-};
-
-// Admin Services
 export const getAdminAnalytics = async (): Promise<UserProfile[]> => {
     try {
         const usersRef = collection(db, "users");
@@ -226,8 +181,6 @@ export const getAdminAnalytics = async (): Promise<UserProfile[]> => {
         return snap.docs.map(doc => {
             const data = doc.data();
             let lastActiveVal = 0;
-            
-            // Check specifically for Firestore Timestamp instances
             if (data.lastActive instanceof Timestamp) {
                 lastActiveVal = data.lastActive.toMillis();
             } else if (typeof data.lastActive === 'number') {
@@ -235,7 +188,6 @@ export const getAdminAnalytics = async (): Promise<UserProfile[]> => {
             } else if (data.lastActive && typeof data.lastActive.toMillis === 'function') {
                 lastActiveVal = data.lastActive.toMillis();
             }
-
             return {
                 ...data,
                 uid: doc.id,

@@ -12,7 +12,6 @@ import { toPng } from 'html-to-image';
 import { GoogleGenAI } from "@google/genai";
 import clsx from 'clsx';
 
-// Vibrant Gradients for the Image Download - Synchronized with PublicProfile themes
 const THEME_STYLES: Record<string, { card: string, gradient: string, text: string, subtext: string }> = {
   crimson: {
     card: 'bg-gradient-to-br from-rose-900/30 to-red-900/30 border-rose-500/30 hover:border-rose-500',
@@ -58,7 +57,7 @@ const Inbox = () => {
   const [loading, setLoading] = useState(true);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [answerText, setAnswerText] = useState('');
-  const [isPublic, setIsPublic] = useState(false); // Default to Private (Off)
+  const [isPublic, setIsPublic] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -83,14 +82,11 @@ const Inbox = () => {
     try {
       const messaging = await getMessagingInstance();
       if (!messaging) return;
-
       const permission = await Notification.requestPermission();
       setNotificationPermission(permission);
-
       if (permission === 'granted') {
-        const vapidKey = 'REPLACE_WITH_YOUR_VAPID_KEY'; // IMPORTANT: Replace with actual key
+        const vapidKey = 'REPLACE_WITH_YOUR_VAPID_KEY';
         if (vapidKey === 'REPLACE_WITH_YOUR_VAPID_KEY') {
-             console.warn("VAPID Key missing");
              setEnablingNotifs(false);
              return;
         }
@@ -122,10 +118,6 @@ const Inbox = () => {
     }
   };
 
-  /**
-   * AI Reply Generator
-   * Uses Gemini to suggest clever and engaging answers.
-   */
   const handleAISuggest = async () => {
     if (!selectedQuestion) return;
     setAiLoading(true);
@@ -133,9 +125,9 @@ const Inbox = () => {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: `I received this anonymous question: "${selectedQuestion.text}". Give me a short, witty, and slightly playful reply to post on my story. Just the text, no quotes.`,
+        contents: `I received this anonymous question: "${selectedQuestion.text}". Give me a short, witty reply to post on my story. Just the text.`,
         config: {
-          systemInstruction: "You are a witty social media personality. Keep answers under 15 words and highly engaging.",
+          systemInstruction: "You are a witty social media personality. Keep answers under 15 words.",
           temperature: 0.8,
         }
       });
@@ -143,7 +135,7 @@ const Inbox = () => {
         setAnswerText(response.text.trim());
       }
     } catch (err) {
-      console.error("AI Suggestion failed", err);
+      console.error("AI failed", err);
     } finally {
       setAiLoading(false);
     }
@@ -165,7 +157,6 @@ const Inbox = () => {
     if(!userProfile) return;
     const url = `${window.location.origin}/#/u/${userProfile.username}`;
     const success = await copyToClipboard(url);
-    
     if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -176,12 +167,7 @@ const Inbox = () => {
     if (!cardRef.current) return;
     setDownloading(true);
     try {
-      const dataUrl = await toPng(cardRef.current, { 
-        cacheBust: true, 
-        pixelRatio: 3, 
-        backgroundColor: 'transparent',
-      });
-      
+      const dataUrl = await toPng(cardRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
       const link = document.createElement('a');
       link.download = `askme-story-${Date.now()}.png`;
       link.href = dataUrl;
@@ -206,48 +192,15 @@ const Inbox = () => {
         </div>
       </header>
 
-      {notificationPermission === 'default' && (
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="lg:hidden mb-6 bg-gradient-to-r from-pink-900/10 to-orange-900/10 dark:from-pink-900/40 dark:to-orange-900/40 border border-pink-500/20 rounded-[24px] p-5 flex items-center justify-between"
-        >
-           <div className="flex items-center gap-3">
-             <div className="w-10 h-10 bg-pink-500/20 rounded-full flex items-center justify-center text-pink-600 dark:text-pink-400">
-               <Bell size={20} />
-             </div>
-             <div>
-               <p className="text-zinc-900 dark:text-white font-bold text-sm">Don't miss a message</p>
-               <p className="text-zinc-500 dark:text-zinc-400 text-xs">Get notified when friends ask.</p>
-             </div>
-           </div>
-           <button 
-             onClick={enableNotifications}
-             disabled={enablingNotifs}
-             className="bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold px-4 py-2 rounded-full hover:opacity-90 transition-opacity"
-           >
-             {enablingNotifs ? '...' : 'Enable'}
-           </button>
-        </motion.div>
-      )}
-
       {questions.length === 0 ? (
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-12 text-center flex flex-col items-center max-w-2xl mx-auto shadow-sm"
-        >
-          <div className="w-24 h-24 bg-zinc-100 dark:bg-zinc-900 rounded-full flex items-center justify-center mb-6 text-zinc-400 dark:text-zinc-600 shadow-inner">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-12 text-center flex flex-col items-center max-w-2xl mx-auto shadow-sm">
+          <div className="w-24 h-24 bg-zinc-100 dark:bg-zinc-900 rounded-full flex items-center justify-center mb-6 text-zinc-400 shadow-inner">
             <MessageSquare size={40} />
           </div>
-          <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">It's quiet... too quiet.</h3>
-          <p className="text-zinc-500 dark:text-zinc-400 mb-8 max-w-xs mx-auto">Share your profile link to start receiving anonymous questions from your friends.</p>
-          
-          <button 
-             onClick={copyLink}
-             className="bg-zinc-900 dark:bg-white text-white dark:text-black px-8 py-3 rounded-full font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all"
-          >
-            {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
+          <h3 className="text-2xl font-bold mb-2">It's quiet...</h3>
+          <p className="text-zinc-500 mb-8 max-w-xs mx-auto">Share your link to get questions!</p>
+          <button onClick={copyLink} className="bg-zinc-900 dark:bg-white text-white dark:text-black px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg">
+            {copied ? <Check size={18} /> : <Copy size={18} />}
             {copied ? 'Link Copied!' : 'Copy Profile Link'}
           </button>
         </motion.div>
@@ -255,52 +208,23 @@ const Inbox = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {questions.map((q, i) => {
              const styles = THEME_STYLES[q.theme || 'default'] || THEME_STYLES['default'];
-             const isDefault = !q.theme || q.theme === 'default';
-             
              return (
-              <motion.div
-                key={q.id}
-                initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                onClick={() => setSelectedQuestion(q)}
-                className={clsx(
-                  "border p-8 rounded-[32px] cursor-pointer group transition-all relative overflow-hidden backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 min-h-[260px] flex flex-col justify-between",
-                  styles.card
-                )}
-              >
+              <motion.div key={q.id} initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} onClick={() => setSelectedQuestion(q)} className={clsx("border p-8 rounded-[32px] cursor-pointer group transition-all relative overflow-hidden backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 min-h-[260px] flex flex-col justify-between", styles.card)}>
                 <div>
                     <div className="flex justify-between items-center mb-6 relative z-10">
-                        <div className={clsx("flex items-center gap-2 rounded-full px-3 py-1", isDefault ? "bg-zinc-100 dark:bg-zinc-800" : "bg-black/20")}>
-                            <Shield size={12} className={clsx(isDefault ? "text-zinc-500 dark:text-zinc-400" : "text-white/70")} />
-                            <span className={clsx("text-[10px] font-bold uppercase tracking-wider", isDefault ? "text-zinc-500 dark:text-zinc-300" : "text-white/80")}>Anon</span>
+                        <div className="flex items-center gap-2 bg-black/20 rounded-full px-3 py-1">
+                            <Shield size={12} className="text-white/70" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">Anon</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className={clsx("text-[10px] font-medium opacity-60", styles.text)}>{timeAgo(q.timestamp)}</span>
-                            <button 
-                                onClick={(e) => handleDelete(e, q.id)}
-                                className="p-1.5 rounded-full hover:bg-red-500/20 text-zinc-400 hover:text-red-500 transition-colors"
-                            >
-                                <Trash2 size={14} />
-                            </button>
+                            <button onClick={(e) => handleDelete(e, q.id)} className="p-1.5 rounded-full hover:bg-red-500/20 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
                         </div>
                     </div>
-                    
-                    <p className={clsx("text-2xl font-bold leading-snug relative z-10 line-clamp-4", styles.text)}>
-                    {q.text}
-                    </p>
+                    <p className={clsx("text-2xl font-bold leading-snug line-clamp-4", styles.text)}>{q.text}</p>
                 </div>
-                
                 <div className="mt-6 flex justify-end relative z-10">
-                   <span className={clsx(
-                     "text-xs font-bold transition-transform flex items-center gap-1 px-4 py-2 rounded-full border",
-                     "group-hover:scale-105 active:scale-95 shadow-sm",
-                     isDefault 
-                       ? "bg-zinc-900 text-white dark:bg-white dark:text-black border-transparent" 
-                       : "bg-white/10 text-white border-white/20 hover:bg-white/20"
-                   )}>
-                     Reply <Share2 size={12} />
-                   </span>
+                   <span className="text-xs font-bold px-4 py-2 rounded-full border bg-black/20 text-white border-white/20">Reply <Share2 size={12} /></span>
                 </div>
               </motion.div>
             );
@@ -308,152 +232,56 @@ const Inbox = () => {
         </div>
       )}
 
-      {/* Answer Modal */}
       <AnimatePresence>
         {selectedQuestion && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl"
-              onClick={() => setSelectedQuestion(null)}
-            />
-            
-            <motion.div 
-              initial={{ scale: 0.95, y: 50, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.95, y: 50, opacity: 0 }}
-              className="w-full max-w-5xl h-[90vh] md:h-[80vh] flex flex-col md:flex-row bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] overflow-hidden shadow-2xl relative z-10"
-            >
-              <button 
-                  onClick={() => setSelectedQuestion(null)}
-                  className="absolute top-4 right-4 z-50 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white bg-white/50 dark:bg-black/50 rounded-full p-2 backdrop-blur-md transition-colors"
-              >
-                  <X size={24} />
-              </button>
-
-              {/* LEFT: Image Preview / Generator */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl" onClick={() => setSelectedQuestion(null)}/>
+            <motion.div initial={{ scale: 0.95, y: 50, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.95, y: 50, opacity: 0 }} className="w-full max-w-5xl h-[90vh] md:h-[80vh] flex flex-col md:flex-row bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] overflow-hidden shadow-2xl relative z-10">
+              <button onClick={() => setSelectedQuestion(null)} className="absolute top-4 right-4 z-50 text-zinc-500 hover:text-zinc-900 bg-white/50 rounded-full p-2 backdrop-blur-md"><X size={24} /></button>
               <div className="flex-1 bg-zinc-100 dark:bg-black/50 relative flex items-center justify-center p-8 overflow-hidden">
-                 <div className="absolute inset-0 opacity-5 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
-                 
-                 <div className="relative shadow-2xl shadow-black/20 dark:shadow-black rounded-[32px] overflow-hidden ring-1 ring-black/5 dark:ring-white/10" style={{ height: '560px', aspectRatio: '9/16' }}>
-                    <div 
-                        ref={cardRef} 
-                        className={clsx(
-                            "w-full h-full flex flex-col items-center justify-center relative p-8 text-center",
-                            (THEME_STYLES[selectedQuestion.theme || 'default'] || THEME_STYLES.default).gradient
-                        )}
-                    >
-                         <div className="absolute inset-0 opacity-10 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-                         <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-[60px] pointer-events-none"></div>
-                         <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-[80px] pointer-events-none"></div>
-
+                 <div className="relative shadow-2xl rounded-[32px] overflow-hidden" style={{ height: '560px', aspectRatio: '9/16' }}>
+                    <div ref={cardRef} className={clsx("w-full h-full flex flex-col items-center justify-center relative p-8 text-center", (THEME_STYLES[selectedQuestion.theme || 'default'] || THEME_STYLES.default).gradient)}>
                          <div className="absolute top-12 flex flex-col items-center gap-2 opacity-90">
-                            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20">
-                                <Shield size={18} className="text-white" fill="white" fillOpacity={0.5} />
-                            </div>
+                            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"><Shield size={18} className="text-white" /></div>
                             <span className="text-white/80 font-bold uppercase tracking-widest text-xs">Anonymous Q&A</span>
                          </div>
-
                          <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/30 p-8 rounded-[32px] shadow-2xl w-full rotate-1">
-                             <p className="text-white font-black text-2xl drop-shadow-sm leading-snug break-words">
-                                {selectedQuestion.text}
-                             </p>
+                             <p className="text-white font-black text-2xl leading-snug break-words">{selectedQuestion.text}</p>
                          </div>
-
                          <div className="absolute bottom-12 flex flex-col items-center gap-2">
-                             <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Send me messages at</p>
-                             <div className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-                                <p className="text-white font-bold text-sm tracking-wide">
-                                    askme.app<span className="text-white/50">/u/{userProfile?.username}</span>
-                                </p>
-                             </div>
+                             <p className="text-[10px] text-white/60 uppercase tracking-widest">Send me messages at</p>
+                             <div className="bg-black/20 px-4 py-2 rounded-full border border-white/10"><p className="text-white font-bold text-sm">askme.app<span className="text-white/50">/u/{userProfile?.username}</span></p></div>
                          </div>
                     </div>
                  </div>
-
                  <div className="absolute bottom-8 z-20">
-                     <button 
-                      onClick={handleDownloadImage}
-                      disabled={downloading}
-                      className="bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 dark:backdrop-blur-md dark:border-white/20 dark:text-white text-sm font-bold px-6 py-3 rounded-full shadow-xl transition-all flex items-center gap-2 hover:scale-105 active:scale-95"
-                    >
+                     <button onClick={handleDownloadImage} disabled={downloading} className="bg-white text-zinc-900 text-sm font-bold px-6 py-3 rounded-full shadow-xl flex items-center gap-2 hover:scale-105 transition-all">
                        {downloading ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
                        Save for Story
                     </button>
                  </div>
               </div>
-
-              {/* RIGHT: Answer Input */}
               <div className="flex-1 bg-white dark:bg-zinc-900 p-8 lg:p-12 flex flex-col justify-center">
                  <div className="max-w-md mx-auto w-full">
                     <div className="flex items-start justify-between mb-4">
-                        <div>
-                            <h3 className="text-3xl font-black text-zinc-900 dark:text-white">Reply to this</h3>
-                            <p className="text-zinc-500 text-base">Choose how you want to share your answer.</p>
-                        </div>
-                        <button 
-                            onClick={handleAISuggest}
-                            disabled={aiLoading}
-                            className="p-3 bg-pink-500/10 text-pink-600 dark:text-pink-400 rounded-2xl hover:bg-pink-500/20 transition-all group"
-                            title="Generate AI suggestion"
-                        >
-                            {aiLoading ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={20} className="group-hover:scale-110 transition-transform" />}
+                        <div><h3 className="text-3xl font-black mb-3">Reply</h3><p className="text-zinc-500 text-base">Type your answer.</p></div>
+                        <button onClick={handleAISuggest} disabled={aiLoading} className="p-3 bg-pink-500/10 text-pink-600 rounded-2xl transition-all">
+                            {aiLoading ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={20} />}
                         </button>
                     </div>
-                    
                     <div className="relative mb-6">
-                        <textarea
-                        value={answerText}
-                        onChange={(e) => setAnswerText(e.target.value)}
-                        placeholder="Type your answer here..."
-                        autoFocus
-                        className="w-full bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-[24px] p-6 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 outline-none resize-none text-xl leading-relaxed min-h-[180px] shadow-inner"
-                        />
-                        <div className="absolute bottom-6 right-6 text-xs font-bold text-zinc-400">
-                            {answerText.length} chars
-                        </div>
+                        <textarea value={answerText} onChange={(e) => setAnswerText(e.target.value)} placeholder="Type here..." autoFocus className="w-full bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-[24px] p-6 text-zinc-900 dark:text-white outline-none resize-none text-xl min-h-[180px]" />
+                        <div className="absolute bottom-6 right-6 text-xs font-bold text-zinc-400">{answerText.length} chars</div>
                     </div>
-
-                    {/* Visibility Toggle */}
-                    <div className="bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 p-5 rounded-[24px] mb-8 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className={clsx(
-                                "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
-                                isPublic ? "bg-pink-500/10 text-pink-500" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-500"
-                            )}>
-                                {isPublic ? <Eye size={20} /> : <Lock size={20} />}
-                            </div>
-                            <div>
-                                <p className="text-sm font-bold text-zinc-900 dark:text-white">Make Public</p>
-                                <p className="text-[10px] text-zinc-500 font-medium">Show content on your profile feed</p>
-                            </div>
-                        </div>
-                        <button 
-                            onClick={() => setIsPublic(!isPublic)}
-                            className={clsx(
-                                "relative w-12 h-6 rounded-full transition-colors outline-none",
-                                isPublic ? "bg-pink-500" : "bg-zinc-300 dark:bg-zinc-700"
-                            )}
-                        >
-                            <motion.div 
-                                animate={{ x: isPublic ? 24 : 4 }}
-                                className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm"
-                            />
-                        </button>
+                    <div className="bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 p-5 rounded-[24px] mb-8 flex items-center justify-between">
+                        <div className="flex items-center gap-4"><div className={clsx("w-10 h-10 rounded-xl flex items-center justify-center transition-colors", isPublic ? "bg-pink-500/10 text-pink-500" : "bg-zinc-200 text-zinc-500")}>{isPublic ? <Eye size={20} /> : <Lock size={20} />}</div><div><p className="text-sm font-bold">Make Public</p></div></div>
+                        <button onClick={() => setIsPublic(!isPublic)} className={clsx("relative w-12 h-6 rounded-full transition-colors", isPublic ? "bg-pink-500" : "bg-zinc-300")}><motion.div animate={{ x: isPublic ? 24 : 4 }} className="absolute top-1 w-4 h-4 bg-white rounded-full"/></button>
                     </div>
-
-                    <div className="flex flex-col gap-3">
-                        <button
-                            onClick={handlePublish}
-                            disabled={!answerText.trim() || publishing}
-                            className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-black text-xl py-5 rounded-[20px] hover:opacity-90 transition-all flex justify-center items-center gap-2 active:scale-[0.98] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {publishing ? <Loader2 className="animate-spin" /> : 'Post Answer'}
-                        </button>
-                    </div>
+                    <button onClick={handlePublish} disabled={!answerText.trim() || publishing} className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-black text-xl py-5 rounded-[20px] shadow-lg disabled:opacity-50">
+                        {publishing ? <Loader2 className="animate-spin" /> : 'Post Answer'}
+                    </button>
                  </div>
               </div>
-
             </motion.div>
           </div>
         )}
