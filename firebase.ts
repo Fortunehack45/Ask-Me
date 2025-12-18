@@ -1,10 +1,12 @@
 
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 // Use consolidated imports to ensure correct resolution of modular SDK members
-import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
-import { getFirestore, type Firestore } from "firebase/firestore";
+// Separate type imports from values to fix "no exported member" errors in some environments
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import type { Auth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import type { Firestore } from "firebase/firestore";
 import { getAnalytics, isSupported as isAnalyticsSupported } from "firebase/analytics";
-import { getMessaging, isSupported as isMessagingSupported } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCSs8dyTW_5FNllDtODiPuVuqScXbweDl4",
@@ -18,18 +20,25 @@ const firebaseConfig = {
 
 const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
+// Initializing core services with proper types
 export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 
+// Safe initialization of Analytics
 isAnalyticsSupported().then(supported => {
   if (supported) {
     getAnalytics(app);
   }
 });
 
+/**
+ * Utility to get messaging instance with robust support check
+ */
 export const getMessagingInstance = async () => {
   try {
+    // Dynamic import to handle environments without messaging support
+    const { getMessaging, isSupported: isMessagingSupported } = await import("firebase/messaging");
     const supported = await isMessagingSupported();
     if (supported) {
       return getMessaging(app);

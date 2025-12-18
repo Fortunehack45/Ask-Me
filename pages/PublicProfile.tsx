@@ -11,12 +11,14 @@ import { toPng } from 'html-to-image';
 import clsx from 'clsx';
 
 const THEMES = [
-  { id: 'default', name: 'Noir', css: 'bg-zinc-900', gradient: 'from-zinc-800 to-black', text: 'text-white' },
+  { id: 'noir', name: 'Noir', css: 'bg-zinc-900', gradient: 'from-zinc-800 to-black', text: 'text-white' },
   { id: 'crimson', name: 'Crimson', css: 'bg-rose-900', gradient: 'from-rose-600 to-red-900', text: 'text-white' },
   { id: 'ocean', name: 'Ocean', css: 'bg-blue-900', gradient: 'from-blue-600 to-indigo-900', text: 'text-white' },
-  { id: 'forest', name: 'Forest', css: 'bg-emerald-900', gradient: 'from-emerald-600 to-teal-900', text: 'text-white' },
+  { id: 'aurora', name: 'Aurora', css: 'bg-emerald-900', gradient: 'from-emerald-400 to-teal-900', text: 'text-white' },
   { id: 'sunset', name: 'Sunset', css: 'bg-orange-900', gradient: 'from-orange-500 to-pink-700', text: 'text-white' },
-  { id: 'lavender', name: 'Lavender', css: 'bg-violet-900', gradient: 'from-violet-500 to-purple-900', text: 'text-white' },
+  { id: 'nebula', name: 'Nebula', css: 'bg-purple-900', gradient: 'from-violet-500 to-purple-900', text: 'text-white' },
+  { id: 'lemonade', name: 'Lemonade', css: 'bg-yellow-400', gradient: 'from-yellow-300 to-orange-500', text: 'text-zinc-900' },
+  { id: 'midnight', name: 'Midnight', css: 'bg-slate-900', gradient: 'from-slate-900 to-black', text: 'text-white' },
 ];
 
 const placeholders = [
@@ -197,7 +199,7 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
                                     <div className="flex justify-between items-end mt-6 relative z-10">
                                         <div className="flex gap-2">
                                             {THEMES.map(t => (
-                                                <button key={t.id} onClick={() => setTheme(t)} className={clsx("w-6 h-6 rounded-full border-2", t.css, theme.id === t.id ? "border-white scale-110" : "border-transparent opacity-60")} />
+                                                <button key={t.id} onClick={() => setTheme(t)} className={clsx("w-6 h-6 rounded-full border-2 transition-all hover:scale-110", t.css, theme.id === t.id ? "border-white scale-125 ring-2 ring-white/20" : "border-transparent opacity-60")} />
                                             ))}
                                         </div>
                                         <span className={clsx("text-xs font-bold font-mono", text.length > 280 ? "text-red-300" : "text-white/40")}>{text.length}/300</span>
@@ -219,7 +221,7 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
                         </div>
                         <h2 className="text-3xl font-black text-zinc-900 dark:text-white mb-2 tracking-tight">Sent!</h2>
                         <p className="text-zinc-500 font-medium mb-8 max-w-xs mx-auto">Your message is safely on its way.</p>
-                        <button onClick={() => setSent(false)} className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold px-8 py-3.5 rounded-full">Send Another</button>
+                        <button onClick={() => setSent(false)} className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold px-8 py-3.5 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">Send Another</button>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -393,8 +395,8 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                             <div className="pl-4">
                                 <p className="text-zinc-600 dark:text-zinc-300 font-medium leading-relaxed text-lg mb-6">{ans.answerText}</p>
                                 <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-zinc-100 dark:border-zinc-800/50">
-                                    <button onClick={() => setDownloadItem({ answer: ans, type: 'question' })} className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-xs font-bold text-zinc-600 dark:text-zinc-300"><ImageIcon size={14} /><span>Story</span></button>
-                                    <button onClick={() => setDownloadItem({ answer: ans, type: 'full' })} className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-xs font-bold text-zinc-600 dark:text-zinc-300"><Download size={14} /><span>Post</span></button>
+                                    <button onClick={() => setDownloadItem({ answer: ans, type: 'question' })} className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"><ImageIcon size={14} /><span>Story</span></button>
+                                    <button onClick={() => setDownloadItem({ answer: ans, type: 'full' })} className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"><Download size={14} /><span>Post</span></button>
                                     <div className="ml-auto flex items-center gap-4 text-xs font-medium text-zinc-400">
                                         <span>{timeAgo(ans.timestamp)}</span>
                                         <span className="flex items-center gap-1"><Heart size={14} className={ans.likes > 0 ? "text-pink-500 fill-pink-500" : ""} /> {ans.likes}</span>
@@ -406,7 +408,7 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                 </div>
             )}
 
-            {/* Custom Download Modal */}
+            {/* Premium Download & Live Customizer Modal */}
             <AnimatePresence>
                 {downloadItem && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -419,55 +421,58 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                             className="relative bg-white dark:bg-zinc-900 w-full max-w-lg rounded-[32px] overflow-hidden flex flex-col shadow-2xl"
                         >
                             <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                                <h3 className="text-xl font-black text-zinc-900 dark:text-white">Custom Story</h3>
-                                <button onClick={() => setDownloadItem(null)} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white"><X size={24} /></button>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-pink-500/10 text-pink-500 flex items-center justify-center"><Palette size={18} /></div>
+                                    <h3 className="text-xl font-black text-zinc-900 dark:text-white">Customizer</h3>
+                                </div>
+                                <button onClick={() => setDownloadItem(null)} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"><X size={24} /></button>
                             </div>
 
                             <div className="p-8 flex flex-col items-center">
-                                {/* Theme Palette */}
-                                <div className="flex gap-3 mb-8 bg-zinc-100 dark:bg-zinc-800 p-3 rounded-full border border-zinc-200 dark:border-zinc-700">
-                                    <Palette size={16} className="text-zinc-400 mt-0.5 ml-1 mr-1" />
+                                {/* Theme Palette UI */}
+                                <div className="flex gap-2.5 mb-8 bg-zinc-100 dark:bg-zinc-800 p-3 rounded-full border border-zinc-200 dark:border-zinc-700 shadow-inner">
                                     {THEMES.map((t) => (
                                         <button 
                                             key={t.id} 
                                             onClick={() => setCustomTheme(t)} 
                                             className={clsx(
-                                                "w-6 h-6 rounded-full border-2 transition-all",
+                                                "w-7 h-7 rounded-full border-2 transition-all hover:scale-110 active:scale-90",
                                                 t.css,
-                                                customTheme.id === t.id ? "border-pink-500 scale-125" : "border-transparent opacity-60 hover:opacity-100"
+                                                "bg-gradient-to-br",
+                                                t.gradient,
+                                                customTheme.id === t.id ? "border-pink-500 ring-2 ring-pink-500/20 scale-125 shadow-lg" : "border-white/20 opacity-70"
                                             )}
                                         />
                                     ))}
                                 </div>
 
                                 {/* Capture Preview Area */}
-                                <div className="relative shadow-2xl rounded-[24px] overflow-hidden" style={{ height: downloadItem.type === 'full' ? 'auto' : '480px', width: downloadItem.type === 'full' ? '100%' : '270px' }}>
+                                <div className="relative shadow-2xl rounded-[32px] overflow-hidden transition-all duration-500" style={{ height: downloadItem.type === 'full' ? 'auto' : '480px', width: downloadItem.type === 'full' ? '100%' : '270px' }}>
                                     <div 
                                         ref={captureRef} 
                                         className={clsx(
-                                            "w-full h-full flex flex-col items-center justify-center relative p-8 text-center",
-                                            customTheme.css,
+                                            "w-full h-full flex flex-col items-center justify-center relative p-8 text-center transition-all duration-700",
                                             "bg-gradient-to-br",
                                             customTheme.gradient
                                         )}
                                         style={{ minHeight: downloadItem.type === 'full' ? 'auto' : '480px' }}
                                     >
-                                        <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
+                                        <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay pointer-events-none"></div>
                                         
                                         <div className="absolute top-6 flex items-center gap-1.5 opacity-80">
-                                            <div className="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center text-white font-black text-[10px]">A</div>
-                                            <span className="text-white/80 font-bold uppercase tracking-widest text-[8px]">Ask Me</span>
+                                            <div className="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center text-white font-black text-[10px] border border-white/10 shadow-sm">A</div>
+                                            <span className="text-white font-black uppercase tracking-widest text-[8px]">Ask Me</span>
                                         </div>
                                         
                                         {downloadItem.type === 'profile' ? (
                                             <div className="relative z-10 flex flex-col items-center w-full">
-                                                <div className="w-20 h-20 rounded-full border-4 border-white/20 mb-6 overflow-hidden shadow-lg">
+                                                <div className="w-20 h-20 rounded-full border-4 border-white/30 mb-6 overflow-hidden shadow-2xl ring-4 ring-black/5">
                                                     <img src={profile.avatar} className="w-full h-full object-cover" alt="Profile" />
                                                 </div>
-                                                <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-[24px] shadow-xl rotate-1 w-full">
-                                                    <h2 className="text-white font-black text-xl leading-tight">Send me anonymous messages!</h2>
+                                                <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-[24px] shadow-2xl rotate-1 w-full">
+                                                    <h2 className={clsx("font-black text-xl leading-tight drop-shadow-sm", customTheme.text)}>Send me anonymous messages!</h2>
                                                 </div>
-                                                <div className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 mt-6">
+                                                <div className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 mt-6 shadow-xl">
                                                      <p className="text-white font-black text-xs tracking-wide">
                                                         askme.app<span className="text-white/40">/u/{profile.username}</span>
                                                      </p>
@@ -475,26 +480,26 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                                             </div>
                                         ) : downloadItem.type === 'question' && downloadItem.answer ? (
                                             <div className="relative z-10 w-full">
-                                                <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-[24px] shadow-xl rotate-1">
-                                                    <h2 className="text-white font-black text-xl leading-tight">{downloadItem.answer.questionText}</h2>
+                                                <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-[24px] shadow-2xl rotate-1">
+                                                    <h2 className={clsx("font-black text-xl leading-tight drop-shadow-sm", customTheme.text)}>{downloadItem.answer.questionText}</h2>
                                                 </div>
                                                 <div className="mt-8">
                                                     <p className="text-white/40 text-[10px] uppercase font-black tracking-widest mb-2">Send at</p>
-                                                    <div className="bg-black/20 px-4 py-2 rounded-full border border-white/10 inline-block">
+                                                    <div className="bg-black/20 px-4 py-2 rounded-full border border-white/10 inline-block shadow-lg">
                                                         <p className="text-white font-black text-[10px]">askme.app/u/{profile.username}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                         ) : downloadItem.answer && (
                                             <div className="relative z-10 w-full py-4">
-                                                <div className="bg-white/10 border border-white/10 p-5 rounded-2xl mb-4 shadow-lg text-left">
-                                                    <p className="text-white font-bold text-lg leading-tight">{downloadItem.answer.questionText}</p>
+                                                <div className="bg-white/10 border border-white/10 p-5 rounded-2xl mb-4 shadow-xl text-left backdrop-blur-md">
+                                                    <p className={clsx("font-bold text-lg leading-tight", customTheme.text)}>{downloadItem.answer.questionText}</p>
                                                 </div>
                                                 <div className="flex gap-4 items-start px-1 text-left">
-                                                    <img src={profile.avatar} className="w-12 h-12 rounded-full border-2 border-white/20" alt="Avatar" />
+                                                    <img src={profile.avatar} className="w-12 h-12 rounded-full border-2 border-white/20 shadow-lg" alt="Avatar" />
                                                     <div>
-                                                        <p className="font-black text-sm text-white">{profile.fullName}</p>
-                                                        <p className="text-base leading-relaxed text-white/90 font-medium">{downloadItem.answer.answerText}</p>
+                                                        <p className={clsx("font-black text-sm", customTheme.text)}>{profile.fullName}</p>
+                                                        <p className={clsx("text-base leading-relaxed font-medium opacity-90", customTheme.text)}>{downloadItem.answer.answerText}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -507,12 +512,12 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                                 <button 
                                     onClick={handleDownload}
                                     disabled={downloading}
-                                    className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-black py-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
+                                    className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-black py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-all hover:opacity-90"
                                 >
                                     {downloading ? <Loader2 className="animate-spin" /> : <Download size={20} />}
-                                    Download Image
+                                    Download & Share
                                 </button>
-                                <p className="text-center text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Post this image to Instagram or Snapchat</p>
+                                <p className="text-center text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Premium assets optimized for Instagram & Snapchat</p>
                             </div>
                         </motion.div>
                     </div>

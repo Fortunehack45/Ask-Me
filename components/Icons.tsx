@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Home, 
@@ -43,6 +44,7 @@ import {
   Zap,
   Search,
   ChevronRight,
+  Palette,
   Trash2
 } from 'lucide-react';
 
@@ -90,5 +92,6 @@ export {
   Zap,
   Search,
   ChevronRight,
+  Palette,
   Trash2
 };

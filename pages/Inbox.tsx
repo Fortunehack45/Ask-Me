@@ -13,41 +13,53 @@ import { GoogleGenAI } from "@google/genai";
 import clsx from 'clsx';
 
 const THEME_STYLES: Record<string, { card: string, gradient: string, text: string, subtext: string }> = {
+  noir: {
+    card: 'bg-zinc-950 border-zinc-800 hover:border-pink-500/40',
+    gradient: 'bg-gradient-to-bl from-zinc-800 via-zinc-900 to-black',
+    text: 'text-white',
+    subtext: 'text-zinc-400'
+  },
   crimson: {
-    card: 'bg-gradient-to-br from-rose-900/30 to-red-900/30 border-rose-500/30 hover:border-rose-500',
+    card: 'bg-rose-950/30 border-rose-500/30 hover:border-rose-500',
     gradient: 'bg-gradient-to-bl from-rose-600 via-rose-500 to-red-900',
     text: 'text-white',
     subtext: 'text-white/70'
   },
   ocean: {
-    card: 'bg-gradient-to-br from-blue-900/30 to-indigo-900/30 border-blue-500/30 hover:border-blue-500',
+    card: 'bg-blue-950/30 border-blue-500/30 hover:border-blue-500',
     gradient: 'bg-gradient-to-bl from-blue-600 via-indigo-600 to-blue-900',
     text: 'text-white',
     subtext: 'text-white/70'
   },
-  forest: {
-    card: 'bg-gradient-to-br from-emerald-900/30 to-teal-900/30 border-emerald-500/30 hover:border-emerald-500',
-    gradient: 'bg-gradient-to-bl from-emerald-600 via-green-600 to-teal-900',
+  aurora: {
+    card: 'bg-emerald-950/30 border-emerald-500/30 hover:border-emerald-500',
+    gradient: 'bg-gradient-to-bl from-emerald-400 via-teal-500 to-cyan-900',
     text: 'text-white',
     subtext: 'text-white/70'
   },
   sunset: {
-    card: 'bg-gradient-to-br from-orange-900/30 to-pink-900/30 border-orange-500/30 hover:border-orange-500',
-    gradient: 'bg-gradient-to-bl from-orange-500 via-orange-600 to-pink-700',
+    card: 'bg-orange-950/30 border-orange-500/30 hover:border-orange-500',
+    gradient: 'bg-gradient-to-bl from-orange-500 via-pink-600 to-rose-700',
     text: 'text-white',
     subtext: 'text-white/70'
   },
-  lavender: {
-    card: 'bg-gradient-to-br from-violet-900/30 via-purple-900/30 to-zinc-900/30 border-violet-500/30 hover:border-violet-500',
-    gradient: 'bg-gradient-to-bl from-violet-500 via-purple-600 to-purple-900',
+  nebula: {
+    card: 'bg-purple-950/30 border-purple-500/30 hover:border-purple-500',
+    gradient: 'bg-gradient-to-bl from-violet-500 via-purple-600 to-indigo-900',
     text: 'text-white',
     subtext: 'text-white/70'
   },
-  default: {
-    card: 'bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-pink-500/40 shadow-md dark:shadow-none',
-    gradient: 'bg-gradient-to-bl from-zinc-800 via-zinc-900 to-black',
-    text: 'text-zinc-900 dark:text-white',
-    subtext: 'text-zinc-500 dark:text-zinc-400'
+  lemonade: {
+    card: 'bg-yellow-950/30 border-yellow-500/30 hover:border-yellow-500',
+    gradient: 'bg-gradient-to-bl from-yellow-300 via-orange-400 to-amber-700',
+    text: 'text-zinc-900',
+    subtext: 'text-zinc-900/70'
+  },
+  midnight: {
+    card: 'bg-slate-950 border-slate-800 hover:border-blue-500/40',
+    gradient: 'bg-gradient-to-bl from-slate-900 via-slate-950 to-black',
+    text: 'text-white',
+    subtext: 'text-slate-400'
   }
 };
 
@@ -56,7 +68,7 @@ const Inbox = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
-  const [modalTheme, setModalTheme] = useState('default');
+  const [modalTheme, setModalTheme] = useState('noir');
   const [answerText, setAnswerText] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -80,7 +92,7 @@ const Inbox = () => {
 
   useEffect(() => {
     if (selectedQuestion) {
-      setModalTheme(selectedQuestion.theme || 'default');
+      setModalTheme(selectedQuestion.theme || 'noir');
     }
   }, [selectedQuestion]);
 
@@ -206,7 +218,7 @@ const Inbox = () => {
           </div>
           <h3 className="text-2xl font-bold mb-2">It's quiet...</h3>
           <p className="text-zinc-500 mb-8 max-w-xs mx-auto">Share your link to get questions!</p>
-          <button onClick={copyLink} className="bg-zinc-900 dark:bg-white text-white dark:text-black px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg">
+          <button onClick={copyLink} className="bg-zinc-900 dark:bg-white text-white dark:text-black px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all">
             {copied ? <Check size={18} /> : <Copy size={18} />}
             {copied ? 'Link Copied!' : 'Copy Profile Link'}
           </button>
@@ -214,7 +226,7 @@ const Inbox = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {questions.map((q, i) => {
-             const styles = THEME_STYLES[q.theme || 'default'] || THEME_STYLES['default'];
+             const styles = THEME_STYLES[q.theme || 'noir'] || THEME_STYLES['noir'];
              return (
               <motion.div key={q.id} initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} onClick={() => setSelectedQuestion(q)} className={clsx("border p-8 rounded-[32px] cursor-pointer group transition-all relative overflow-hidden backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 min-h-[260px] flex flex-col justify-between", styles.card)}>
                 <div>
@@ -247,18 +259,18 @@ const Inbox = () => {
               <button onClick={() => setSelectedQuestion(null)} className="absolute top-4 right-4 z-50 text-zinc-500 hover:text-zinc-900 bg-white/50 rounded-full p-2 backdrop-blur-md"><X size={24} /></button>
               
               <div className="flex-1 bg-zinc-100 dark:bg-black/50 relative flex flex-col items-center justify-center p-8 overflow-hidden">
-                 {/* Theme Selector UI */}
-                 <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                    <Palette size={14} className="text-zinc-400" />
-                    <div className="flex gap-1.5">
+                 {/* Premium Theme Selector UI */}
+                 <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl px-5 py-2.5 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-xl">
+                    <Palette size={16} className="text-pink-500" />
+                    <div className="flex gap-2">
                       {Object.keys(THEME_STYLES).map((t) => (
                         <button
                           key={t}
                           onClick={() => setModalTheme(t)}
                           className={clsx(
-                            "w-5 h-5 rounded-full border-2 transition-all",
-                            t === 'default' ? 'bg-zinc-900 dark:bg-zinc-100' : THEME_STYLES[t].gradient,
-                            modalTheme === t ? 'border-pink-500 scale-125' : 'border-transparent opacity-60 hover:opacity-100'
+                            "w-6 h-6 rounded-full border-2 transition-all hover:scale-110 active:scale-90",
+                            THEME_STYLES[t].gradient,
+                            modalTheme === t ? 'border-pink-500 ring-2 ring-pink-500/20 scale-125 shadow-lg' : 'border-white/10 opacity-70'
                           )}
                         />
                       ))}
@@ -266,24 +278,25 @@ const Inbox = () => {
                  </div>
 
                  <div className="relative shadow-2xl rounded-[32px] overflow-hidden mt-8" style={{ height: '520px', aspectRatio: '9/16' }}>
-                    <div ref={cardRef} className={clsx("w-full h-full flex flex-col items-center justify-center relative p-8 text-center transition-colors duration-500", (THEME_STYLES[modalTheme] || THEME_STYLES.default).gradient)}>
+                    <div ref={cardRef} className={clsx("w-full h-full flex flex-col items-center justify-center relative p-8 text-center transition-all duration-700 ease-in-out", (THEME_STYLES[modalTheme] || THEME_STYLES.noir).gradient)}>
+                         <div className="absolute inset-0 opacity-10 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
                          <div className="absolute top-12 flex flex-col items-center gap-2 opacity-90">
                             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"><Shield size={18} className="text-white" /></div>
                             <span className="text-white/80 font-bold uppercase tracking-widest text-xs">Anonymous Q&A</span>
                          </div>
                          <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/30 p-8 rounded-[32px] shadow-2xl w-full rotate-1">
-                             <p className="text-white font-black text-2xl leading-snug break-words">{selectedQuestion.text}</p>
+                             <p className={clsx("font-black text-2xl leading-snug break-words drop-shadow-sm", THEME_STYLES[modalTheme].text)}>{selectedQuestion.text}</p>
                          </div>
                          <div className="absolute bottom-12 flex flex-col items-center gap-2">
-                             <p className="text-[10px] text-white/60 uppercase tracking-widest">Send me messages at</p>
+                             <p className="text-[10px] text-white/60 uppercase tracking-widest font-black">Send messages at</p>
                              <div className="bg-black/20 px-4 py-2 rounded-full border border-white/10"><p className="text-white font-bold text-sm">askme.app<span className="text-white/50">/u/{userProfile?.username}</span></p></div>
                          </div>
                     </div>
                  </div>
                  <div className="mt-6 z-20">
-                     <button onClick={handleDownloadImage} disabled={downloading} className="bg-white text-zinc-900 text-sm font-bold px-6 py-3 rounded-full shadow-xl flex items-center gap-2 hover:scale-105 transition-all">
+                     <button onClick={handleDownloadImage} disabled={downloading} className="bg-white hover:bg-zinc-50 text-zinc-900 text-sm font-bold px-8 py-3.5 rounded-full shadow-2xl flex items-center gap-2 hover:scale-105 active:scale-95 transition-all">
                        {downloading ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
-                       Save for Story
+                       Save Story Asset
                     </button>
                  </div>
               </div>
@@ -291,20 +304,20 @@ const Inbox = () => {
               <div className="flex-1 bg-white dark:bg-zinc-900 p-8 lg:p-12 flex flex-col justify-center">
                  <div className="max-w-md mx-auto w-full">
                     <div className="flex items-start justify-between mb-4">
-                        <div><h3 className="text-3xl font-black mb-3">Reply</h3><p className="text-zinc-500 text-base">Type your answer.</p></div>
-                        <button onClick={handleAISuggest} disabled={aiLoading} className="p-3 bg-pink-500/10 text-pink-600 rounded-2xl transition-all">
+                        <div><h3 className="text-3xl font-black mb-3">Reply</h3><p className="text-zinc-500 text-base font-medium">Type your anonymous response.</p></div>
+                        <button onClick={handleAISuggest} disabled={aiLoading} className="p-3 bg-pink-500/10 text-pink-600 rounded-2xl transition-all hover:scale-110 active:rotate-12">
                             {aiLoading ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={20} />}
                         </button>
                     </div>
                     <div className="relative mb-6">
-                        <textarea value={answerText} onChange={(e) => setAnswerText(e.target.value)} placeholder="Type here..." autoFocus className="w-full bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-[24px] p-6 text-zinc-900 dark:text-white outline-none resize-none text-xl min-h-[180px]" />
+                        <textarea value={answerText} onChange={(e) => setAnswerText(e.target.value)} placeholder="Type here..." autoFocus className="w-full bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-[24px] p-6 text-zinc-900 dark:text-white outline-none resize-none text-xl min-h-[180px] focus:ring-2 focus:ring-pink-500/50 transition-all" />
                         <div className="absolute bottom-6 right-6 text-xs font-bold text-zinc-400">{answerText.length} chars</div>
                     </div>
                     <div className="bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 p-5 rounded-[24px] mb-8 flex items-center justify-between">
-                        <div className="flex items-center gap-4"><div className={clsx("w-10 h-10 rounded-xl flex items-center justify-center transition-colors", isPublic ? "bg-pink-500/10 text-pink-500" : "bg-zinc-200 text-zinc-500")}>{isPublic ? <Eye size={20} /> : <Lock size={20} />}</div><div><p className="text-sm font-bold">Make Public</p></div></div>
-                        <button onClick={() => setIsPublic(!isPublic)} className={clsx("relative w-12 h-6 rounded-full transition-colors", isPublic ? "bg-pink-500" : "bg-zinc-300")}><motion.div animate={{ x: isPublic ? 24 : 4 }} className="absolute top-1 w-4 h-4 bg-white rounded-full"/></button>
+                        <div className="flex items-center gap-4"><div className={clsx("w-10 h-10 rounded-xl flex items-center justify-center transition-colors", isPublic ? "bg-pink-500/10 text-pink-500" : "bg-zinc-200 text-zinc-500")}>{isPublic ? <Eye size={20} /> : <Lock size={20} />}</div><div><p className="text-sm font-bold">Public Feed</p></div></div>
+                        <button onClick={() => setIsPublic(!isPublic)} className={clsx("relative w-12 h-6 rounded-full transition-colors", isPublic ? "bg-pink-500" : "bg-zinc-300")}><motion.div animate={{ x: isPublic ? 24 : 4 }} className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm"/></button>
                     </div>
-                    <button onClick={handlePublish} disabled={!answerText.trim() || publishing} className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-black text-xl py-5 rounded-[20px] shadow-lg disabled:opacity-50">
+                    <button onClick={handlePublish} disabled={!answerText.trim() || publishing} className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-black text-xl py-5 rounded-[20px] shadow-lg disabled:opacity-50 hover:opacity-90 active:scale-[0.98] transition-all">
                         {publishing ? <Loader2 className="animate-spin" /> : 'Post Answer'}
                     </button>
                  </div>
