@@ -4,7 +4,7 @@ import { useParams, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserByUsername, sendQuestion, getUserFeed, deleteAnswer, updateAnswerVisibility } from '../services/db';
 import { UserProfile, Answer } from '../types';
-import { Send, Dice5, Shield, Loader2, Share2, Check, Download, Image as ImageIcon, Heart, Sparkles, ImageDown, Trash2, Lock, Eye } from '../components/Icons';
+import { Send, Dice5, Shield, Loader2, Share2, Check, Download, Image as ImageIcon, Heart, Sparkles, ImageDown, Trash2, Lock, Eye, Palette, X } from '../components/Icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { copyToClipboard, timeAgo } from '../utils';
 import { toPng } from 'html-to-image';
@@ -279,6 +279,8 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
     const [answers, setAnswers] = useState<Answer[]>([]);
     const [loading, setLoading] = useState(true);
     const [downloadItem, setDownloadItem] = useState<{answer?: Answer, type: 'question' | 'full' | 'profile'} | null>(null);
+    const [customTheme, setCustomTheme] = useState(THEMES[0]);
+    const [downloading, setDownloading] = useState(false);
     const captureRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -290,23 +292,23 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
         fetchContent();
     }, [profile.uid]);
 
-    useEffect(() => {
-        if (downloadItem && captureRef.current) {
-            const capture = async () => {
-                await new Promise(r => setTimeout(r, 100));
-                try {
-                    const dataUrl = await toPng(captureRef.current!, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
-                    const link = document.createElement('a');
-                    link.download = `askme-${downloadItem.type}-${Date.now()}.png`;
-                    link.href = dataUrl;
-                    link.click();
-                } finally {
-                    setDownloadItem(null);
-                }
-            };
-            capture();
+    const handleDownload = async () => {
+        if (!captureRef.current) return;
+        setDownloading(true);
+        try {
+            await new Promise(r => setTimeout(r, 200));
+            const dataUrl = await toPng(captureRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
+            const link = document.createElement('a');
+            link.download = `askme-${downloadItem?.type}-${Date.now()}.png`;
+            link.href = dataUrl;
+            link.click();
+            setDownloadItem(null);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setDownloading(false);
         }
-    }, [downloadItem]);
+    };
 
     const handleDeleteAnswer = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
@@ -344,7 +346,7 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                     className="shrink-0 bg-pink-500 hover:bg-pink-600 text-white font-black px-8 py-4 rounded-[20px] shadow-lg shadow-pink-500/20 transition-all flex items-center gap-3 active:scale-95"
                 >
                     <ImageDown size={20} />
-                    Share to Story
+                    Share Profile
                 </button>
             </div>
 
@@ -404,54 +406,118 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                 </div>
             )}
 
-            <div className="fixed left-[-9999px] top-0 pointer-events-none">
+            {/* Custom Download Modal */}
+            <AnimatePresence>
                 {downloadItem && (
-                    <div ref={captureRef} className={clsx("w-[600px] p-12 flex flex-col items-center justify-center relative bg-zinc-950 text-white", downloadItem.type !== 'full' ? 'min-h-[1067px]' : 'min-h-[auto]')}>
-                        <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 to-black z-0"></div>
-                        <div className="absolute top-10 flex items-center gap-2 opacity-60 z-20">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black text-sm">A</div>
-                            <span className="font-bold tracking-widest text-sm uppercase">Ask Me</span>
-                        </div>
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setDownloadItem(null)} />
                         
-                        {downloadItem.type === 'profile' ? (
-                            <div className="relative z-10 flex flex-col items-center max-w-md w-full">
-                                <div className="w-32 h-32 rounded-full border-[8px] border-white/10 mb-10 overflow-hidden shadow-2xl">
-                                    <img src={profile.avatar} className="w-full h-full object-cover" alt="Profile" />
-                                </div>
-                                <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-12 rounded-[48px] shadow-2xl rotate-2 mb-10 text-center w-full">
-                                    <h2 className="text-5xl font-black leading-tight">Send me anonymous messages!</h2>
-                                </div>
-                                <div className="bg-black/30 backdrop-blur-md px-8 py-4 rounded-full border border-white/10 mt-6 shadow-xl">
-                                     <p className="text-white font-black text-2xl tracking-wide">
-                                        askme.app<span className="text-white/40">/u/{profile.username}</span>
-                                     </p>
-                                </div>
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }} 
+                            animate={{ scale: 1, opacity: 1, y: 0 }} 
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }} 
+                            className="relative bg-white dark:bg-zinc-900 w-full max-w-lg rounded-[32px] overflow-hidden flex flex-col shadow-2xl"
+                        >
+                            <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                                <h3 className="text-xl font-black text-zinc-900 dark:text-white">Custom Story</h3>
+                                <button onClick={() => setDownloadItem(null)} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white"><X size={24} /></button>
                             </div>
-                        ) : downloadItem.type === 'question' && downloadItem.answer ? (
-                            <div className="relative z-10 p-10 max-w-md">
-                                <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-10 rounded-[40px] shadow-2xl rotate-2">
-                                    <h2 className="text-4xl font-black leading-tight">{downloadItem.answer.questionText}</h2>
+
+                            <div className="p-8 flex flex-col items-center">
+                                {/* Theme Palette */}
+                                <div className="flex gap-3 mb-8 bg-zinc-100 dark:bg-zinc-800 p-3 rounded-full border border-zinc-200 dark:border-zinc-700">
+                                    <Palette size={16} className="text-zinc-400 mt-0.5 ml-1 mr-1" />
+                                    {THEMES.map((t) => (
+                                        <button 
+                                            key={t.id} 
+                                            onClick={() => setCustomTheme(t)} 
+                                            className={clsx(
+                                                "w-6 h-6 rounded-full border-2 transition-all",
+                                                t.css,
+                                                customTheme.id === t.id ? "border-pink-500 scale-125" : "border-transparent opacity-60 hover:opacity-100"
+                                            )}
+                                        />
+                                    ))}
                                 </div>
-                            </div>
-                        ) : downloadItem.answer && (
-                            <div className="relative z-10 w-full pt-8">
-                                <div className="bg-white/5 border border-white/10 p-8 rounded-3xl mb-6 shadow-xl relative overflow-hidden">
-                                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-pink-500 to-orange-500"></div>
-                                    <p className="text-3xl font-bold leading-tight">{downloadItem.answer.questionText}</p>
-                                </div>
-                                <div className="flex gap-5 mt-8 px-2">
-                                    <img src={profile.avatar} className="w-20 h-20 rounded-full border-4 border-zinc-800" alt="Avatar" />
-                                    <div>
-                                        <p className="font-bold text-xl mb-2 text-white">{profile.fullName}</p>
-                                        <p className="text-2xl leading-relaxed text-zinc-300 font-medium">{downloadItem.answer.answerText}</p>
+
+                                {/* Capture Preview Area */}
+                                <div className="relative shadow-2xl rounded-[24px] overflow-hidden" style={{ height: downloadItem.type === 'full' ? 'auto' : '480px', width: downloadItem.type === 'full' ? '100%' : '270px' }}>
+                                    <div 
+                                        ref={captureRef} 
+                                        className={clsx(
+                                            "w-full h-full flex flex-col items-center justify-center relative p-8 text-center",
+                                            customTheme.css,
+                                            "bg-gradient-to-br",
+                                            customTheme.gradient
+                                        )}
+                                        style={{ minHeight: downloadItem.type === 'full' ? 'auto' : '480px' }}
+                                    >
+                                        <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
+                                        
+                                        <div className="absolute top-6 flex items-center gap-1.5 opacity-80">
+                                            <div className="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center text-white font-black text-[10px]">A</div>
+                                            <span className="text-white/80 font-bold uppercase tracking-widest text-[8px]">Ask Me</span>
+                                        </div>
+                                        
+                                        {downloadItem.type === 'profile' ? (
+                                            <div className="relative z-10 flex flex-col items-center w-full">
+                                                <div className="w-20 h-20 rounded-full border-4 border-white/20 mb-6 overflow-hidden shadow-lg">
+                                                    <img src={profile.avatar} className="w-full h-full object-cover" alt="Profile" />
+                                                </div>
+                                                <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-[24px] shadow-xl rotate-1 w-full">
+                                                    <h2 className="text-white font-black text-xl leading-tight">Send me anonymous messages!</h2>
+                                                </div>
+                                                <div className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 mt-6">
+                                                     <p className="text-white font-black text-xs tracking-wide">
+                                                        askme.app<span className="text-white/40">/u/{profile.username}</span>
+                                                     </p>
+                                                </div>
+                                            </div>
+                                        ) : downloadItem.type === 'question' && downloadItem.answer ? (
+                                            <div className="relative z-10 w-full">
+                                                <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-[24px] shadow-xl rotate-1">
+                                                    <h2 className="text-white font-black text-xl leading-tight">{downloadItem.answer.questionText}</h2>
+                                                </div>
+                                                <div className="mt-8">
+                                                    <p className="text-white/40 text-[10px] uppercase font-black tracking-widest mb-2">Send at</p>
+                                                    <div className="bg-black/20 px-4 py-2 rounded-full border border-white/10 inline-block">
+                                                        <p className="text-white font-black text-[10px]">askme.app/u/{profile.username}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : downloadItem.answer && (
+                                            <div className="relative z-10 w-full py-4">
+                                                <div className="bg-white/10 border border-white/10 p-5 rounded-2xl mb-4 shadow-lg text-left">
+                                                    <p className="text-white font-bold text-lg leading-tight">{downloadItem.answer.questionText}</p>
+                                                </div>
+                                                <div className="flex gap-4 items-start px-1 text-left">
+                                                    <img src={profile.avatar} className="w-12 h-12 rounded-full border-2 border-white/20" alt="Avatar" />
+                                                    <div>
+                                                        <p className="font-black text-sm text-white">{profile.fullName}</p>
+                                                        <p className="text-base leading-relaxed text-white/90 font-medium">{downloadItem.answer.answerText}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
-                        )}
-                        <div className="absolute bottom-10 text-white/30 font-mono text-xs z-20 bg-white/5 px-4 py-1.5 rounded-full">askme.app/u/{profile.username}</div>
+
+                            <div className="p-8 bg-zinc-50 dark:bg-zinc-800/50 flex flex-col gap-3">
+                                <button 
+                                    onClick={handleDownload}
+                                    disabled={downloading}
+                                    className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-black py-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
+                                >
+                                    {downloading ? <Loader2 className="animate-spin" /> : <Download size={20} />}
+                                    Download Image
+                                </button>
+                                <p className="text-center text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Post this image to Instagram or Snapchat</p>
+                            </div>
+                        </motion.div>
                     </div>
                 )}
-            </div>
+            </AnimatePresence>
         </div>
     );
 };

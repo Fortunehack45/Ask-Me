@@ -5,7 +5,7 @@ import { getInboxQuestions, publishAnswer, saveFCMToken, deleteQuestion } from '
 import { getMessagingInstance } from '../firebase';
 import { getToken } from 'firebase/messaging';
 import { Question } from '../types';
-import { Loader2, MessageSquare, Share2, X, Shield, Check, Copy, Download, Bell, Image as ImageIcon, Trash2, Lock, Eye, Sparkles } from '../components/Icons';
+import { Loader2, MessageSquare, Share2, X, Shield, Check, Copy, Download, Bell, Trash2, Lock, Eye, Sparkles, Palette } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { timeAgo, copyToClipboard } from '../utils';
 import { toPng } from 'html-to-image';
@@ -56,6 +56,7 @@ const Inbox = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  const [modalTheme, setModalTheme] = useState('default');
   const [answerText, setAnswerText] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -76,6 +77,12 @@ const Inbox = () => {
     };
     loadInbox();
   }, [user]);
+
+  useEffect(() => {
+    if (selectedQuestion) {
+      setModalTheme(selectedQuestion.theme || 'default');
+    }
+  }, [selectedQuestion]);
 
   const enableNotifications = async () => {
     setEnablingNotifs(true);
@@ -238,9 +245,28 @@ const Inbox = () => {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl" onClick={() => setSelectedQuestion(null)}/>
             <motion.div initial={{ scale: 0.95, y: 50, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.95, y: 50, opacity: 0 }} className="w-full max-w-5xl h-[90vh] md:h-[80vh] flex flex-col md:flex-row bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] overflow-hidden shadow-2xl relative z-10">
               <button onClick={() => setSelectedQuestion(null)} className="absolute top-4 right-4 z-50 text-zinc-500 hover:text-zinc-900 bg-white/50 rounded-full p-2 backdrop-blur-md"><X size={24} /></button>
-              <div className="flex-1 bg-zinc-100 dark:bg-black/50 relative flex items-center justify-center p-8 overflow-hidden">
-                 <div className="relative shadow-2xl rounded-[32px] overflow-hidden" style={{ height: '560px', aspectRatio: '9/16' }}>
-                    <div ref={cardRef} className={clsx("w-full h-full flex flex-col items-center justify-center relative p-8 text-center", (THEME_STYLES[selectedQuestion.theme || 'default'] || THEME_STYLES.default).gradient)}>
+              
+              <div className="flex-1 bg-zinc-100 dark:bg-black/50 relative flex flex-col items-center justify-center p-8 overflow-hidden">
+                 {/* Theme Selector UI */}
+                 <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <Palette size={14} className="text-zinc-400" />
+                    <div className="flex gap-1.5">
+                      {Object.keys(THEME_STYLES).map((t) => (
+                        <button
+                          key={t}
+                          onClick={() => setModalTheme(t)}
+                          className={clsx(
+                            "w-5 h-5 rounded-full border-2 transition-all",
+                            t === 'default' ? 'bg-zinc-900 dark:bg-zinc-100' : THEME_STYLES[t].gradient,
+                            modalTheme === t ? 'border-pink-500 scale-125' : 'border-transparent opacity-60 hover:opacity-100'
+                          )}
+                        />
+                      ))}
+                    </div>
+                 </div>
+
+                 <div className="relative shadow-2xl rounded-[32px] overflow-hidden mt-8" style={{ height: '520px', aspectRatio: '9/16' }}>
+                    <div ref={cardRef} className={clsx("w-full h-full flex flex-col items-center justify-center relative p-8 text-center transition-colors duration-500", (THEME_STYLES[modalTheme] || THEME_STYLES.default).gradient)}>
                          <div className="absolute top-12 flex flex-col items-center gap-2 opacity-90">
                             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"><Shield size={18} className="text-white" /></div>
                             <span className="text-white/80 font-bold uppercase tracking-widest text-xs">Anonymous Q&A</span>
@@ -254,13 +280,14 @@ const Inbox = () => {
                          </div>
                     </div>
                  </div>
-                 <div className="absolute bottom-8 z-20">
+                 <div className="mt-6 z-20">
                      <button onClick={handleDownloadImage} disabled={downloading} className="bg-white text-zinc-900 text-sm font-bold px-6 py-3 rounded-full shadow-xl flex items-center gap-2 hover:scale-105 transition-all">
                        {downloading ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
                        Save for Story
                     </button>
                  </div>
               </div>
+
               <div className="flex-1 bg-white dark:bg-zinc-900 p-8 lg:p-12 flex flex-col justify-center">
                  <div className="max-w-md mx-auto w-full">
                     <div className="flex items-start justify-between mb-4">
