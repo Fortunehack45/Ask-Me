@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-// Consolidated modular auth imports and ensured correct subpath mapping
+// Consolidated modular auth imports to fix resolution issues with named exports and types
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -260,30 +260,56 @@ const Settings = () => {
                 </form>
             </section>
 
-            {/* Theme Card */}
+            {/* Appearance Card (Theme Toggle) */}
             <section className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-8 shadow-sm transition-all duration-300">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div className="flex items-center gap-5">
-                    <div className="w-14 h-14 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors">
-                        {theme === 'dark' ? <Moon size={28} /> : <Sun size={28} />}
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Theme Preference</h3>
-                        <p className="text-base text-zinc-500 dark:text-zinc-400 font-medium">Switch between light and dark.</p>
-                    </div>
+                        <div className="w-14 h-14 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors">
+                            {theme === 'dark' ? <Moon size={28} /> : <Sun size={28} />}
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Appearance</h3>
+                            <p className="text-base text-zinc-500 dark:text-zinc-400 font-medium">Switch between light and dark.</p>
+                        </div>
                     </div>
                     
-                    <button 
-                      onClick={toggleTheme}
-                      aria-label="Toggle Theme"
-                      className="relative inline-flex h-10 w-18 items-center rounded-full bg-zinc-200 dark:bg-zinc-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
-                    >
-                    <span 
-                        className={`${
-                            theme === 'dark' ? 'translate-x-9' : 'translate-x-1'
-                        } inline-block h-8 w-8 transform rounded-full bg-white shadow-md transition-transform duration-300 ease-spring`}
-                    />
-                    </button>
+                    {/* Premium Segmented Control Theme Toggle */}
+                    <div className="bg-zinc-100 dark:bg-zinc-800 p-1.5 rounded-[20px] flex items-center relative overflow-hidden shadow-inner border border-zinc-200 dark:border-zinc-700 w-full sm:w-auto">
+                        <button 
+                            onClick={() => theme !== 'light' && toggleTheme()}
+                            className={clsx(
+                                "relative z-10 flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 rounded-[14px] text-sm font-black transition-all",
+                                theme === 'light' ? "text-zinc-900" : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                            )}
+                        >
+                            <Sun size={18} strokeWidth={3} />
+                            Light
+                            {theme === 'light' && (
+                                <motion.div 
+                                    layoutId="theme-pill" 
+                                    className="absolute inset-0 bg-white rounded-[14px] shadow-sm -z-10 border border-zinc-100"
+                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                />
+                            )}
+                        </button>
+                        <button 
+                            onClick={() => theme !== 'dark' && toggleTheme()}
+                            className={clsx(
+                                "relative z-10 flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 rounded-[14px] text-sm font-black transition-all",
+                                theme === 'dark' ? "text-white" : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                            )}
+                        >
+                            <Moon size={18} strokeWidth={3} />
+                            Dark
+                            {theme === 'dark' && (
+                                <motion.div 
+                                    layoutId="theme-pill" 
+                                    className="absolute inset-0 bg-zinc-900 rounded-[14px] shadow-sm -z-10 border border-zinc-700"
+                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                />
+                            )}
+                        </button>
+                    </div>
                 </div>
             </section>
          </div>

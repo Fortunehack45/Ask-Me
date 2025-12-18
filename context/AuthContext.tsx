@@ -1,7 +1,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Consolidated modular auth imports to fix resolution issues
-import { onAuthStateChanged, User } from 'firebase/auth';
+// Consolidated modular auth imports to fix resolution issues with named exports and types
+import { onAuthStateChanged } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { auth } from '../firebase';
 import { getUserProfile, updateUserLastActive } from '../services/db';
 import { UserProfile } from '../types';

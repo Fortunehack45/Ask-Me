@@ -6,9 +6,9 @@ import {
   signInWithEmailAndPassword, 
   signInWithPopup, 
   updateProfile, 
-  sendPasswordResetEmail,
-  User
+  sendPasswordResetEmail
 } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { createUserProfile, getUserProfile, isUsernameTaken, getEmailByUsername } from '../services/db';
