@@ -2,47 +2,89 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check authentication
+    // --- HELPER FUNCTIONS ---
+
+    // Check if the request is from a logged-in user
     function isAuthenticated() {
       return request.auth != null;
     }
-    
-    // Check if user is accessing their own data
+
+    // Check if the request is from the owner of the document
+    // Standardized to check against the provided UID
     function isOwner(uid) {
       return isAuthenticated() && request.auth.uid == uid;
     }
 
-    // Check if user is the specific admin
+    // Admin authorization based on specific email
     function isAdmin() {
       return isAuthenticated() && request.auth.token.email == 'fortunedomination@gmail.com';
     }
 
-    // Users: 
-    // - Read: Public (to see profiles)
-    // - Write: Own data only
+    // Helper to validate string fields
+    function isValidString(val, min, max) {
+      return val is string && val.size() >= min && val.size() <= max;
+    }
+
+    // --- COLLECTION RULES ---
+
+    // Users Collection: Profiles and metadata
     match /users/{uid} {
+      // Anyone can read a profile (needed for sending questions and viewing public feeds)
       allow read: if true;
-      allow write: if isOwner(uid);
+      
+      // Only the account owner can create or update their own profile
+      allow create, update: if isOwner(uid) 
+        && isValidString(request.resource.data.username, 3, 30)
+        && isValidString(request.resource.data.fullName, 1, 100);
+      
+      // Only the owner or an admin can delete an account
+      allow delete: if isOwner(uid) || isAdmin();
     }
 
-    // Questions:
-    // - Create: Public (Anonymous users can send questions)
-    // - Read: Only the receiver can read their inbox
-    // - Update/Delete: Receiver can mark as answered or delete
+    // Questions Collection: The private "Inbox" for anonymous messages
     match /questions/{questionId} {
-      allow create: if true;
-      allow read: if isAuthenticated() && (request.auth.uid == resource.data.receiverId || isAdmin());
-      allow update, delete: if isAuthenticated() && request.auth.uid == resource.data.receiverId;
+      // Creation: Anyone (even non-logged-in users) can send a question
+      // Enforces basic content safety (length limits)
+      allow create: if true 
+        && isValidString(request.resource.data.text, 1, 500)
+        && request.resource.data.receiverId is string;
+        
+      // Read: ONLY the intended recipient or an admin can see the contents of the inbox
+      // This is the core "anonymous" protection: senders cannot read back what they sent
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.receiverId || isAdmin()
+      );
+      
+      // Update/Delete: Only the recipient can mark a question as 'isAnswered' or remove it
+      allow update, delete: if isAuthenticated() && (
+        request.auth.uid == resource.data.receiverId || isAdmin()
+      );
     }
 
-    // Answers:
-    // - Create: User can answer questions sent to them
-    // - Read: Public (Feed)
-    // - Update/Delete: Owner only
+    // Answers Collection: The public "Feed" and published stories
     match /answers/{answerId} {
-      allow read: if true;
-      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.userId;
-      allow update, delete: if isAuthenticated() && request.auth.uid == resource.data.userId;
+      // Read Access: 
+      // 1. If marked public, anyone can see it.
+      // 2. If private, only the owner or an admin can see it.
+      allow read: if (resource.data.isPublic == true) 
+        || isOwner(resource.data.userId) 
+        || isAdmin();
+      
+      // Create: Only the person who received the question can publish an answer to it
+      allow create: if isAuthenticated() 
+        && request.auth.uid == request.resource.data.userId
+        && isValidString(request.resource.data.answerText, 1, 1000);
+      
+      // Update:
+      // 1. Owners/Admins can update everything (text, visibility, etc.)
+      // 2. Visitors can ONLY update 'likes' and 'likedBy' (standard engagement logic)
+      allow update: if isOwner(resource.data.userId) || isAdmin() || (
+        isAuthenticated() 
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes', 'likedBy'])
+      );
+      
+      // Delete: Only the owner or an admin
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
   }
 }

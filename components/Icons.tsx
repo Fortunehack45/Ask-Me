@@ -45,7 +45,9 @@ import {
   Search,
   ChevronRight,
   Palette,
-  Trash2
+  Trash2,
+  // Added RefreshCcw icon
+  RefreshCcw
 } from 'lucide-react';
 
 export {
@@ -93,5 +95,7 @@ export {
   Search,
   ChevronRight,
   Palette,
-  Trash2
+  Trash2,
+  // Exported RefreshCcw icon
+  RefreshCcw
 };

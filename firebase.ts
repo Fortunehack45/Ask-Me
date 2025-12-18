@@ -1,12 +1,13 @@
 
-import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
-// Use consolidated imports to ensure correct resolution of modular SDK members
-// Separate type imports from values to fix "no exported member" errors in some environments
+import { initializeApp, getApps, getApp } from "firebase/app";
+import type { FirebaseApp } from "firebase/app";
+// Separated type and value imports to resolve member resolution issues in strict TS environments
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import type { Auth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
-import { getAnalytics, isSupported as isAnalyticsSupported } from "firebase/analytics";
+// Fixed analytics imports by using explicit named exports for modular SDK
+import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCSs8dyTW_5FNllDtODiPuVuqScXbweDl4",
@@ -20,13 +21,13 @@ const firebaseConfig = {
 
 const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Initializing core services with proper types
+// Initializing core services with proper types and explicit modular functions
 export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 
-// Safe initialization of Analytics
-isAnalyticsSupported().then(supported => {
+// Safe initialization of Analytics using the resolved isSupported function
+isSupported().then(supported => {
   if (supported) {
     getAnalytics(app);
   }

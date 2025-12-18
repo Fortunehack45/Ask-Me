@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-// Restructured modular imports to fix resolution issues with the Firebase SDK in strict environments
+// Corrected modular auth imports to fix resolution issues with named exports
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 

@@ -10,7 +10,8 @@ export interface UserProfile {
   bio?: string;
   premiumStatus?: boolean;
   createdAt: number;
-  lastActive?: number | { toMillis: () => number }; 
+  lastActive?: number | { toMillis: () => number };
+  lastUsernameChange?: number; // Timestamp of the last username modification
 }
 
 export interface Question {

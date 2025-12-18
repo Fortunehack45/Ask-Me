@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Grouping auth imports to resolve modular resolution issues in various environments
+// Separated type and value imports to fix resolution issues with modular SDK exports
 import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { auth } from '../firebase';

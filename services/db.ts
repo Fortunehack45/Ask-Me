@@ -49,6 +49,15 @@ export const createUserProfile = async (user: UserProfile) => {
   await setDoc(userRef, {
     ...user,
     username: usernameLower,
+    lastActive: serverTimestamp(),
+    lastUsernameChange: Date.now() // Initial set
+  });
+};
+
+export const updateUserProfile = async (uid: string, updates: Partial<UserProfile>) => {
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, {
+    ...updates,
     lastActive: serverTimestamp()
   });
 };
