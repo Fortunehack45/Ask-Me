@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Separated value and type imports for compatibility with stricter TypeScript environments
+// Separating logic imports from type imports for better compatibility with different TypeScript/Firebase versions
 import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { auth } from '../firebase';

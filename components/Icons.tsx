@@ -42,7 +42,8 @@ import {
   Image,
   Zap,
   Search,
-  ChevronRight
+  ChevronRight,
+  Trash2
 } from 'lucide-react';
 
 export {
@@ -88,5 +89,6 @@ export {
   Image,
   Zap,
   Search,
-  ChevronRight
+  ChevronRight,
+  Trash2
 };

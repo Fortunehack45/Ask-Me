@@ -1,44 +1,45 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getInboxQuestions, publishAnswer, saveFCMToken } from '../services/db';
+import { getInboxQuestions, publishAnswer, saveFCMToken, deleteQuestion } from '../services/db';
 import { getMessagingInstance } from '../firebase';
 import { getToken } from 'firebase/messaging';
 import { Question } from '../types';
-import { Loader2, MessageSquare, Share2, X, Shield, Check, Copy, Download, Bell, Image as ImageIcon } from '../components/Icons';
+import { Loader2, MessageSquare, Share2, X, Shield, Check, Copy, Download, Bell, Image as ImageIcon, Trash2, Lock, Eye } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { timeAgo, copyToClipboard } from '../utils';
 import { toPng } from 'html-to-image';
 import clsx from 'clsx';
 
-// Vibrant Gradients for the Image Download
+// Vibrant Gradients for the Image Download - Synchronized with PublicProfile themes
 const THEME_STYLES: Record<string, { card: string, gradient: string, text: string, subtext: string }> = {
-  fiery: {
-    card: 'bg-gradient-to-br from-pink-900/30 to-orange-900/30 border-pink-500/30 hover:border-pink-500',
-    gradient: 'bg-gradient-to-bl from-rose-600 via-pink-600 to-orange-500',
+  crimson: {
+    card: 'bg-gradient-to-br from-rose-900/30 to-red-900/30 border-rose-500/30 hover:border-rose-500',
+    gradient: 'bg-gradient-to-bl from-rose-600 via-rose-500 to-red-900',
     text: 'text-white',
     subtext: 'text-white/70'
   },
   ocean: {
-    card: 'bg-gradient-to-br from-blue-900/30 to-cyan-900/30 border-cyan-500/30 hover:border-cyan-500',
-    gradient: 'bg-gradient-to-bl from-blue-600 via-indigo-600 to-cyan-500',
+    card: 'bg-gradient-to-br from-blue-900/30 to-indigo-900/30 border-blue-500/30 hover:border-blue-500',
+    gradient: 'bg-gradient-to-bl from-blue-600 via-indigo-600 to-blue-900',
     text: 'text-white',
     subtext: 'text-white/70'
   },
-  jungle: {
-    card: 'bg-gradient-to-br from-green-900/30 to-emerald-900/30 border-emerald-500/30 hover:border-emerald-500',
-    gradient: 'bg-gradient-to-bl from-emerald-600 via-green-600 to-teal-500',
+  forest: {
+    card: 'bg-gradient-to-br from-emerald-900/30 to-teal-900/30 border-emerald-500/30 hover:border-emerald-500',
+    gradient: 'bg-gradient-to-bl from-emerald-600 via-green-600 to-teal-900',
     text: 'text-white',
     subtext: 'text-white/70'
   },
-  love: {
-    card: 'bg-gradient-to-br from-rose-900/30 to-pink-900/30 border-rose-500/30 hover:border-rose-500',
-    gradient: 'bg-gradient-to-bl from-rose-500 via-red-500 to-pink-600',
+  sunset: {
+    card: 'bg-gradient-to-br from-orange-900/30 to-pink-900/30 border-orange-500/30 hover:border-orange-500',
+    gradient: 'bg-gradient-to-bl from-orange-500 via-orange-600 to-pink-700',
     text: 'text-white',
     subtext: 'text-white/70'
   },
-  midnight: {
-    card: 'bg-gradient-to-br from-indigo-900/40 via-purple-900/40 to-slate-900/40 border-indigo-500/30 hover:border-indigo-500',
-    gradient: 'bg-gradient-to-bl from-slate-900 via-indigo-900 to-black',
+  lavender: {
+    card: 'bg-gradient-to-br from-violet-900/30 via-purple-900/30 to-zinc-900/30 border-violet-500/30 hover:border-violet-500',
+    gradient: 'bg-gradient-to-bl from-violet-500 via-purple-600 to-purple-900',
     text: 'text-white',
     subtext: 'text-white/70'
   },
@@ -56,6 +57,7 @@ const Inbox = () => {
   const [loading, setLoading] = useState(true);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [answerText, setAnswerText] = useState('');
+  const [isPublic, setIsPublic] = useState(false); // Default to Private (Off)
   const [publishing, setPublishing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -106,14 +108,26 @@ const Inbox = () => {
     if (!selectedQuestion || !answerText.trim()) return;
     setPublishing(true);
     try {
-      await publishAnswer(selectedQuestion, answerText, userProfile);
+      await publishAnswer(selectedQuestion, answerText, userProfile, isPublic);
       setQuestions(prev => prev.filter(q => q.id !== selectedQuestion.id));
       setSelectedQuestion(null);
       setAnswerText('');
+      setIsPublic(false);
     } catch (e) {
       console.error(e);
     } finally {
       setPublishing(false);
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!window.confirm("Delete this question forever?")) return;
+    try {
+        await deleteQuestion(id);
+        setQuestions(prev => prev.filter(q => q.id !== id));
+    } catch (e) {
+        alert("Failed to delete.");
     }
   };
 
@@ -231,7 +245,15 @@ const Inbox = () => {
                             <Shield size={12} className={clsx(isDefault ? "text-zinc-500 dark:text-zinc-400" : "text-white/70")} />
                             <span className={clsx("text-[10px] font-bold uppercase tracking-wider", isDefault ? "text-zinc-500 dark:text-zinc-300" : "text-white/80")}>Anon</span>
                         </div>
-                        <span className={clsx("text-xs font-medium", styles.subtext)}>{timeAgo(q.timestamp)}</span>
+                        <div className="flex items-center gap-2">
+                            <span className={clsx("text-[10px] font-medium opacity-60", styles.text)}>{timeAgo(q.timestamp)}</span>
+                            <button 
+                                onClick={(e) => handleDelete(e, q.id)}
+                                className="p-1.5 rounded-full hover:bg-red-500/20 text-zinc-400 hover:text-red-500 transition-colors"
+                            >
+                                <Trash2 size={14} />
+                            </button>
+                        </div>
                     </div>
                     
                     <p className={clsx("text-2xl font-bold leading-snug relative z-10 line-clamp-4", styles.text)}>
@@ -335,22 +357,50 @@ const Inbox = () => {
               <div className="flex-1 bg-white dark:bg-zinc-900 p-8 lg:p-12 flex flex-col justify-center">
                  <div className="max-w-md mx-auto w-full">
                     <h3 className="text-3xl font-black text-zinc-900 dark:text-white mb-3">Reply to this</h3>
-                    <p className="text-zinc-500 mb-8 text-base">Your answer will be posted to your public feed.</p>
+                    <p className="text-zinc-500 mb-8 text-base">Choose how you want to share your answer.</p>
                     
-                    <div className="relative">
+                    <div className="relative mb-6">
                         <textarea
                         value={answerText}
                         onChange={(e) => setAnswerText(e.target.value)}
                         placeholder="Type your answer here..."
                         autoFocus
-                        className="w-full bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-[24px] p-6 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 outline-none resize-none text-xl leading-relaxed min-h-[200px] shadow-inner"
+                        className="w-full bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-[24px] p-6 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 outline-none resize-none text-xl leading-relaxed min-h-[180px] shadow-inner"
                         />
                         <div className="absolute bottom-6 right-6 text-xs font-bold text-zinc-400">
                             {answerText.length} chars
                         </div>
                     </div>
 
-                    <div className="mt-8 flex flex-col gap-3">
+                    {/* Visibility Toggle */}
+                    <div className="bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 p-5 rounded-[24px] mb-8 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className={clsx(
+                                "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
+                                isPublic ? "bg-pink-500/10 text-pink-500" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-500"
+                            )}>
+                                {isPublic ? <Eye size={20} /> : <Lock size={20} />}
+                            </div>
+                            <div>
+                                <p className="text-sm font-bold text-zinc-900 dark:text-white">Make Public</p>
+                                <p className="text-[10px] text-zinc-500 font-medium">Show content on your profile feed</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={() => setIsPublic(!isPublic)}
+                            className={clsx(
+                                "relative w-12 h-6 rounded-full transition-colors outline-none",
+                                isPublic ? "bg-pink-500" : "bg-zinc-300 dark:bg-zinc-700"
+                            )}
+                        >
+                            <motion.div 
+                                animate={{ x: isPublic ? 24 : 4 }}
+                                className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm"
+                            />
+                        </button>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
                         <button
                             onClick={handlePublish}
                             disabled={!answerText.trim() || publishing}

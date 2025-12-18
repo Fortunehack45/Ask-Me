@@ -2,9 +2,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getUserByUsername, sendQuestion, getUserFeed } from '../services/db';
+import { getUserByUsername, sendQuestion, getUserFeed, deleteAnswer, updateAnswerVisibility } from '../services/db';
 import { UserProfile, Answer } from '../types';
-import { Send, Dice5, Shield, Loader2, Share2, Check, Download, Image as ImageIcon, Heart, Sparkles, ImageDown } from '../components/Icons';
+import { Send, Dice5, Shield, Loader2, Share2, Check, Download, Image as ImageIcon, Heart, Sparkles, ImageDown, Trash2, Lock, Eye } from '../components/Icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { copyToClipboard, timeAgo } from '../utils';
 import { toPng } from 'html-to-image';
@@ -140,11 +140,20 @@ const ProfileHeader = ({ profile }: { profile: UserProfile }) => {
 
 const VisitorView = ({ profile }: { profile: UserProfile }) => {
     const { user } = useAuth();
+    const [answers, setAnswers] = useState<Answer[]>([]);
     const [text, setText] = useState('');
     const [theme, setTheme] = useState(THEMES[0]);
     const [sending, setSending] = useState(false);
     const [sent, setSent] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    useEffect(() => {
+        const fetchAnswers = async () => {
+            const data = await getUserFeed(profile.uid);
+            setAnswers(data);
+        };
+        fetchAnswers();
+    }, [profile.uid]);
 
     const handleSend = async () => {
         if (!text.trim()) return;
@@ -214,6 +223,50 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <div className="mt-16 space-y-6">
+                <div className="flex items-center gap-4 mb-4 px-2">
+                    <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">Recent Answers</h3>
+                    <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div>
+                </div>
+                
+                {answers.length === 0 ? (
+                    <div className="py-20 text-center bg-zinc-50/50 dark:bg-zinc-900/20 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-[32px]">
+                        <p className="text-zinc-400 font-bold">No public answers yet</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 gap-6">
+                        {answers.map(ans => (
+                            <motion.div key={ans.id} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[28px] p-8 shadow-sm transition-all backdrop-blur-sm overflow-hidden relative group">
+                                {!ans.isPublic ? (
+                                    <div className="flex flex-col items-center justify-center py-10">
+                                        <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center text-zinc-400 mb-3">
+                                            <Lock size={20} />
+                                        </div>
+                                        <p className="text-zinc-400 font-bold text-sm tracking-wide uppercase">Private Message</p>
+                                        <p className="text-zinc-500 text-xs mt-1">This answer is hidden by the user.</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="mb-6">
+                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1 block">Anonymous Asked</span>
+                                            <h3 className="text-xl font-black text-zinc-900 dark:text-white leading-tight">{ans.questionText}</h3>
+                                        </div>
+                                        <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800/50">
+                                            <p className="text-zinc-600 dark:text-zinc-300 font-medium leading-relaxed text-lg">{ans.answerText}</p>
+                                            <div className="mt-6 flex justify-between text-xs text-zinc-400">
+                                                <span>{timeAgo(ans.timestamp)}</span>
+                                                <div className="flex items-center gap-1"><Heart size={14} /> {ans.likes}</div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="mt-12 flex flex-col items-center text-center">
                 <p className="text-zinc-900 dark:text-white font-bold text-lg">👇 Want to receive secret messages?</p>
                 <Link to={user ? "/" : "/auth"} className="group relative mt-4 inline-flex items-center gap-3 bg-zinc-900 dark:bg-white text-white dark:text-black font-black text-lg px-8 py-4 rounded-full shadow-2xl transition-all"><Sparkles size={20} className="text-yellow-400" />Get your own link</Link>
@@ -255,6 +308,27 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
         }
     }, [downloadItem]);
 
+    const handleDeleteAnswer = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        if (!window.confirm("Delete this answer from your feed?")) return;
+        try {
+            await deleteAnswer(id);
+            setAnswers(prev => prev.filter(a => a.id !== id));
+        } catch (e) {
+            alert("Failed to delete.");
+        }
+    };
+
+    const handleTogglePrivacy = async (answer: Answer) => {
+        const newPublic = !answer.isPublic;
+        try {
+            await updateAnswerVisibility(answer.id, newPublic);
+            setAnswers(prev => prev.map(a => a.id === answer.id ? { ...a, isPublic: newPublic } : a));
+        } catch (e) {
+            alert("Failed to update visibility.");
+        }
+    };
+
     if (loading) return <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-zinc-400" /></div>;
 
     return (
@@ -287,12 +361,32 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
             ) : (
                 <div className="grid grid-cols-1 gap-6">
                     {answers.map((ans, i) => (
-                        <motion.div key={ans.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[28px] p-6 sm:p-8 shadow-sm transition-all backdrop-blur-sm">
-                            <div className="mb-6 relative">
+                        <motion.div key={ans.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[28px] p-6 sm:p-8 shadow-sm transition-all backdrop-blur-sm group">
+                            <div className="mb-6 relative flex justify-between items-start">
                                 <div className="pl-4">
-                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1 block">Anonymous Asked</span>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Anonymous Asked</span>
+                                        <button 
+                                            onClick={() => handleTogglePrivacy(ans)}
+                                            className={clsx(
+                                                "flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all",
+                                                ans.isPublic 
+                                                    ? "bg-pink-500/10 text-pink-500 border-pink-500/20" 
+                                                    : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700"
+                                            )}
+                                        >
+                                            {ans.isPublic ? <Eye size={10} /> : <Lock size={10} />}
+                                            {ans.isPublic ? 'Public' : 'Private'}
+                                        </button>
+                                    </div>
                                     <h3 className="text-xl font-black text-zinc-900 dark:text-white leading-tight">{ans.questionText}</h3>
                                 </div>
+                                <button 
+                                    onClick={(e) => handleDeleteAnswer(e, ans.id)}
+                                    className="p-2 rounded-full hover:bg-red-500/10 text-zinc-300 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
                             </div>
                             <div className="pl-4">
                                 <p className="text-zinc-600 dark:text-zinc-300 font-medium leading-relaxed text-lg mb-6">{ans.answerText}</p>

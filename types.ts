@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export interface UserProfile {
@@ -34,6 +35,7 @@ export interface Answer {
   authorUsername?: string;
   authorAvatar?: string;
   authorFullName?: string;
+  isPublic: boolean;
 }
 
 export interface NavigationItem {

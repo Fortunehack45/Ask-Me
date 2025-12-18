@@ -1,3 +1,4 @@
+
 import { 
   collection, 
   doc, 
@@ -14,7 +15,8 @@ import {
   increment,
   arrayUnion,
   arrayRemove,
-  Timestamp
+  Timestamp,
+  deleteDoc
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { UserProfile, Question, Answer } from "../types";
@@ -110,8 +112,13 @@ export const getInboxQuestions = async (uid: string): Promise<Question[]> => {
   return questions.sort((a, b) => b.timestamp - a.timestamp);
 };
 
+export const deleteQuestion = async (id: string) => {
+  const qRef = doc(db, "questions", id);
+  await deleteDoc(qRef);
+};
+
 // Answer Services
-export const publishAnswer = async (question: Question, answerText: string, userProfile: UserProfile | null) => {
+export const publishAnswer = async (question: Question, answerText: string, userProfile: UserProfile | null, isPublic: boolean = false) => {
   await addDoc(collection(db, "answers"), {
     questionId: question.id,
     userId: question.receiverId,
@@ -122,11 +129,22 @@ export const publishAnswer = async (question: Question, answerText: string, user
     likedBy: [],
     authorUsername: userProfile?.username || '',
     authorAvatar: userProfile?.avatar || '',
-    authorFullName: userProfile?.fullName || ''
+    authorFullName: userProfile?.fullName || '',
+    isPublic
   });
 
   const qRef = doc(db, "questions", question.id);
   await updateDoc(qRef, { isAnswered: true });
+};
+
+export const deleteAnswer = async (answerId: string) => {
+  const aRef = doc(db, "answers", answerId);
+  await deleteDoc(aRef);
+};
+
+export const updateAnswerVisibility = async (answerId: string, isPublic: boolean) => {
+  const aRef = doc(db, "answers", answerId);
+  await updateDoc(aRef, { isPublic });
 };
 
 export const toggleAnswerLike = async (answerId: string, userId: string): Promise<boolean> => {
@@ -163,7 +181,7 @@ export const getUserFeed = async (uid: string): Promise<Answer[]> => {
   
   const snap = await getDocs(q);
   const answers = snap.docs.map(d => ({ id: d.id, ...d.data() } as Answer));
-  return answers.sort((a, b) => b.timestamp - a.timestamp).slice(0, 20);
+  return answers.sort((a, b) => b.timestamp - a.timestamp).slice(0, 50);
 };
 
 export const getUserStats = async (uid: string) => {
@@ -184,13 +202,14 @@ export const getGlobalFeed = async (): Promise<Answer[]> => {
   try {
     const q = query(
         collection(db, "answers"),
+        where("isPublic", "==", true),
         orderBy("timestamp", "desc"),
         limit(20)
     );
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() } as Answer));
   } catch (e) {
-      const q = query(collection(db, "answers"), limit(50));
+      const q = query(collection(db, "answers"), where("isPublic", "==", true), limit(50));
       const snap = await getDocs(q);
       const answers = snap.docs.map(d => ({ id: d.id, ...d.data() } as Answer));
       return answers.sort((a, b) => b.timestamp - a.timestamp).slice(0, 20);

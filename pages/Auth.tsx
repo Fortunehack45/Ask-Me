@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-// Grouping and separating auth methods and types to fix export resolution issues
+// Consolidating and cleaning up Firebase Auth imports to resolve modular resolution issues
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
