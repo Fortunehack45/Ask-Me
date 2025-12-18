@@ -1,12 +1,11 @@
 
 import { initializeApp, getApps, getApp } from "firebase/app";
 import type { FirebaseApp } from "firebase/app";
-// Separating function/class imports from type-only imports to improve compatibility with modular SDK resolution
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import type { Auth } from "firebase/auth";
+// Consolidating modular SDK imports to improve compatibility and resolve "no exported member" errors
+import { getAuth, GoogleAuthProvider, Auth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
-import { getAnalytics, isSupported } from "firebase/analytics";
+import { getAnalytics, isSupported as isAnalyticsSupported } from "firebase/analytics";
 import { getMessaging, isSupported as isMessagingSupported } from "firebase/messaging";
 
 const firebaseConfig = {
@@ -31,7 +30,7 @@ export const db: Firestore = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 
 // Analytics initialization with environment check
-isSupported().then(supported => {
+isAnalyticsSupported().then(supported => {
   if (supported) {
     getAnalytics(app);
   }

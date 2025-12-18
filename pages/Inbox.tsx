@@ -5,10 +5,11 @@ import { getInboxQuestions, publishAnswer, saveFCMToken, deleteQuestion } from '
 import { getMessagingInstance } from '../firebase';
 import { getToken } from 'firebase/messaging';
 import { Question } from '../types';
-import { Loader2, MessageSquare, Share2, X, Shield, Check, Copy, Download, Bell, Image as ImageIcon, Trash2, Lock, Eye } from '../components/Icons';
+import { Loader2, MessageSquare, Share2, X, Shield, Check, Copy, Download, Bell, Image as ImageIcon, Trash2, Lock, Eye, Sparkles } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { timeAgo, copyToClipboard } from '../utils';
 import { toPng } from 'html-to-image';
+import { GoogleGenAI } from "@google/genai";
 import clsx from 'clsx';
 
 // Vibrant Gradients for the Image Download - Synchronized with PublicProfile themes
@@ -63,6 +64,7 @@ const Inbox = () => {
   const [downloading, setDownloading] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState(Notification.permission);
   const [enablingNotifs, setEnablingNotifs] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
   
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -120,14 +122,42 @@ const Inbox = () => {
     }
   };
 
+  /**
+   * AI Reply Generator
+   * Uses Gemini to suggest clever and engaging answers.
+   */
+  const handleAISuggest = async () => {
+    if (!selectedQuestion) return;
+    setAiLoading(true);
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: `I received this anonymous question: "${selectedQuestion.text}". Give me a short, witty, and slightly playful reply to post on my story. Just the text, no quotes.`,
+        config: {
+          systemInstruction: "You are a witty social media personality. Keep answers under 15 words and highly engaging.",
+          temperature: 0.8,
+        }
+      });
+      if (response.text) {
+        setAnswerText(response.text.trim());
+      }
+    } catch (err) {
+      console.error("AI Suggestion failed", err);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     if (!window.confirm("Delete this question forever?")) return;
     try {
         await deleteQuestion(id);
         setQuestions(prev => prev.filter(q => q.id !== id));
-    } catch (e) {
-        alert("Failed to delete.");
+    } catch (e: any) {
+        console.error("Delete error:", e);
+        alert(`Failed to delete: ${e.message || 'Unknown error'}`);
     }
   };
 
@@ -356,8 +386,20 @@ const Inbox = () => {
               {/* RIGHT: Answer Input */}
               <div className="flex-1 bg-white dark:bg-zinc-900 p-8 lg:p-12 flex flex-col justify-center">
                  <div className="max-w-md mx-auto w-full">
-                    <h3 className="text-3xl font-black text-zinc-900 dark:text-white mb-3">Reply to this</h3>
-                    <p className="text-zinc-500 mb-8 text-base">Choose how you want to share your answer.</p>
+                    <div className="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 className="text-3xl font-black text-zinc-900 dark:text-white">Reply to this</h3>
+                            <p className="text-zinc-500 text-base">Choose how you want to share your answer.</p>
+                        </div>
+                        <button 
+                            onClick={handleAISuggest}
+                            disabled={aiLoading}
+                            className="p-3 bg-pink-500/10 text-pink-600 dark:text-pink-400 rounded-2xl hover:bg-pink-500/20 transition-all group"
+                            title="Generate AI suggestion"
+                        >
+                            {aiLoading ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={20} className="group-hover:scale-110 transition-transform" />}
+                        </button>
+                    </div>
                     
                     <div className="relative mb-6">
                         <textarea
