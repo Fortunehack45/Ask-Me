@@ -1,12 +1,9 @@
 
-import { initializeApp, getApps, getApp } from "firebase/app";
-import type { FirebaseApp } from "firebase/app";
-// Separated type and value imports to resolve member resolution issues in strict TS environments
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import type { Auth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import type { Firestore } from "firebase/firestore";
-// Fixed analytics imports by using explicit named exports for modular SDK
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
+// Consolidated auth imports to fix resolution errors
+import { getAuth, GoogleAuthProvider, Auth } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
+// Consolidated analytics imports to fix resolution errors
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
