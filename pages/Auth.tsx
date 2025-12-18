@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
-// Grouping all auth methods and types from 'firebase/auth'
+// Grouping and separating auth methods and types to fix export resolution issues
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signInWithPopup, 
   updateProfile, 
-  sendPasswordResetEmail,
-  type User 
+  sendPasswordResetEmail
 } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { createUserProfile, getUserProfile, isUsernameTaken, getEmailByUsername } from '../services/db';

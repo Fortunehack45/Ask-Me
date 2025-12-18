@@ -1,9 +1,10 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserByUsername, sendQuestion, getUserFeed } from '../services/db';
 import { UserProfile, Answer } from '../types';
-import { Send, Dice5, Shield, Loader2, Share2, Check, Download, Image as ImageIcon, Heart, Sparkles } from '../components/Icons';
+import { Send, Dice5, Shield, Loader2, Share2, Check, Download, Image as ImageIcon, Heart, Sparkles, ImageDown } from '../components/Icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { copyToClipboard, timeAgo } from '../utils';
 import { toPng } from 'html-to-image';
@@ -224,7 +225,7 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
 const OwnerView = ({ profile }: { profile: UserProfile }) => {
     const [answers, setAnswers] = useState<Answer[]>([]);
     const [loading, setLoading] = useState(true);
-    const [downloadItem, setDownloadItem] = useState<{answer: Answer, type: 'question' | 'full'} | null>(null);
+    const [downloadItem, setDownloadItem] = useState<{answer?: Answer, type: 'question' | 'full' | 'profile'} | null>(null);
     const captureRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -256,46 +257,102 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
 
     if (loading) return <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-zinc-400" /></div>;
 
-    if (answers.length === 0) return (
-        <div className="py-16 text-center bg-zinc-50/50 dark:bg-zinc-900/30 rounded-[32px] border-2 border-dashed border-zinc-200 dark:border-zinc-800 w-full">
-            <p className="text-zinc-500 font-bold mb-2">No answered questions yet</p>
-        </div>
-    );
-
     return (
         <div className="w-full space-y-8">
-            <div className="grid grid-cols-1 gap-6">
-                {answers.map((ans, i) => (
-                    <motion.div key={ans.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[28px] p-6 sm:p-8 shadow-sm transition-all backdrop-blur-sm">
-                        <div className="mb-6 relative">
-                            <div className="pl-4">
-                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1 block">Anonymous Asked</span>
-                                <h3 className="text-xl font-black text-zinc-900 dark:text-white leading-tight">{ans.questionText}</h3>
-                            </div>
-                        </div>
-                        <div className="pl-4">
-                            <p className="text-zinc-600 dark:text-zinc-300 font-medium leading-relaxed text-lg mb-6">{ans.answerText}</p>
-                            <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-zinc-100 dark:border-zinc-800/50">
-                                <button onClick={() => setDownloadItem({ answer: ans, type: 'question' })} className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-xs font-bold text-zinc-600 dark:text-zinc-300"><ImageIcon size={14} /><span>Story</span></button>
-                                <button onClick={() => setDownloadItem({ answer: ans, type: 'full' })} className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-xs font-bold text-zinc-600 dark:text-zinc-300"><Download size={14} /><span>Post</span></button>
-                                <div className="ml-auto flex items-center gap-4 text-xs font-medium text-zinc-400">
-                                    <span>{timeAgo(ans.timestamp)}</span>
-                                    <span className="flex items-center gap-1"><Heart size={14} className={ans.likes > 0 ? "text-pink-500 fill-pink-500" : ""} /> {ans.likes}</span>
+            {/* Quick Promo Section */}
+            <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm backdrop-blur-sm">
+                <div className="flex-1 text-center md:text-left">
+                    <h3 className="text-2xl font-black text-zinc-900 dark:text-white mb-2">Get more questions!</h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 font-medium">Download your profile story and post it on Instagram or Snapchat.</p>
+                </div>
+                <button 
+                    onClick={() => setDownloadItem({ type: 'profile' })} 
+                    className="shrink-0 bg-pink-500 hover:bg-pink-600 text-white font-black px-8 py-4 rounded-[20px] shadow-lg shadow-pink-500/20 transition-all flex items-center gap-3 active:scale-95"
+                >
+                    <ImageDown size={20} />
+                    Share to Story
+                </button>
+            </div>
+
+            <div className="flex items-center gap-4 py-4">
+                <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">Your Answer Feed</h3>
+                <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div>
+            </div>
+
+            {answers.length === 0 ? (
+                <div className="py-16 text-center bg-zinc-50/50 dark:bg-zinc-900/30 rounded-[32px] border-2 border-dashed border-zinc-200 dark:border-zinc-800 w-full">
+                    <p className="text-zinc-500 font-bold mb-2">No answered questions yet</p>
+                    <p className="text-zinc-400 text-sm">Once you answer an anonymous message, it will appear here.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 gap-6">
+                    {answers.map((ans, i) => (
+                        <motion.div key={ans.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[28px] p-6 sm:p-8 shadow-sm transition-all backdrop-blur-sm">
+                            <div className="mb-6 relative">
+                                <div className="pl-4">
+                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1 block">Anonymous Asked</span>
+                                    <h3 className="text-xl font-black text-zinc-900 dark:text-white leading-tight">{ans.questionText}</h3>
                                 </div>
                             </div>
-                        </div>
-                    </motion.div>
-                ))}
-            </div>
+                            <div className="pl-4">
+                                <p className="text-zinc-600 dark:text-zinc-300 font-medium leading-relaxed text-lg mb-6">{ans.answerText}</p>
+                                <div className="flex flex-wrap items-center gap-3 pt-6 border-t border-zinc-100 dark:border-zinc-800/50">
+                                    <button onClick={() => setDownloadItem({ answer: ans, type: 'question' })} className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-xs font-bold text-zinc-600 dark:text-zinc-300"><ImageIcon size={14} /><span>Story</span></button>
+                                    <button onClick={() => setDownloadItem({ answer: ans, type: 'full' })} className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-50 dark:bg-zinc-800/50 text-xs font-bold text-zinc-600 dark:text-zinc-300"><Download size={14} /><span>Post</span></button>
+                                    <div className="ml-auto flex items-center gap-4 text-xs font-medium text-zinc-400">
+                                        <span>{timeAgo(ans.timestamp)}</span>
+                                        <span className="flex items-center gap-1"><Heart size={14} className={ans.likes > 0 ? "text-pink-500 fill-pink-500" : ""} /> {ans.likes}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            )}
+
             <div className="fixed left-[-9999px] top-0 pointer-events-none">
                 {downloadItem && (
-                    <div ref={captureRef} className={clsx("w-[600px] p-12 flex flex-col items-center justify-center relative bg-zinc-950 text-white", downloadItem.type === 'question' ? 'min-h-[600px]' : 'min-h-[auto]')}>
+                    <div ref={captureRef} className={clsx("w-[600px] p-12 flex flex-col items-center justify-center relative bg-zinc-950 text-white", downloadItem.type !== 'full' ? 'min-h-[1067px]' : 'min-h-[auto]')}>
                         <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 to-black z-0"></div>
-                        <div className="absolute top-10 flex items-center gap-2 opacity-60 z-20"><div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black text-sm">A</div><span className="font-bold tracking-widest text-sm uppercase">Ask Me</span></div>
-                        {downloadItem.type === 'question' ? (
-                            <div className="relative z-10 p-10 max-w-md"><div className="bg-white/10 backdrop-blur-xl border border-white/20 p-10 rounded-[40px] shadow-2xl rotate-2"><h2 className="text-4xl font-black leading-tight">{downloadItem.answer.questionText}</h2></div></div>
-                        ) : (
-                            <div className="relative z-10 w-full pt-8"><div className="bg-white/5 border border-white/10 p-8 rounded-3xl mb-6 shadow-xl relative overflow-hidden"><div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-pink-500 to-orange-500"></div><p className="text-3xl font-bold leading-tight">{downloadItem.answer.questionText}</p></div><div className="flex gap-5 mt-8 px-2"><img src={profile.avatar} className="w-20 h-20 rounded-full border-4 border-zinc-800" alt="Avatar" /><div><p className="font-bold text-xl mb-2 text-white">{profile.fullName}</p><p className="text-2xl leading-relaxed text-zinc-300 font-medium">{downloadItem.answer.answerText}</p></div></div></div>
+                        <div className="absolute top-10 flex items-center gap-2 opacity-60 z-20">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-pink-600 to-orange-500 flex items-center justify-center text-white font-black text-sm">A</div>
+                            <span className="font-bold tracking-widest text-sm uppercase">Ask Me</span>
+                        </div>
+                        
+                        {downloadItem.type === 'profile' ? (
+                            <div className="relative z-10 flex flex-col items-center max-w-md w-full">
+                                <div className="w-32 h-32 rounded-full border-[8px] border-white/10 mb-10 overflow-hidden shadow-2xl">
+                                    <img src={profile.avatar} className="w-full h-full object-cover" alt="Profile" />
+                                </div>
+                                <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-12 rounded-[48px] shadow-2xl rotate-2 mb-10 text-center w-full">
+                                    <h2 className="text-5xl font-black leading-tight">Send me anonymous messages!</h2>
+                                </div>
+                                <div className="bg-black/30 backdrop-blur-md px-8 py-4 rounded-full border border-white/10 mt-6 shadow-xl">
+                                     <p className="text-white font-black text-2xl tracking-wide">
+                                        askme.app<span className="text-white/40">/u/{profile.username}</span>
+                                     </p>
+                                </div>
+                            </div>
+                        ) : downloadItem.type === 'question' && downloadItem.answer ? (
+                            <div className="relative z-10 p-10 max-w-md">
+                                <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-10 rounded-[40px] shadow-2xl rotate-2">
+                                    <h2 className="text-4xl font-black leading-tight">{downloadItem.answer.questionText}</h2>
+                                </div>
+                            </div>
+                        ) : downloadItem.answer && (
+                            <div className="relative z-10 w-full pt-8">
+                                <div className="bg-white/5 border border-white/10 p-8 rounded-3xl mb-6 shadow-xl relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-pink-500 to-orange-500"></div>
+                                    <p className="text-3xl font-bold leading-tight">{downloadItem.answer.questionText}</p>
+                                </div>
+                                <div className="flex gap-5 mt-8 px-2">
+                                    <img src={profile.avatar} className="w-20 h-20 rounded-full border-4 border-zinc-800" alt="Avatar" />
+                                    <div>
+                                        <p className="font-bold text-xl mb-2 text-white">{profile.fullName}</p>
+                                        <p className="text-2xl leading-relaxed text-zinc-300 font-medium">{downloadItem.answer.answerText}</p>
+                                    </div>
+                                </div>
+                            </div>
                         )}
                         <div className="absolute bottom-10 text-white/30 font-mono text-xs z-20 bg-white/5 px-4 py-1.5 rounded-full">askme.app/u/{profile.username}</div>
                     </div>

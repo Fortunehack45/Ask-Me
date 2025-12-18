@@ -1,7 +1,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Consolidated onAuthStateChanged and User type import
-import { onAuthStateChanged, type User } from 'firebase/auth';
+// Separated value and type imports for compatibility with stricter TypeScript environments
+import { onAuthStateChanged } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { auth } from '../firebase';
 import { getUserProfile, updateUserLastActive } from '../services/db';
 import { UserProfile } from '../types';
