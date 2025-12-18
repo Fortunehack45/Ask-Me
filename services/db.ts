@@ -13,7 +13,8 @@ import {
   serverTimestamp, 
   increment,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
+  Timestamp
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { UserProfile, Question, Answer } from "../types";
@@ -37,7 +38,7 @@ export const getEmailByUsername = async (username: string): Promise<string | nul
   );
   const snap = await getDocs(q);
   if (snap.empty) return null;
-  return snap.docs[0].data().email;
+  return snap.docs[0].data().email as string;
 };
 
 export const createUserProfile = async (user: UserProfile) => {
@@ -197,7 +198,7 @@ export const getGlobalFeed = async (): Promise<Answer[]> => {
 };
 
 // Admin Services
-export const getAdminAnalytics = async () => {
+export const getAdminAnalytics = async (): Promise<UserProfile[]> => {
     try {
         const usersRef = collection(db, "users");
         const q = query(usersRef, orderBy("createdAt", "desc"), limit(1000));
@@ -205,24 +206,26 @@ export const getAdminAnalytics = async () => {
         
         return snap.docs.map(doc => {
             const data = doc.data();
-            let lastActive = 0;
-            if (data.lastActive) {
-                if (typeof data.lastActive.toMillis === 'function') {
-                    lastActive = data.lastActive.toMillis();
-                } else if (typeof data.lastActive === 'number') {
-                    lastActive = data.lastActive;
-                }
+            let lastActiveVal = 0;
+            
+            // Check specifically for Firestore Timestamp instances
+            if (data.lastActive instanceof Timestamp) {
+                lastActiveVal = data.lastActive.toMillis();
+            } else if (typeof data.lastActive === 'number') {
+                lastActiveVal = data.lastActive;
+            } else if (data.lastActive && typeof data.lastActive.toMillis === 'function') {
+                lastActiveVal = data.lastActive.toMillis();
             }
 
             return {
-                uid: doc.id,
                 ...data,
+                uid: doc.id,
                 createdAt: data.createdAt || 0,
-                lastActive: lastActive
+                lastActive: lastActiveVal
             } as UserProfile;
         });
     } catch (e) {
-        console.error("Admin retrieval error", e);
+        console.error("Admin analytics error:", e);
         return [];
     }
 };

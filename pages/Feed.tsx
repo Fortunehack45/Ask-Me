@@ -93,7 +93,7 @@ const Feed: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between px-1 mb-4 gap-4">
         <div>
           <h1 className="text-3xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-3">
-            Feed <Sparkles className="text-yellow-500 hidden md:block" size={32} />
+            Dashboard <Sparkles className="text-yellow-500 hidden md:block" size={32} />
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 font-medium text-sm md:text-lg mt-2 max-w-md">
             Welcome, <span className="text-zinc-900 dark:text-white font-bold">{userProfile?.fullName || 'User'}</span>.

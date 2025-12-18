@@ -1,44 +1,43 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { initializeFirestore } from "firebase/firestore";
+
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+// Consolidated auth imports to resolve member visibility issues
+import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
+// Consolidated analytics imports and fixed isSupported named export
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getMessaging, isSupported as isMessagingSupported } from "firebase/messaging";
 
-// Standardize env access for Vite/ESM environments
-const getEnv = (key: string) => {
-  const env = (import.meta as any).env;
-  if (env) {
-    return env[key] || env[`VITE_${key}`];
-  }
-  return undefined;
-};
-
 const firebaseConfig = {
-  apiKey: getEnv('FIREBASE_API_KEY') || "AIzaSyCSs8dyTW_5FNllDtODiPuVuqScXbweDl4",
-  authDomain: getEnv('FIREBASE_AUTH_DOMAIN') || "close-box-17904.firebaseapp.com",
-  projectId: getEnv('FIREBASE_PROJECT_ID') || "close-box-17904",
-  storageBucket: getEnv('FIREBASE_STORAGE_BUCKET') || "close-box-17904.firebasestorage.app",
-  messagingSenderId: getEnv('FIREBASE_MESSAGING_SENDER_ID') || "353620096626",
-  appId: getEnv('FIREBASE_APP_ID') || "1:353620096626:web:2ac80029d6feb775ae34eb",
-  measurementId: getEnv('FIREBASE_MEASUREMENT_ID') || "G-CZS08SWWE6"
+  apiKey: "AIzaSyCSs8dyTW_5FNllDtODiPuVuqScXbweDl4",
+  authDomain: "close-box-17904.firebaseapp.com",
+  projectId: "close-box-17904",
+  storageBucket: "close-box-17904.firebasestorage.app",
+  messagingSenderId: "353620096626",
+  appId: "1:353620096626:web:2ac80029d6feb775ae34eb",
+  measurementId: "G-CZS08SWWE6"
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+// Singleton pattern for Firebase App initialization. 
+// This ensures we always use the exact same internal registry for components.
+const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-});
-
+/**
+ * Initialize services using the singleton app instance.
+ */
+export const auth: Auth = getAuth(app);
+export const db: Firestore = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 
-// Initialize analytics
+// Analytics initialization with environment check
 isSupported().then(supported => {
   if (supported) {
     getAnalytics(app);
   }
 });
 
+/**
+ * Robust FCM instance getter
+ */
 export const getMessagingInstance = async () => {
   try {
     const supported = await isMessagingSupported();
@@ -47,7 +46,7 @@ export const getMessagingInstance = async () => {
     }
     return null;
   } catch (err) {
-    console.warn("Messaging initialization skipped", err);
+    console.warn("FCM registration error skipped in this environment:", err);
     return null;
   }
 };

@@ -5,33 +5,32 @@ export interface UserProfile {
   email: string;
   username: string;
   fullName: string;
-  avatar?: string; // URL
+  avatar?: string;
   bio?: string;
   premiumStatus?: boolean;
   createdAt: number;
-  lastActive?: any; // Firestore Timestamp or number
+  lastActive?: number | { toMillis: () => number }; 
 }
 
 export interface Question {
   id: string;
-  receiverId: string; // The user who received the question
-  senderId?: string | null; // Null if anonymous
+  receiverId: string;
+  senderId?: string | null;
   text: string;
   timestamp: number;
   isAnswered: boolean;
-  theme?: string; // For visual customization
+  theme?: string;
 }
 
 export interface Answer {
   id: string;
   questionId: string;
-  userId: string; // The user who answered (same as question receiver)
+  userId: string;
   questionText: string;
   answerText: string;
   timestamp: number;
   likes: number;
-  likedBy?: string[]; // Array of user IDs or device IDs who liked this
-  // Denormalized fields for faster feed loading
+  likedBy?: string[];
   authorUsername?: string;
   authorAvatar?: string;
   authorFullName?: string;
@@ -40,5 +39,5 @@ export interface Answer {
 export interface NavigationItem {
   name: string;
   path: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; size?: number }>;
 }
