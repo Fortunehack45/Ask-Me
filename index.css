@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -45,8 +46,8 @@ body {
   left: 0;
   width: 100vw;
   height: 100dvh;
-  pointer-events: none;
-  z-index: 0;
+  pointer-events: none !important;
+  z-index: -1;
   opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
@@ -61,6 +62,7 @@ body {
     radial-gradient(at 0% 100%, hsla(27, 96%, 53%, 1) 0, transparent 50%), 
     radial-gradient(at 50% 100%, hsla(339, 81%, 59%, 1) 0, transparent 50%), 
     radial-gradient(at 100% 100%, hsla(27, 96%, 53%, 1) 0, transparent 50%);
+  pointer-events: none;
 }
 
 .no-scrollbar::-webkit-scrollbar {

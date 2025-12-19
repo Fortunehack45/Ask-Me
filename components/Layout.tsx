@@ -63,7 +63,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return (
       <main className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white relative overflow-x-hidden">
         <div className="bg-noise"></div>
-        {children}
+        <div className="relative z-10">
+          {children}
+        </div>
       </main>
     );
   }
@@ -80,10 +82,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans relative transition-colors duration-300">
+    <div className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans relative transition-colors duration-300 overflow-x-hidden">
       
       {/* Background Studio Aura - Subtle */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden">
         <div className="bg-noise absolute inset-0"></div>
         <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-pink-500/5 dark:bg-pink-600/5 rounded-full blur-[120px]"></div>
       </div>
@@ -157,7 +159,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </aside>
 
       {/* FULL SCREEN MAIN AREA */}
-      <main className="w-full md:pl-64 min-h-screen relative z-10">
+      <main className="w-full md:pl-64 min-h-screen relative z-[5]">
         <div className="w-full h-full px-6 md:px-10 pt-24 pb-32 md:py-12 transition-all">
            {children}
         </div>
