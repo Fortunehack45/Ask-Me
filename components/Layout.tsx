@@ -74,15 +74,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen w-full bg-white dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 font-sans relative transition-colors duration-300 overflow-x-hidden">
       
-      {/* Dynamic Background */}
+      {/* Cinematic Background */}
       <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
         <div className="bg-noise absolute inset-0 opacity-[0.03]"></div>
-        <div className="absolute -top-[10%] -right-[10%] w-[80vw] h-[80vw] bg-pink-500/5 dark:bg-pink-500/[0.02] rounded-full blur-[120px] animate-blob"></div>
-        <div className="absolute -bottom-[10%] -left-[10%] w-[80vw] h-[80vw] bg-blue-500/5 dark:bg-blue-500/[0.02] rounded-full blur-[120px] animate-blob animation-delay-2000"></div>
+        <div className="absolute -top-[10%] -right-[10%] w-[100vw] h-[100vw] bg-pink-500/5 dark:bg-pink-500/[0.02] rounded-full blur-[160px] animate-blob"></div>
+        <div className="absolute -bottom-[10%] -left-[10%] w-[100vw] h-[100vw] bg-blue-500/5 dark:bg-blue-500/[0.02] rounded-full blur-[160px] animate-blob animation-delay-2000"></div>
       </div>
 
-      {/* Mobile Top Header (Glass) */}
-      <header className="md:hidden fixed top-0 inset-x-0 z-40 px-6 h-16 flex justify-between items-center backdrop-blur-[30px] bg-white/70 dark:bg-zinc-950/70 border-b border-white/20 dark:border-white/5">
+      {/* Mobile Glass Header */}
+      <header className="md:hidden fixed top-0 inset-x-0 z-40 px-6 h-16 flex justify-between items-center backdrop-blur-[32px] bg-white/70 dark:bg-zinc-950/70 border-b border-white/20 dark:border-white/5">
         <Link to="/" className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-black shadow-lg shadow-pink-500/20">A</div>
           <span className="text-lg font-black text-zinc-900 dark:text-white tracking-tight">Ask Me</span>
@@ -92,12 +92,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </button>
       </header>
 
-      {/* APPLE-LEVEL SCROLLABLE SIDEBAR */}
-      <aside className="hidden md:flex fixed left-0 top-0 h-[100dvh] w-72 border-r border-white/10 dark:border-white/5 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-[50px] z-40 flex-col shadow-2xl overflow-y-auto no-scrollbar">
-        {/* Specular highlight at the top */}
-        <div className="absolute top-0 inset-x-0 h-px bg-white/30 dark:bg-white/10 pointer-events-none"></div>
-
-        {/* Branding Area */}
+      {/* ADAPTIVE APPLE-STYLE SIDEBAR */}
+      <aside className="hidden md:flex fixed left-0 top-0 h-[100dvh] w-72 border-r border-white/10 dark:border-white/5 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-[50px] z-40 flex-col shadow-2xl">
+        {/* Branding (Fixed) */}
         <div className="pt-12 pb-8 px-8 shrink-0">
           <Link to="/" className="flex items-center gap-4 group">
             <div className="relative">
@@ -111,9 +108,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </Link>
         </div>
 
-        {/* Navigation Section */}
-        <nav className="flex-1 px-5 py-2 space-y-1.5">
-          <p className="px-5 text-[11px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4 mt-6">Main Menu</p>
+        {/* Scrollable Middle Content */}
+        <nav className="flex-1 px-5 py-2 space-y-1.5 overflow-y-auto no-scrollbar">
+          <p className="px-5 text-[11px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4 mt-6">Navigation</p>
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
             return (
@@ -142,16 +139,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </Link>
             );
           })}
+          
+          <div className="pt-6">
+            <p className="px-5 text-[11px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4 mt-6">System</p>
+            {notificationPermission === 'default' && (
+              <button 
+                onClick={enableNotifications}
+                className="w-full flex items-center gap-4 px-5 py-4 rounded-[22px] text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-50/50 dark:hover:bg-white/5 transition-all font-bold text-[15px]"
+              >
+                <Bell size={22} />
+                <span>Alerts</span>
+              </button>
+            )}
+          </div>
         </nav>
 
-        {/* User Footer (Pinned but within scroll container for safety) */}
-        <div className="mt-auto p-5 pb-8">
+        {/* User Footer (Fixed Bottom within Sidebar) */}
+        <div className="mt-auto p-5 pb-10 shrink-0">
           <div className="bg-zinc-500/5 dark:bg-white/5 border border-white/10 dark:border-white/5 p-4 rounded-[28px] flex items-center gap-3.5 transition-all hover:bg-zinc-500/10 dark:hover:bg-white/10">
              <div className="relative shrink-0">
                <img 
                  src={userProfile.avatar} 
                  alt="Avatar" 
-                 className="w-11 h-11 rounded-full bg-zinc-200 dark:bg-zinc-800 object-cover shadow-sm ring-2 ring-white/20" 
+                 className="w-11 h-11 rounded-full bg-zinc-200 dark:bg-zinc-800 object-cover shadow-sm ring-2 ring-white/10" 
                />
                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-[3.5px] border-white dark:border-zinc-950"></div>
              </div>
@@ -169,21 +179,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </aside>
 
-      {/* EXPANDED HORIZON CONTENT AREA */}
-      <main className="w-full md:pl-72 min-h-screen relative z-10 flex flex-col">
-        <div className="flex-1 w-full px-6 md:px-12 pt-24 pb-32 md:py-16 max-w-full lg:max-w-[1800px] mx-auto transition-all">
+      {/* FULL HORIZON CONTENT AREA */}
+      <main className="w-full md:pl-72 min-h-screen relative z-10">
+        <div className="w-full px-6 md:px-12 pt-24 pb-32 md:py-20 max-w-[1920px] mx-auto transition-all">
            {children}
         </div>
       </main>
 
       {/* LIQUID GLASS MOBILE BOTTOM NAV */}
-      <nav className="md:hidden fixed bottom-6 left-6 right-6 z-50 h-20 px-2 flex items-center justify-around rounded-[36px] overflow-hidden">
-        {/* Surface Material */}
-        <div className="absolute inset-0 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-[40px] border border-white/20 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.4)] pointer-events-none"></div>
+      <nav className="md:hidden fixed bottom-6 left-6 right-6 z-50 h-20 px-2 flex items-center justify-around rounded-[40px] overflow-hidden">
+        {/* Multi-layer Glass Material */}
+        <div className="absolute inset-0 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-[40px] border border-white/20 dark:border-white/10 shadow-[0_24px_64px_rgba(0,0,0,0.5)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-20 pointer-events-none"></div>
         
-        {/* Liquid Refraction Layer */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
-
         {navItems.map((item) => {
           const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
           return (
@@ -198,7 +206,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {isActive && (
                 <motion.div 
                   layoutId="liquidPill"
-                  className="absolute inset-2.5 rounded-[24px] bg-pink-500/10 dark:bg-pink-500/20 border border-pink-500/30"
+                  className="absolute inset-2.5 rounded-[28px] bg-pink-500/10 dark:bg-pink-500/20 border border-pink-500/20"
                   transition={{ type: "spring", stiffness: 400, damping: 40 }}
                 />
               )}
@@ -208,7 +216,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {isActive && (
                 <motion.div 
                   layoutId="mobileGlowDot"
-                  className="absolute bottom-2.5 w-1 h-1 bg-pink-500 rounded-full shadow-[0_0_12px_rgba(236,72,153,1)]"
+                  className="absolute bottom-2 w-1 h-1 bg-pink-500 rounded-full shadow-[0_0_12px_rgba(236,72,153,1)]"
                   transition={{ type: "spring", stiffness: 400, damping: 40 }}
                 />
               )}
