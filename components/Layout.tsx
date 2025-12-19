@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -82,34 +81,48 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans relative transition-colors duration-300 overflow-x-hidden">
+    <div className="min-h-screen w-full bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 font-sans relative transition-colors duration-300 overflow-x-hidden">
       
-      {/* Background Studio Aura - Subtle */}
-      <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden">
+      {/* Background Aura */}
+      <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
         <div className="bg-noise absolute inset-0"></div>
-        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-pink-500/5 dark:bg-pink-600/5 rounded-full blur-[120px]"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-pink-500/5 dark:bg-pink-500/[0.03] rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 dark:bg-blue-500/[0.03] rounded-full blur-[120px]"></div>
       </div>
 
       {/* Mobile Top Header */}
-      <header className="md:hidden fixed top-0 inset-x-0 z-40 px-6 py-4 flex justify-between items-center backdrop-blur-xl bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-white/5 shadow-sm">
-        <Link to="/" className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-pink-500 rounded-xl flex items-center justify-center text-white font-black shadow-lg">A</div>
-          <span className="text-xl font-black text-zinc-900 dark:text-white tracking-tighter">Ask Me</span>
+      <header className="md:hidden fixed top-0 inset-x-0 z-40 px-6 h-16 flex justify-between items-center backdrop-blur-xl bg-white/70 dark:bg-zinc-950/70 border-b border-zinc-200 dark:border-white/[0.03]">
+        <Link to="/" className="flex items-center gap-2.5">
+          <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-black shadow-lg shadow-pink-500/20">A</div>
+          <span className="text-lg font-black text-zinc-900 dark:text-white tracking-tight">Ask Me</span>
         </Link>
-        <button onClick={handleLogout} className="text-zinc-400 p-2"><LogOut size={20} /></button>
+        <button onClick={handleLogout} className="text-zinc-400 p-2 hover:text-red-500 transition-colors">
+          <LogOut size={18} />
+        </button>
       </header>
 
-      {/* CLASSIC SIDEBAR - Based on screenshot */}
-      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 dark:border-white/5 bg-white dark:bg-zinc-950 z-40 flex-col py-10 px-6">
-        <Link to="/" className="flex items-center gap-3 px-3 mb-12 group">
-           <div className="w-10 h-10 bg-pink-500 rounded-xl flex items-center justify-center text-white font-black shadow-lg group-hover:scale-105 transition-transform">A</div>
-           <div className="flex flex-col">
-              <span className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter">Ask Me</span>
-              <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-zinc-400">Studio v1.5</span>
-           </div>
-        </Link>
+      {/* REFINED SIDEBAR */}
+      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-72 border-r border-zinc-200 dark:border-white/[0.05] bg-white dark:bg-[#09090b] z-40 flex-col py-8 px-5 shadow-sm">
+        {/* Branding Area */}
+        <div className="px-4 mb-10">
+          <Link to="/" className="flex items-center gap-3.5 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-pink-500 blur-md opacity-20 group-hover:opacity-40 transition-opacity"></div>
+              <div className="relative w-11 h-11 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-xl shadow-pink-500/20 group-hover:scale-105 transition-transform">A</div>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter leading-tight">Ask Me</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">Professional Studio</span>
+                <div className="w-1 h-1 rounded-full bg-pink-500"></div>
+              </div>
+            </div>
+          </Link>
+        </div>
 
-        <nav className="flex-1 space-y-1.5">
+        {/* Navigation Items */}
+        <nav className="flex-1 space-y-1">
+          <p className="px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.15em] mb-3">Main Menu</p>
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
             return (
@@ -117,57 +130,82 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 key={item.name} 
                 to={item.path}
                 className={clsx(
-                  "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-bold text-sm",
+                  "relative group flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all font-semibold text-[14px]",
                   isActive 
-                    ? "bg-pink-500 text-white shadow-lg shadow-pink-500/20" 
-                    : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/5"
+                    ? "bg-zinc-100 dark:bg-white/[0.05] text-zinc-950 dark:text-white shadow-sm" 
+                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-white/[0.02]"
                 )}
               >
-                <item.icon size={20} strokeWidth={isActive ? 3 : 2} />
+                {isActive && (
+                  <motion.div 
+                    layoutId="activeIndicator"
+                    className="absolute left-0 w-1 h-5 bg-pink-500 rounded-r-full"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <item.icon 
+                  size={20} 
+                  strokeWidth={isActive ? 2.5 : 2} 
+                  className={clsx("transition-colors", isActive ? "text-pink-500" : "group-hover:text-pink-500/70")} 
+                />
                 <span>{item.name}</span>
               </Link>
             );
           })}
 
-          {notificationPermission === 'default' && (
-            <button 
-              onClick={enableNotifications}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-zinc-500 hover:text-pink-500 hover:bg-pink-500/5 mt-4 transition-all font-bold text-sm"
-            >
-              <Bell size={20} />
-              <span>Enable Alerts</span>
-            </button>
-          )}
+          <div className="pt-6">
+            <p className="px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.15em] mb-3">Settings & Alerts</p>
+            {notificationPermission === 'default' && (
+              <button 
+                onClick={enableNotifications}
+                className="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-all font-semibold text-[14px]"
+              >
+                <div className="relative">
+                  <Bell size={20} />
+                  <div className="absolute top-0 right-0 w-2 h-2 bg-pink-500 rounded-full border-2 border-white dark:border-zinc-950"></div>
+                </div>
+                <span>Enable Alerts</span>
+              </button>
+            )}
+          </div>
         </nav>
 
-        <div className="mt-auto border-t border-zinc-100 dark:border-white/5 pt-6">
-          <div className="flex items-center gap-3 p-2 rounded-2xl">
-             <img 
-               src={userProfile.avatar} 
-               alt="Me" 
-               className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 object-cover shadow-sm" 
-             />
-             <div className="flex-1 min-w-0">
-               <p className="text-sm font-black text-zinc-900 dark:text-white truncate">{userProfile.fullName}</p>
-               <p className="text-[10px] font-bold text-zinc-400 truncate uppercase tracking-widest">@{userProfile.username}</p>
+        {/* REFINED USER FOOTER */}
+        <div className="mt-auto border-t border-zinc-100 dark:border-white/[0.03] pt-6 px-1">
+          <div className="group bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.03] p-3 rounded-2xl flex items-center gap-3 transition-all hover:border-zinc-200 dark:hover:border-white/[0.08]">
+             <div className="relative">
+               <img 
+                 src={userProfile.avatar} 
+                 alt="Avatar" 
+                 className="w-10 h-10 rounded-xl bg-zinc-200 dark:bg-zinc-800 object-cover shadow-sm group-hover:scale-105 transition-transform" 
+               />
+               <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 rounded-full border-[3px] border-white dark:border-zinc-900"></div>
              </div>
-             <button onClick={handleLogout} title="Logout" className="text-zinc-400 hover:text-red-500 transition-colors">
+             <div className="flex-1 min-w-0">
+               <p className="text-sm font-bold text-zinc-900 dark:text-white truncate leading-none mb-1">{userProfile.fullName}</p>
+               <p className="text-[10px] font-semibold text-zinc-400 truncate uppercase tracking-widest">@{userProfile.username}</p>
+             </div>
+             <button 
+                onClick={handleLogout} 
+                className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all active:scale-90"
+                title="Logout"
+              >
                 <LogOut size={18} />
              </button>
           </div>
         </div>
       </aside>
 
-      {/* FULL SCREEN MAIN AREA */}
-      <main className="w-full md:pl-64 min-h-screen relative z-[5]">
-        <div className="w-full h-full px-6 md:px-10 pt-24 pb-32 md:py-12 transition-all">
+      {/* CONTENT AREA */}
+      <main className="w-full md:pl-72 min-h-screen relative z-10">
+        <div className="w-full h-full px-6 md:px-12 pt-24 pb-32 md:py-12 max-w-7xl mx-auto transition-all">
            {children}
         </div>
       </main>
 
-      {/* MOBILE BOTTOM NAV - Simplified */}
-      <nav className="md:hidden fixed bottom-6 left-6 right-6 z-50 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-[32px] shadow-2xl overflow-hidden">
-        <div className="flex justify-around items-center h-16">
+      {/* SLICK MOBILE BOTTOM NAV */}
+      <nav className="md:hidden fixed bottom-6 left-6 right-6 z-50 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-zinc-200 dark:border-white/10 rounded-[28px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden">
+        <div className="flex justify-around items-center h-16 px-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
             return (
@@ -175,16 +213,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 key={item.name} 
                 to={item.path}
                 className={clsx(
-                  "flex items-center justify-center w-full h-full transition-all",
-                  isActive ? "text-pink-500" : "text-zinc-400 dark:text-zinc-500"
+                  "flex flex-col items-center justify-center w-full h-full transition-all relative",
+                  isActive ? "text-pink-500" : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
                 )}
               >
                 <div className={clsx(
-                  "p-2.5 rounded-xl transition-all",
-                  isActive && "bg-pink-500/10"
+                  "p-2 rounded-xl transition-all duration-300",
+                  isActive && "bg-pink-500/10 scale-110"
                 )}>
-                  <item.icon size={22} strokeWidth={isActive ? 3 : 2} />
+                  <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
                 </div>
+                {isActive && (
+                  <motion.div 
+                    layoutId="mobileActiveDot"
+                    className="absolute bottom-1 w-1 h-1 bg-pink-500 rounded-full"
+                  />
+                )}
               </Link>
             );
           })}
