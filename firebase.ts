@@ -20,7 +20,7 @@ const firebaseConfig = {
 // Initialize Firebase App
 const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize Modular Services
+// Initialize Modular Services with explicit app reference to ensure registration
 export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();

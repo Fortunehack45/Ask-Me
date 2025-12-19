@@ -141,7 +141,7 @@ const Feed: React.FC = () => {
 
       <div className="px-1">
         <h1 className="text-4xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-3">
-          Feed <span className="text-yellow-500" size={32} />
+          Feed <Sparkles className="text-yellow-500" size={32} />
         </h1>
         <p className="text-zinc-500 dark:text-zinc-400 font-medium text-lg mt-1">
           Welcome, <span className="text-zinc-900 dark:text-white font-bold">{userProfile?.fullName || 'User'}</span>.

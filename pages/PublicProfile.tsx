@@ -481,11 +481,11 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                         </div>
                      )}
 
-                     {/* Question/Answer Views */}
+                     {/* Question/Answer Views - NO QUOTES */}
                      {(downloadItem?.type === 'question' || downloadItem?.type === 'full') && downloadItem.answer && (
                         <div className="relative z-10 w-full flex flex-col items-center">
                             <div className={clsx("p-24 rounded-[100px] shadow-2xl w-full max-w-4xl border mb-20", customTheme.card)}>
-                                <h2 className={clsx("font-black text-7xl leading-tight tracking-tight text-center", customTheme.text)}>"{downloadItem.answer.questionText}"</h2>
+                                <h2 className={clsx("font-black text-7xl leading-tight tracking-tight text-center", customTheme.text)}>{downloadItem.answer.questionText}</h2>
                             </div>
                             {downloadItem.type === 'full' && (
                                 <div className="flex gap-10 items-center px-16 py-12 bg-black/40 rounded-[80px] backdrop-blur-[100px] border border-white/15 shadow-2xl w-full max-w-4xl">
@@ -554,7 +554,7 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                                                 {ans.isPublic ? 'Public' : 'Hidden'}
                                             </button>
                                         </div>
-                                        <h3 className="text-3xl font-black text-zinc-900 dark:text-white leading-tight tracking-tighter">"{ans.questionText}"</h3>
+                                        <h3 className="text-3xl font-black text-zinc-900 dark:text-white leading-tight tracking-tighter">{ans.questionText}</h3>
                                     </div>
                                     <button onClick={(e) => handleDeleteAnswer(e, ans.id)} className="p-4 rounded-2xl hover:bg-red-500/10 text-zinc-300 hover:text-red-500 transition-all active:scale-90">
                                         <Trash2 size={24} />
@@ -621,7 +621,7 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                                         ) : downloadItem.answer && (
                                             <div className="relative z-10 w-full flex flex-col items-center">
                                                 <div className={clsx("p-10 rounded-[40px] shadow-2xl w-full border text-center leading-tight font-black text-xl mb-6", customTheme.card, customTheme.text)}>
-                                                    "{downloadItem.answer.questionText}"
+                                                    {downloadItem.answer.questionText}
                                                 </div>
                                                 {downloadItem.type === 'full' && (
                                                     <div className="flex gap-3 items-center p-6 bg-black/40 rounded-[32px] backdrop-blur-3xl border border-white/10 shadow-2xl w-full">
