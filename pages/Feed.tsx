@@ -1,9 +1,10 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { 
-  Inbox, User, Loader2, Sparkles, Check, 
-  MessageSquare, Heart, Copy, Shield, Share2, X, Palette, Clock
+  Inbox, Loader2, Sparkles, Check, 
+  MessageSquare, Heart, Shield, Share2, Palette, Clock, X
 } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getUserFeed, getUserStats } from '../services/db';
@@ -116,7 +117,7 @@ const Feed: React.FC = () => {
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div className="space-y-1">
           <h1 className="text-5xl md:text-7xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-4">
-            Dashboard <span className="text-pink-500" size={40} />
+            Dashboard <Sparkles className="text-pink-500" size={40} />
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 font-bold text-xl opacity-80 leading-relaxed">
             Welcome back, <span className="text-pink-600 dark:text-pink-500 font-black">{userProfile?.fullName}</span>.
@@ -220,6 +221,7 @@ const Feed: React.FC = () => {
                         <div className="w-12 h-12 rounded-[20px] bg-pink-500 text-white flex items-center justify-center shadow-2xl shadow-pink-500/30"><Palette size={24} /></div>
                         <h3 className="text-3xl font-black dark:text-white tracking-tighter">Studio Pro</h3>
                     </div>
+                    {/* Fixed missing icon reference by importing 'X' from components/Icons above */}
                     <button onClick={() => setShowStudio(false)} className="p-4 text-zinc-400 hover:text-white transition-all bg-zinc-100 dark:bg-white/5 rounded-full"><X size={28} /></button>
                 </div>
 

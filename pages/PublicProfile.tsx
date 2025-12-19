@@ -1,15 +1,14 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getUserByUsername, sendQuestion, getUserFeed, deleteAnswer, updateAnswerVisibility } from '../services/db';
+import { getUserByUsername, sendQuestion, getUserFeed } from '../services/db';
 import { UserProfile, Answer } from '../types';
 import { 
-  Send, Dice5, Shield, Loader2, Share2, Check, Download, 
-  Heart, Sparkles, ImageDown, Trash2, 
-  Lock, Eye, Palette, X, ChevronRight, Activity, Camera
+  Send, Dice5, Shield, Loader2, Share2, Check, Sparkles, Lock, Palette, X
 } from '../components/Icons';
 import { AnimatePresence, motion } from 'framer-motion';
-import { copyToClipboard, timeAgo } from '../utils';
+import { copyToClipboard } from '../utils';
 import { toPng } from 'html-to-image';
 import clsx from 'clsx';
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -433,6 +432,55 @@ const Settings = () => {
             </div>
           </section>
         </div>
+
+        {/* ABOUT DEVELOPER - PRESTIGE SECTION */}
+        <section className="bg-zinc-950 rounded-[72px] p-16 md:p-20 text-white relative overflow-hidden group shadow-2xl border border-white/5">
+          <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-transparent opacity-50 group-hover:opacity-70 transition-opacity"></div>
+          <div className="absolute top-[-20%] right-[-10%] w-[60vw] h-[60vw] bg-pink-500/10 rounded-full blur-[120px] pointer-events-none animate-blob"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-16">
+            <div className="w-40 h-40 bg-white/10 rounded-[48px] flex items-center justify-center border border-white/20 shadow-2xl backdrop-blur-xl shrink-0 group-hover:scale-110 transition-transform duration-700">
+              <Code2 size={80} strokeWidth={1.5} className="text-pink-500" />
+            </div>
+            
+            <div className="flex-1 text-center md:text-left space-y-8">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-3 px-6 py-2 bg-pink-500/20 text-pink-500 rounded-full border border-pink-500/20 text-[10px] font-black uppercase tracking-[0.4em]">The Architect</div>
+                <h2 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">Esho Fortune <span className="text-pink-500">Adebayo</span></h2>
+                <div className="flex flex-col gap-2">
+                   <p className="text-2xl font-bold text-white leading-relaxed max-w-3xl">
+                    Student of Information Systems (IFS/IS) in Federal University of Technology Akure, Ondo State.
+                  </p>
+                  <p className="text-xl font-medium text-white/50 leading-relaxed max-w-3xl">
+                    A self-taught web and software architect crafting high-fidelity digital universes that bridge imagination and reality.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap justify-center md:justify-start gap-10">
+                <div className="flex items-center gap-4 text-white/50">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-400"><GraduationCap size={20} /></div>
+                  <span className="text-[12px] font-black uppercase tracking-widest">FUTA • IFS/IS</span>
+                </div>
+                <div className="flex items-center gap-4 text-white/50">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-pink-500"><Heart size={20} className="fill-current" /></div>
+                  <span className="text-[12px] font-black uppercase tracking-widest">Digital Craftsman</span>
+                </div>
+              </div>
+
+              <div className="pt-8">
+                <a 
+                  href="https://wa.me/2349167689200" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-5 bg-white text-black px-14 py-7 rounded-[32px] font-black text-2xl hover:bg-pink-500 hover:text-white transition-all shadow-[0_40px_80px_-20px_rgba(255,255,255,0.2)] active:scale-95"
+                >
+                  Connect with Creator <ChevronRight size={28} strokeWidth={3} />
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );

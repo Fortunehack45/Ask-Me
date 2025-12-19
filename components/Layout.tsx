@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { auth, getMessagingInstance } from '../firebase';
 import { getToken } from 'firebase/messaging';
 import { saveFCMToken } from '../services/db';
-import { Home, Inbox, User, LogOut, LayoutDashboard, Bell, Settings, Code2, GraduationCap } from './Icons';
+import { Home, Inbox, User, LogOut, LayoutDashboard, Bell, Settings } from './Icons';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -51,7 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   if (!userProfile) {
     return (
       <main className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white relative overflow-x-hidden">
-        <div className="bg-noise"></div>
+        <div className="bg-noise absolute inset-0 opacity-[0.03]"></div>
         <div className="relative z-10">{children}</div>
       </main>
     );
@@ -159,66 +160,40 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                <p className="text-[9px] font-black text-zinc-400 truncate uppercase tracking-widest">@{userProfile.username}</p>
              </div>
              <button 
-                onClick={handleLogout} 
-                className="p-2.5 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all active:scale-90"
-              >
-                <LogOut size={20} />
+                onClick={handleLogout}
+                className="p-2.5 text-zinc-400 hover:text-red-500 transition-colors"
+             >
+                <LogOut size={18} />
              </button>
           </div>
-          
-          <a 
-            href="https://wa.me/2349167689200" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center justify-between px-4 py-2 text-zinc-300 dark:text-zinc-600 hover:text-pink-500 transition-all group"
-          >
-            <div className="flex items-center gap-2">
-              <Code2 size={12} className="group-hover:rotate-12 transition-transform" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Esho Fortune</span>
-            </div>
-            <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-               <GraduationCap size={12} />
-               <span className="text-[8px] font-black">FUTA</span>
-            </div>
-          </a>
         </div>
       </aside>
 
-      {/* FULL HORIZON CONTENT AREA - Expanded to use all available space */}
-      <main className="w-full md:pl-72 min-h-screen relative z-10 flex flex-col">
-        <div className="flex-1 w-full px-4 md:px-10 lg:px-12 pt-24 pb-32 md:pt-16 md:pb-16 transition-all">
-           {children}
+      <main className="md:pl-72 pt-16 md:pt-0">
+        <div className="p-6 md:p-10">
+          {children}
         </div>
       </main>
 
-      <nav className="md:hidden fixed bottom-6 left-6 right-6 z-50 h-20 px-2 flex items-center justify-around rounded-[40px] overflow-hidden">
-        <div className="absolute inset-0 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-[40px] border border-white/20 dark:border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.5)] pointer-events-none"></div>
-        <div className="absolute inset-x-0 top-0 h-px bg-white/20 dark:bg-white/10 pointer-events-none"></div>
-        
-        {navItems.map((item) => {
-          const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
-          return (
-            <Link 
-              key={item.name} 
-              to={item.path}
-              className={clsx(
-                "flex flex-col items-center justify-center flex-1 h-full transition-all relative z-10",
-                isActive ? "text-pink-500" : "text-zinc-500 dark:text-zinc-400"
-              )}
-            >
-              {isActive && (
-                <motion.div 
-                  layoutId="liquidPill"
-                  className="absolute inset-2.5 rounded-[28px] bg-pink-500/10 dark:bg-pink-500/20 border border-pink-500/20 shadow-inner"
-                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                />
-              )}
-              <div className={clsx("relative z-10 p-2.5 transition-all duration-300", isActive && "scale-125")}>
-                <item.icon size={26} strokeWidth={isActive ? 2.5 : 2} />
-              </div>
-            </Link>
-          );
-        })}
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/80 dark:bg-[#070708]/80 backdrop-blur-[32px] border-t border-zinc-100 dark:border-white/5 px-6 py-2">
+        <div className="flex justify-around items-center h-16">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
+            return (
+              <Link 
+                key={item.name} 
+                to={item.path}
+                className={clsx(
+                  "p-2 rounded-2xl transition-all",
+                  isActive ? "bg-zinc-900 dark:bg-white text-white dark:text-black shadow-lg" : "text-zinc-400"
+                )}
+              >
+                <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+              </Link>
+            );
+          })}
+        </div>
       </nav>
     </div>
   );

@@ -11,7 +11,7 @@ import {
 import { auth, googleProvider } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { createUserProfile, getUserProfile, isUsernameTaken, getEmailByUsername } from '../services/db';
-import { Loader2, Shield, Eye, EyeOff, Sparkles, Check } from '../components/Icons';
+import { Loader2, Shield, Eye, EyeOff, Check } from '../components/Icons';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
@@ -136,7 +136,7 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-zinc-50 dark:bg-zinc-950">
       {/* Background Orbs */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-pink-500/10 blur-[120px] rounded-full"></div>
       

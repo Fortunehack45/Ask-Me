@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { getAdminAnalytics } from '../services/db';
 import { UserProfile } from '../types';
 import { 
-  LayoutDashboard, Activity, Loader2, TrendingUp, Users, Clock, ArrowUpRight, X, Send, Sparkles, Mail, Check, AlertCircle, RefreshCcw, PenTool, Image, FileText, Globe, Copy, ExternalLink, ChevronRight, Search
+  Activity, Loader2, TrendingUp, Users, ArrowUpRight, Mail, Check, RefreshCcw, PenTool, Image, ExternalLink, Search, Copy, Clock, ShieldCheck
 } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -23,12 +23,42 @@ interface StatsCardProps {
   color: 'blue' | 'green' | 'orange' | 'purple';
 }
 
+const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon: Icon, trend, trendUp, subtitle, color }) => {
+  const colors = {
+    blue: 'text-blue-500 bg-blue-500/10',
+    green: 'text-emerald-500 bg-emerald-500/10',
+    orange: 'text-orange-500 bg-orange-500/10',
+    purple: 'text-purple-500 bg-purple-500/10'
+  };
+
+  return (
+    <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-3xl border border-zinc-200 dark:border-white/5 p-10 rounded-[56px] shadow-sm flex flex-col justify-between group hover:bg-white dark:hover:bg-zinc-900 transition-all duration-500">
+      <div className="flex justify-between items-start mb-8">
+        <div className={clsx("w-16 h-16 rounded-[24px] flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg", colors[color])}>
+          <Icon size={32} />
+        </div>
+        {trend && (
+          <div className={clsx("px-4 py-2 rounded-full text-[10px] font-black tracking-widest uppercase", trendUp ? "text-emerald-500 bg-emerald-500/10" : "text-rose-500 bg-rose-500/10")}>
+            {trend}
+          </div>
+        )}
+      </div>
+      <div>
+        <p className="text-zinc-500 dark:text-zinc-400 font-bold text-lg mb-2">{title}</p>
+        <div className="flex items-baseline gap-4">
+          <h4 className="text-6xl font-black text-zinc-900 dark:text-white tracking-tighter">{value}</h4>
+          {subtitle && <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">{subtitle}</span>}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Admin: React.FC = () => {
   const { isAdmin, loading: authLoading } = useAuth();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'analytics' | 'broadcast' | 'directory'>('analytics');
-  const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d' | 'all'>('7d');
   const [searchQuery, setSearchQuery] = useState('');
   
   // Gmail Dispatcher State
@@ -70,7 +100,6 @@ const Admin: React.FC = () => {
     return dataPoints;
   }, [users]);
 
-  // Search filter for Directory
   const filteredUsers = useMemo(() => {
     const q = searchQuery.toLowerCase();
     return users.filter(u => 
@@ -80,7 +109,6 @@ const Admin: React.FC = () => {
     );
   }, [users, searchQuery]);
 
-  // Generate the BCC list for the Gmail app
   const bccList = useMemo(() => {
     return users.map(u => u.email).filter(Boolean).join(', ');
   }, [users]);
@@ -97,7 +125,7 @@ const Admin: React.FC = () => {
     const subject = encodeURIComponent(emailSubject);
     const body = encodeURIComponent(emailBody);
     const mailtoUrl = `mailto:?bcc=${encodeURIComponent(bccList)}&subject=${subject}&body=${body}`;
-    window.location.href = mailtoUrl;
+    window.open(mailtoUrl, '_blank');
   };
 
   if (authLoading) return null;
@@ -105,8 +133,8 @@ const Admin: React.FC = () => {
   if (loading) return <div className="flex h-[80vh] w-full justify-center items-center text-pink-500"><Loader2 className="animate-spin" size={40} /></div>;
 
   return (
-    <div className="space-y-12 pb-24 w-full animate-in fade-in duration-1000">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
+    <div className="space-y-16 pb-24 w-full animate-in fade-in duration-1000">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10">
         <div>
           <h1 className="text-6xl md:text-8xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-6 leading-none">
             Admin <span className="text-pink-600">HQ</span>
@@ -151,14 +179,13 @@ const Admin: React.FC = () => {
                   </ResponsiveContainer>
               </div>
 
-              {/* RECENT GUESTS WIDGET */}
               <div className="xl:col-span-4 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[64px] p-12 flex flex-col shadow-sm">
                   <div className="flex justify-between items-center mb-12">
                       <h3 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tighter">Recent Entries</h3>
                       <button onClick={() => setActiveTab('directory')} className="text-[12px] font-black text-pink-500 uppercase tracking-[0.3em] hover:underline underline-offset-8">View All</button>
                   </div>
                   <div className="space-y-8 flex-1 overflow-y-auto no-scrollbar">
-                      {users.slice(0, 8).map(u => (
+                      {users.slice(0, 10).map(u => (
                           <div key={u.uid} className="flex items-center gap-6 group">
                               <img src={u.avatar} alt={u.username} className="w-16 h-16 rounded-[24px] object-cover group-hover:scale-110 transition-transform ring-4 ring-zinc-50 dark:ring-white/5 shadow-xl" />
                               <div className="flex-1 min-w-0">
@@ -167,7 +194,7 @@ const Admin: React.FC = () => {
                               </div>
                           </div>
                       ))}
-                      {users.length === 0 && <p className="text-zinc-500 font-bold italic py-20 text-center text-xl">Directory is empty.</p>}
+                      {users.length === 0 && <p className="text-zinc-500 font-bold">No users detected yet.</p>}
                   </div>
               </div>
             </div>
@@ -175,146 +202,132 @@ const Admin: React.FC = () => {
         )}
 
         {activeTab === 'directory' && (
-          <motion.div key="directory" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-12 w-full">
-              <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[64px] p-12 md:p-16 shadow-sm">
-                  <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-12 mb-16">
-                      <div>
-                          <h2 className="text-5xl font-black dark:text-white tracking-tighter leading-none mb-3">Studio Directory</h2>
-                          <p className="text-zinc-500 font-bold text-2xl tracking-tight">{users.length} verified platform guests.</p>
-                      </div>
-                      <div className="relative flex-1 max-w-2xl">
-                          <Search className="absolute left-8 top-1/2 -translate-y-1/2 text-zinc-400" size={32} />
-                          <input 
-                              type="text" 
-                              placeholder="Search by identity, mail, or studio tag..." 
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              className="w-full bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-[40px] py-8 pl-20 pr-10 outline-none focus:ring-[15px] focus:ring-pink-500/5 focus:border-pink-500 font-black text-2xl transition-all shadow-inner placeholder:opacity-30"
-                          />
-                      </div>
+          <motion.div key="directory" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} className="space-y-12">
+             <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[64px] p-12 shadow-sm overflow-hidden">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-10 mb-12">
+                  <div className="relative w-full md:w-1/2">
+                    <Search className="absolute left-8 top-1/2 -translate-y-1/2 text-zinc-400" size={24} />
+                    <input 
+                      type="text" 
+                      placeholder="Search global directory..." 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-[40px] pl-20 pr-10 py-6 text-zinc-900 dark:text-white outline-none focus:ring-8 focus:ring-pink-500/5 focus:border-pink-500 transition-all font-bold text-xl"
+                    />
                   </div>
+                  <div className="px-10 py-4 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full font-black text-xs uppercase tracking-[0.4em] shadow-xl">
+                    {filteredUsers.length} Results
+                  </div>
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
-                      {filteredUsers.map(u => (
-                          <div key={u.uid} className="flex items-center gap-6 p-8 rounded-[48px] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-white/5 group hover:border-pink-500/30 hover:shadow-2xl transition-all">
-                              <img src={u.avatar} alt={u.username} className="w-20 h-20 rounded-[32px] object-cover group-hover:scale-105 transition-transform border-4 border-zinc-50 dark:border-white/10 shadow-lg" />
-                              <div className="flex-1 min-w-0">
-                                  <p className="font-black text-zinc-900 dark:text-white truncate text-2xl leading-none mb-2 tracking-tight">{u.fullName}</p>
-                                  <p className="text-[12px] font-black text-zinc-400 uppercase tracking-[0.3em]">@{u.username}</p>
-                                  <p className="text-[10px] font-bold text-zinc-500 truncate mt-3 opacity-60">{u.email}</p>
-                              </div>
-                              <a href={`#/u/${u.username}`} target="_blank" rel="noopener noreferrer" className="p-4 opacity-0 group-hover:opacity-100 transition-all bg-pink-500/10 text-pink-500 rounded-2xl hover:scale-110 active:scale-90"><ArrowUpRight size={28} /></a>
-                          </div>
-                      ))}
-                      {filteredUsers.length === 0 && (
-                          <div className="col-span-full py-48 text-center bg-zinc-50 dark:bg-white/[0.02] rounded-[64px] border-4 border-dashed border-zinc-100 dark:border-white/5">
-                              <p className="text-zinc-500 dark:text-zinc-600 font-black text-4xl tracking-tighter">Zero matches for "{searchQuery}"</p>
-                          </div>
-                      )}
-                  </div>
-              </div>
+                <div className="overflow-x-auto no-scrollbar">
+                   <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-zinc-100 dark:border-white/5">
+                           <th className="px-8 py-6 text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400">User Profile</th>
+                           <th className="px-8 py-6 text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400">Contact</th>
+                           <th className="px-8 py-6 text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400">Last Pulse</th>
+                           <th className="px-8 py-6 text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400">Joined</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-100 dark:divide-white/5">
+                        {filteredUsers.map(u => (
+                          <tr key={u.uid} className="group hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors">
+                            <td className="px-8 py-8">
+                               <div className="flex items-center gap-6">
+                                  <img src={u.avatar} className="w-16 h-16 rounded-2xl object-cover shadow-lg" alt="" />
+                                  <div>
+                                    <p className="font-black text-zinc-900 dark:text-white text-2xl tracking-tight leading-none mb-2">{u.fullName}</p>
+                                    <p className="text-sm font-black text-pink-500 uppercase tracking-widest">@{u.username}</p>
+                                  </div>
+                               </div>
+                            </td>
+                            <td className="px-8 py-8">
+                               <p className="text-lg font-bold text-zinc-600 dark:text-zinc-300">{u.email}</p>
+                               {u.premiumStatus && <span className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-lg bg-pink-500/10 text-pink-500 text-[9px] font-black uppercase tracking-widest">Premium User</span>}
+                            </td>
+                            <td className="px-8 py-8">
+                               <div className="flex items-center gap-3 text-zinc-400 font-bold">
+                                  <Clock size={16} /> {u.lastActive ? timeAgo(u.lastActive as any) : 'Unknown'}
+                               </div>
+                            </td>
+                            <td className="px-8 py-8">
+                               <span className="text-zinc-400 font-bold">{new Date(u.createdAt).toLocaleDateString()}</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                   </table>
+                </div>
+             </div>
           </motion.div>
         )}
 
         {activeTab === 'broadcast' && (
-          <motion.div key="broadcast" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="grid grid-cols-1 xl:grid-cols-12 gap-12 w-full">
-            <div className="xl:col-span-8 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[72px] p-14 md:p-20 shadow-sm space-y-16">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-5xl font-black dark:text-white tracking-tighter leading-none">Studio Dispatch</h2>
-                        <p className="text-zinc-500 dark:text-zinc-400 font-bold mt-4 text-2xl leading-relaxed">Broadcast professional narratives through Gmail.</p>
-                    </div>
-                    <div className="px-8 py-4 bg-pink-500/10 text-pink-500 rounded-full text-sm font-black uppercase tracking-widest border border-pink-500/20 shadow-lg">Reach: {users.length} Users</div>
+          <motion.div key="broadcast" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-4xl mx-auto w-full">
+             <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[64px] p-12 md:p-16 shadow-sm">
+                <div className="flex items-center gap-6 mb-12">
+                   <div className="w-16 h-16 rounded-[24px] bg-pink-500 text-white flex items-center justify-center shadow-2xl shadow-pink-500/30">
+                      <Mail size={32} />
+                   </div>
+                   <div>
+                      <h2 className="text-4xl font-black text-zinc-900 dark:text-white tracking-tighter">Global Dispatch</h2>
+                      <p className="text-zinc-500 font-bold text-lg mt-1">Blast whispers to all {users.length} registered guests.</p>
+                   </div>
                 </div>
 
-                <div className="space-y-12">
-                    <div className="p-12 bg-zinc-50 dark:bg-[#070708] border border-zinc-100 dark:border-white/5 rounded-[48px] space-y-8 shadow-inner">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[12px] font-black uppercase text-zinc-400 tracking-[0.4em]">Global BCC Pipeline</span>
-                            <button 
-                                onClick={handleCopyBCC} 
-                                className={clsx(
-                                    "flex items-center gap-3 px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all shadow-xl",
-                                    copiedBCC ? "bg-green-500 text-white" : "bg-zinc-200 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:text-pink-500"
-                                )}
-                            >
-                                {copiedBCC ? <Check size={20} strokeWidth={4} /> : <Copy size={20} />} {copiedBCC ? 'Synchronized' : 'Copy All Emails'}
-                            </button>
-                        </div>
-                        <div className="text-zinc-500 font-medium text-lg truncate opacity-40 italic">
-                            {bccList}
-                        </div>
-                    </div>
+                <div className="space-y-10">
+                   <div className="space-y-4">
+                      <label className="text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400 px-4">Recipients (BCC Pipeline)</label>
+                      <div className="relative">
+                        <textarea 
+                          readOnly 
+                          value={bccList}
+                          className="w-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-[32px] p-8 text-zinc-400 font-bold text-sm resize-none h-32 no-scrollbar"
+                        />
+                        <button onClick={handleCopyBCC} className="absolute right-8 bottom-8 px-6 py-3 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl flex items-center gap-3 active:scale-95 transition-all">
+                           {copiedBCC ? <Check size={16} className="text-green-500" /> : <Copy size={16} />} {copiedBCC ? 'Copied' : 'Copy List'}
+                        </button>
+                      </div>
+                   </div>
 
-                    <div className="space-y-6">
-                        <label className="text-sm font-black uppercase text-zinc-400 tracking-[0.5em] ml-10">Broadcast Headline</label>
-                        <input value={emailSubject} onChange={(e) => setEmailSubject(e.target.value)} placeholder="What's the big news today?" className="w-full bg-zinc-50 dark:bg-[#070708] border border-zinc-100 dark:border-white/5 rounded-[40px] px-10 py-8 text-zinc-900 dark:text-white outline-none focus:ring-[15px] focus:ring-pink-500/5 focus:border-pink-500 font-black text-2xl transition-all shadow-inner" />
-                    </div>
+                   <div className="space-y-4">
+                      <label className="text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400 px-4">Announcement Subject</label>
+                      <input 
+                        type="text" 
+                        value={emailSubject}
+                        onChange={(e) => setEmailSubject(e.target.value)}
+                        placeholder="e.g. New Portal Features available in the Studio!" 
+                        className="w-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-[32px] px-8 py-6 text-zinc-900 dark:text-white font-bold text-xl outline-none focus:border-pink-500 transition-all"
+                      />
+                   </div>
 
-                    <div className="space-y-6">
-                        <label className="text-sm font-black uppercase text-zinc-400 tracking-[0.5em] ml-10">Studio Narrative</label>
-                        <textarea value={emailBody} onChange={(e) => setEmailBody(e.target.value)} rows={8} placeholder="Draft your professional message. You'll refine the media in Gmail." className="w-full bg-zinc-50 dark:bg-[#070708] border border-zinc-100 dark:border-white/5 rounded-[56px] px-12 py-12 text-zinc-900 dark:text-white outline-none focus:ring-[15px] focus:ring-pink-500/5 focus:border-pink-500 font-black text-2xl leading-[1.3] resize-none transition-all shadow-inner" />
-                    </div>
+                   <div className="space-y-4">
+                      <label className="text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400 px-4">Whisper Content</label>
+                      <textarea 
+                        value={emailBody}
+                        onChange={(e) => setEmailBody(e.target.value)}
+                        placeholder="Craft your global announcement here..." 
+                        rows={8}
+                        className="w-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-[40px] p-10 text-zinc-900 dark:text-white font-bold text-xl outline-none focus:border-pink-500 transition-all resize-none"
+                      />
+                   </div>
+
+                   <div className="pt-8 flex flex-col sm:flex-row gap-6">
+                      <button 
+                        onClick={openMailClient}
+                        className="flex-1 bg-pink-500 text-white font-black py-8 rounded-[36px] text-2xl shadow-[0_40px_80px_-20px_rgba(236,72,153,0.4)] hover:-translate-y-1 active:scale-95 transition-all flex items-center justify-center gap-4"
+                      >
+                         <ExternalLink size={28} strokeWidth={3} /> Launch Gmail Bridge
+                      </button>
+                   </div>
                 </div>
-
-                <div className="flex flex-col md:flex-row items-center justify-between gap-10 pt-16 border-t border-zinc-100 dark:border-white/5">
-                    <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 rounded-[28px] bg-blue-500/10 text-blue-500 flex items-center justify-center shadow-lg"><Mail size={32} /></div>
-                        <p className="text-sm font-black uppercase tracking-[0.4em] text-zinc-400">Postal Bridge Ready</p>
-                    </div>
-                    <button onClick={openMailClient} className="w-full md:w-auto bg-pink-500 hover:bg-pink-600 text-white font-black px-20 py-8 rounded-[40px] shadow-[0_40px_80px_-20px_rgba(236,72,153,0.4)] flex items-center justify-center gap-6 text-3xl transition-all active:scale-95">
-                        <ExternalLink size={36} /> Launch Studio
-                    </button>
-                </div>
-            </div>
-
-            <div className="xl:col-span-4 space-y-12">
-                <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[72px] p-16 shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:scale-110 transition-transform duration-1000"><RefreshCcw size={180} /></div>
-                    <h3 className="text-4xl font-black dark:text-white tracking-tighter mb-12 flex items-center gap-6"><Sparkles className="text-pink-500" size={32} /> Rules</h3>
-                    
-                    <div className="space-y-12 relative z-10">
-                        {[
-                          { title: 'Launch Draft', desc: 'Pre-populates your native client with the entire BCC list instantly.', icon: ExternalLink, color: 'text-blue-500' },
-                          { title: 'Rich Formatting', desc: 'Use Gmail\'s internal layout engine for that premium Amazon look.', icon: PenTool, color: 'text-purple-500' },
-                          { title: 'Asset Embedding', desc: 'Drag images directly into the Gmail frame. Zero server costs.', icon: Image, color: 'text-orange-500' },
-                        ].map((item, idx) => (
-                            <div key={idx} className="flex gap-8">
-                                <div className={`shrink-0 w-16 h-16 rounded-[24px] bg-zinc-100 dark:bg-white/5 flex items-center justify-center ${item.color} shadow-lg shadow-black/5`}><item.icon size={28} /></div>
-                                <div className="space-y-2">
-                                    <h4 className="font-black text-2xl dark:text-white tracking-tight leading-none">{item.title}</h4>
-                                    <p className="text-lg font-bold text-zinc-500 leading-relaxed">{item.desc}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
-};
-
-const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon: Icon, trend, trendUp, subtitle, color }) => {
-    const colorStyles = {
-        blue: 'bg-blue-500/10 text-blue-500',
-        green: 'bg-green-500/10 text-green-500',
-        orange: 'bg-orange-500/10 text-orange-500',
-        purple: 'bg-purple-500/10 text-purple-500',
-    }[color];
-
-    return (
-        <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 p-12 rounded-[64px] shadow-sm relative overflow-hidden group">
-            <div className="flex justify-between items-start mb-10">
-                <div className={`w-20 h-20 rounded-[32px] flex items-center justify-center ${colorStyles} transition-transform group-hover:scale-110 shadow-xl shadow-black/5`}><Icon size={40} /></div>
-                {trend && <div className={`flex items-center gap-2 text-[12px] font-black uppercase tracking-[0.2em] px-5 py-2.5 rounded-full ${trendUp ? 'text-green-500 bg-green-500/10' : 'text-red-500 bg-red-500/10'}`}>{trend}</div>}
-            </div>
-            <h3 className="text-7xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none mb-4">{value}</h3>
-            <p className="text-zinc-500 text-[12px] font-black uppercase tracking-[0.4em] leading-none">{title} {subtitle && <span className="opacity-40 ml-2">({subtitle})</span>}</p>
-        </div>
-    );
 };
 
 export default Admin;
