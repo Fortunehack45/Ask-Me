@@ -91,7 +91,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* APPLE-LEVEL ADAPTIVE SIDEBAR */}
       <aside className="hidden md:flex fixed left-0 top-0 h-[100dvh] w-72 border-r border-zinc-100 dark:border-white/5 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-[50px] z-40 flex-col shadow-2xl overflow-hidden">
-        {/* Branding (Fixed) */}
         <div className="pt-12 pb-8 px-8 shrink-0 relative">
           <div className="absolute top-0 inset-x-0 h-px bg-white/40 dark:bg-white/10 pointer-events-none"></div>
           <Link to="/" className="flex items-center gap-4 group">
@@ -106,7 +105,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </Link>
         </div>
 
-        {/* Scrollable Navigation Area */}
         <nav className="flex-1 px-5 py-2 space-y-1 overflow-y-auto no-scrollbar">
           <p className="px-5 text-[11px] font-black text-zinc-400 uppercase tracking-[0.25em] mb-4 mt-8 opacity-60">Management</p>
           {navItems.map((item) => {
@@ -146,7 +144,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </nav>
 
-        {/* Profile Footer (Fixed) */}
         <div className="mt-auto p-5 pb-4 shrink-0 border-t border-zinc-100 dark:border-white/5">
           <div className="bg-zinc-50/80 dark:bg-white/5 p-4 rounded-[30px] flex items-center gap-3.5 transition-all hover:bg-zinc-100 dark:hover:bg-white/10 mb-4">
              <div className="relative shrink-0">
@@ -169,7 +166,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
              </button>
           </div>
           
-          {/* Subtle Dev Signature */}
           <a 
             href="https://wa.me/2349167689200" 
             target="_blank" 
@@ -188,16 +184,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </aside>
 
-      {/* FULL HORIZON CONTENT AREA */}
-      <main className="w-full md:pl-72 min-h-screen relative z-10">
-        <div className="w-full px-6 md:px-12 lg:px-16 pt-24 pb-32 md:py-20 max-w-[1920px] mx-auto transition-all">
+      {/* FULL HORIZON CONTENT AREA - Stretch to fill viewport */}
+      <main className="w-full md:pl-72 min-h-screen relative z-10 flex flex-col">
+        <div className="flex-1 w-full px-4 md:px-8 lg:px-10 pt-24 pb-32 md:pt-16 md:pb-16 max-w-[2560px] mx-auto transition-all">
            {children}
         </div>
       </main>
 
-      {/* LIQUID GLASS MOBILE BOTTOM NAV (Removed Dots) */}
       <nav className="md:hidden fixed bottom-6 left-6 right-6 z-50 h-20 px-2 flex items-center justify-around rounded-[40px] overflow-hidden">
-        {/* Layered Glass Surface */}
         <div className="absolute inset-0 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-[40px] border border-white/20 dark:border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.5)] pointer-events-none"></div>
         <div className="absolute inset-x-0 top-0 h-px bg-white/20 dark:bg-white/10 pointer-events-none"></div>
         

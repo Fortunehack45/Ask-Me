@@ -1,10 +1,7 @@
 
-import { initializeApp, getApps, getApp } from "firebase/app";
-import type { FirebaseApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import type { Auth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import type { Firestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
@@ -20,7 +17,7 @@ const firebaseConfig = {
 // Initialize Firebase App
 const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize Modular Services with explicit app reference to ensure registration
+// Initialize Modular Services with explicit app reference
 export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();

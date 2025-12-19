@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Fix: Consolidated imports for onAuthStateChanged and User interface to resolve resolution issues
-import { onAuthStateChanged, User } from 'firebase/auth';
+// Fix: Use explicit type import for User to resolve member resolution issues
+import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '../firebase';
 import { getUserProfile, updateUserLastActive } from '../services/db';
 import { UserProfile } from '../types';

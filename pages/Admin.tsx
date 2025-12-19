@@ -105,69 +105,69 @@ const Admin: React.FC = () => {
   if (loading) return <div className="flex h-[80vh] w-full justify-center items-center text-pink-500"><Loader2 className="animate-spin" size={40} /></div>;
 
   return (
-    <div className="space-y-10 pb-24 max-w-7xl mx-auto px-4 md:px-0">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+    <div className="space-y-12 pb-24 w-full animate-in fade-in duration-1000">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
         <div>
-          <h1 className="text-4xl md:text-6xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-4 leading-none">
-            Admin <span className="text-pink-600">Command</span>
+          <h1 className="text-6xl md:text-8xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-6 leading-none">
+            Admin <span className="text-pink-600">HQ</span>
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-2 font-bold text-lg opacity-80">Platform Nexus & Global Dispatch.</p>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-4 font-bold text-2xl opacity-80 leading-relaxed">Platform nexus and global dispatch center.</p>
         </div>
         
-        <div className="flex bg-zinc-100 dark:bg-white/5 p-1.5 rounded-[24px] border border-zinc-200 dark:border-white/10 shadow-sm self-start">
-            <button onClick={() => setActiveTab('analytics')} className={clsx("px-6 py-3.5 rounded-[20px] text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3", activeTab === 'analytics' ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xl" : "text-zinc-500 hover:text-zinc-900")}>
-              <Activity size={18} /> Pulse
+        <div className="flex bg-zinc-100 dark:bg-white/5 p-2 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm self-start lg:self-center">
+            <button onClick={() => setActiveTab('analytics')} className={clsx("px-10 py-5 rounded-[24px] text-sm font-black uppercase tracking-widest transition-all flex items-center gap-4", activeTab === 'analytics' ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-2xl" : "text-zinc-500 hover:text-zinc-900")}>
+              <Activity size={24} /> Pulse
             </button>
-            <button onClick={() => setActiveTab('directory')} className={clsx("px-6 py-3.5 rounded-[20px] text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3", activeTab === 'directory' ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xl" : "text-zinc-500 hover:text-zinc-900")}>
-              <Users size={18} /> Directory
+            <button onClick={() => setActiveTab('directory')} className={clsx("px-10 py-5 rounded-[24px] text-sm font-black uppercase tracking-widest transition-all flex items-center gap-4", activeTab === 'directory' ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-2xl" : "text-zinc-500 hover:text-zinc-900")}>
+              <Users size={24} /> Directory
             </button>
-            <button onClick={() => setActiveTab('broadcast')} className={clsx("px-6 py-3.5 rounded-[20px] text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3", activeTab === 'broadcast' ? "bg-pink-500 text-white shadow-xl" : "text-zinc-500 hover:text-zinc-900")}>
-              <Mail size={18} /> Dispatch
+            <button onClick={() => setActiveTab('broadcast')} className={clsx("px-10 py-5 rounded-[24px] text-sm font-black uppercase tracking-widest transition-all flex items-center gap-4", activeTab === 'broadcast' ? "bg-pink-500 text-white shadow-2xl" : "text-zinc-500 hover:text-zinc-900")}>
+              <Mail size={24} /> Dispatch
             </button>
         </div>
       </div>
 
       <AnimatePresence mode="wait">
         {activeTab === 'analytics' && (
-          <motion.div key="analytics" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-10">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <StatsCard title="Total Studio Users" value={stats.total} icon={Users} trend="+12%" trendUp={true} color="blue" />
-              <StatsCard title="Active Pulse" value={stats.active} icon={Activity} trend="+5%" trendUp={true} color="green" />
-              <StatsCard title="Recent Guests" value={stats.new} subtitle="This Week" icon={TrendingUp} color="orange" />
+          <motion.div key="analytics" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <StatsCard title="Global Studio Participants" value={stats.total} icon={Users} trend="+18%" trendUp={true} color="blue" />
+              <StatsCard title="Active Pulse Activity" value={stats.active} icon={Activity} trend="+12%" trendUp={true} color="green" />
+              <StatsCard title="Recent Guest Influx" value={stats.new} subtitle="This Week" icon={TrendingUp} color="orange" />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              <div className="lg:col-span-8 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-3xl border border-zinc-200 dark:border-white/5 rounded-[48px] p-10 shadow-sm h-[450px]">
-                  <h3 className="text-2xl font-black text-zinc-900 dark:text-white mb-10 tracking-tight">User Acquisition</h3>
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-12">
+              <div className="xl:col-span-8 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[64px] p-12 shadow-sm h-[550px]">
+                  <h3 className="text-3xl font-black text-zinc-900 dark:text-white mb-12 tracking-tighter">Acquisition Velocity</h3>
                   <ResponsiveContainer width="100%" height="80%">
                       <AreaChart data={chartData}>
                           <defs><linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#ec4899" stopOpacity={0.3}/><stop offset="95%" stopColor="#ec4899" stopOpacity={0}/></linearGradient></defs>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.05} />
-                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#71717a', fontSize: 10, fontWeight: 800 }} />
-                          <YAxis axisLine={false} tickLine={false} tick={{ fill: '#71717a', fontSize: 10, fontWeight: 800 }} />
-                          <Tooltip contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '16px' }} />
-                          <Area type="monotone" dataKey="New Users" stroke="#ec4899" strokeWidth={4} fill="url(#colorUsers)" />
+                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#71717a', fontSize: 12, fontWeight: 900 }} />
+                          <YAxis axisLine={false} tickLine={false} tick={{ fill: '#71717a', fontSize: 12, fontWeight: 900 }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: '24px', padding: '16px' }} />
+                          <Area type="monotone" dataKey="New Users" stroke="#ec4899" strokeWidth={6} fill="url(#colorUsers)" />
                       </AreaChart>
                   </ResponsiveContainer>
               </div>
 
               {/* RECENT GUESTS WIDGET */}
-              <div className="lg:col-span-4 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-3xl border border-zinc-200 dark:border-white/5 rounded-[48px] p-10 flex flex-col shadow-sm">
-                  <div className="flex justify-between items-center mb-8">
-                      <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Recent Guests</h3>
-                      <button onClick={() => setActiveTab('directory')} className="text-[10px] font-black text-pink-500 uppercase tracking-widest hover:underline underline-offset-4">Directory</button>
+              <div className="xl:col-span-4 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[64px] p-12 flex flex-col shadow-sm">
+                  <div className="flex justify-between items-center mb-12">
+                      <h3 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tighter">Recent Entries</h3>
+                      <button onClick={() => setActiveTab('directory')} className="text-[12px] font-black text-pink-500 uppercase tracking-[0.3em] hover:underline underline-offset-8">View All</button>
                   </div>
-                  <div className="space-y-6 flex-1 overflow-y-auto no-scrollbar">
-                      {users.slice(0, 6).map(u => (
-                          <div key={u.uid} className="flex items-center gap-5 group">
-                              <img src={u.avatar} alt={u.username} className="w-12 h-12 rounded-full object-cover group-hover:scale-110 transition-transform ring-2 ring-zinc-100 dark:ring-white/5 shadow-md" />
+                  <div className="space-y-8 flex-1 overflow-y-auto no-scrollbar">
+                      {users.slice(0, 8).map(u => (
+                          <div key={u.uid} className="flex items-center gap-6 group">
+                              <img src={u.avatar} alt={u.username} className="w-16 h-16 rounded-[24px] object-cover group-hover:scale-110 transition-transform ring-4 ring-zinc-50 dark:ring-white/5 shadow-xl" />
                               <div className="flex-1 min-w-0">
-                                  <p className="font-black text-zinc-900 dark:text-white truncate leading-none mb-1">{u.fullName}</p>
-                                  <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Joined {timeAgo(u.createdAt)}</p>
+                                  <p className="font-black text-zinc-900 dark:text-white truncate text-xl leading-none mb-2 tracking-tight">{u.fullName}</p>
+                                  <p className="text-[11px] font-black text-zinc-400 uppercase tracking-[0.2em]">Joined {timeAgo(u.createdAt)}</p>
                               </div>
                           </div>
                       ))}
-                      {users.length === 0 && <p className="text-zinc-500 font-bold italic py-10 text-center">No guests found yet.</p>}
+                      {users.length === 0 && <p className="text-zinc-500 font-bold italic py-20 text-center text-xl">Directory is empty.</p>}
                   </div>
               </div>
             </div>
@@ -175,40 +175,40 @@ const Admin: React.FC = () => {
         )}
 
         {activeTab === 'directory' && (
-          <motion.div key="directory" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-              <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-3xl border border-zinc-200 dark:border-white/5 rounded-[48px] p-10 shadow-sm">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-10">
+          <motion.div key="directory" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-12 w-full">
+              <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[64px] p-12 md:p-16 shadow-sm">
+                  <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-12 mb-16">
                       <div>
-                          <h2 className="text-3xl font-black dark:text-white tracking-tighter">Guest Directory</h2>
-                          <p className="text-zinc-500 font-bold text-sm mt-1">{users.length} verified studio participants.</p>
+                          <h2 className="text-5xl font-black dark:text-white tracking-tighter leading-none mb-3">Studio Directory</h2>
+                          <p className="text-zinc-500 font-bold text-2xl tracking-tight">{users.length} verified platform guests.</p>
                       </div>
-                      <div className="relative flex-1 max-w-md">
-                          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
+                      <div className="relative flex-1 max-w-2xl">
+                          <Search className="absolute left-8 top-1/2 -translate-y-1/2 text-zinc-400" size={32} />
                           <input 
                               type="text" 
-                              placeholder="Search by name, email, or @username..." 
+                              placeholder="Search by identity, mail, or studio tag..." 
                               value={searchQuery}
                               onChange={(e) => setSearchQuery(e.target.value)}
-                              className="w-full bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-[28px] py-5 pl-14 pr-8 outline-none focus:ring-[12px] focus:ring-pink-500/5 focus:border-pink-500 font-bold text-lg transition-all shadow-inner"
+                              className="w-full bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-[40px] py-8 pl-20 pr-10 outline-none focus:ring-[15px] focus:ring-pink-500/5 focus:border-pink-500 font-black text-2xl transition-all shadow-inner placeholder:opacity-30"
                           />
                       </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
                       {filteredUsers.map(u => (
-                          <div key={u.uid} className="flex items-center gap-5 p-5 rounded-[32px] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-white/5 group hover:border-pink-500/20 transition-all shadow-sm">
-                              <img src={u.avatar} alt={u.username} className="w-14 h-14 rounded-full object-cover group-hover:scale-105 transition-transform border-2 border-zinc-100 dark:border-white/10" />
+                          <div key={u.uid} className="flex items-center gap-6 p-8 rounded-[48px] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-white/5 group hover:border-pink-500/30 hover:shadow-2xl transition-all">
+                              <img src={u.avatar} alt={u.username} className="w-20 h-20 rounded-[32px] object-cover group-hover:scale-105 transition-transform border-4 border-zinc-50 dark:border-white/10 shadow-lg" />
                               <div className="flex-1 min-w-0">
-                                  <p className="font-black text-zinc-900 dark:text-white truncate text-lg leading-none mb-1">{u.fullName}</p>
-                                  <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">@{u.username}</p>
-                                  <p className="text-[9px] font-bold text-zinc-500 truncate mt-1">{u.email}</p>
+                                  <p className="font-black text-zinc-900 dark:text-white truncate text-2xl leading-none mb-2 tracking-tight">{u.fullName}</p>
+                                  <p className="text-[12px] font-black text-zinc-400 uppercase tracking-[0.3em]">@{u.username}</p>
+                                  <p className="text-[10px] font-bold text-zinc-500 truncate mt-3 opacity-60">{u.email}</p>
                               </div>
-                              <a href={`#/u/${u.username}`} target="_blank" rel="noopener noreferrer" className="p-3 opacity-0 group-hover:opacity-100 transition-all bg-pink-500/10 text-pink-500 rounded-xl"><ArrowUpRight size={20} /></a>
+                              <a href={`#/u/${u.username}`} target="_blank" rel="noopener noreferrer" className="p-4 opacity-0 group-hover:opacity-100 transition-all bg-pink-500/10 text-pink-500 rounded-2xl hover:scale-110 active:scale-90"><ArrowUpRight size={28} /></a>
                           </div>
                       ))}
                       {filteredUsers.length === 0 && (
-                          <div className="col-span-full py-20 text-center bg-zinc-50 dark:bg-white/5 rounded-[40px] border-2 border-dashed border-zinc-200 dark:border-white/10">
-                              <p className="text-zinc-500 font-black text-xl">No guests match "{searchQuery}"</p>
+                          <div className="col-span-full py-48 text-center bg-zinc-50 dark:bg-white/[0.02] rounded-[64px] border-4 border-dashed border-zinc-100 dark:border-white/5">
+                              <p className="text-zinc-500 dark:text-zinc-600 font-black text-4xl tracking-tighter">Zero matches for "{searchQuery}"</p>
                           </div>
                       )}
                   </div>
@@ -217,94 +217,76 @@ const Admin: React.FC = () => {
         )}
 
         {activeTab === 'broadcast' && (
-          <motion.div key="broadcast" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            {/* DISPATCH CONTROL */}
-            <div className="lg:col-span-7 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-3xl border border-zinc-200 dark:border-white/5 rounded-[48px] p-10 md:p-14 shadow-sm space-y-12">
+          <motion.div key="broadcast" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="grid grid-cols-1 xl:grid-cols-12 gap-12 w-full">
+            <div className="xl:col-span-8 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[72px] p-14 md:p-20 shadow-sm space-y-16">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-3xl font-black dark:text-white tracking-tighter">Gmail Dispatcher</h2>
-                        <p className="text-zinc-500 dark:text-zinc-400 font-bold mt-1 uppercase tracking-widest text-[10px]">Send professional emails using your local app.</p>
+                        <h2 className="text-5xl font-black dark:text-white tracking-tighter leading-none">Studio Dispatch</h2>
+                        <p className="text-zinc-500 dark:text-zinc-400 font-bold mt-4 text-2xl leading-relaxed">Broadcast professional narratives through Gmail.</p>
                     </div>
-                    <div className="px-5 py-2.5 bg-pink-500/10 text-pink-500 rounded-full text-[10px] font-black uppercase tracking-widest border border-pink-500/20">Postal Reach: {users.length}</div>
+                    <div className="px-8 py-4 bg-pink-500/10 text-pink-500 rounded-full text-sm font-black uppercase tracking-widest border border-pink-500/20 shadow-lg">Reach: {users.length} Users</div>
                 </div>
 
-                <div className="space-y-8">
-                    {/* BCC Aggregator */}
-                    <div className="p-8 bg-zinc-50 dark:bg-[#070708] border border-zinc-100 dark:border-white/5 rounded-[32px] space-y-4">
+                <div className="space-y-12">
+                    <div className="p-12 bg-zinc-50 dark:bg-[#070708] border border-zinc-100 dark:border-white/5 rounded-[48px] space-y-8 shadow-inner">
                         <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em]">Verified BCC List</span>
+                            <span className="text-[12px] font-black uppercase text-zinc-400 tracking-[0.4em]">Global BCC Pipeline</span>
                             <button 
                                 onClick={handleCopyBCC} 
                                 className={clsx(
-                                    "flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                    "flex items-center gap-3 px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all shadow-xl",
                                     copiedBCC ? "bg-green-500 text-white" : "bg-zinc-200 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:text-pink-500"
                                 )}
                             >
-                                {copiedBCC ? <Check size={14} /> : <Copy size={14} />} {copiedBCC ? 'Copied' : 'Copy All Emails'}
+                                {copiedBCC ? <Check size={20} strokeWidth={4} /> : <Copy size={20} />} {copiedBCC ? 'Synchronized' : 'Copy All Emails'}
                             </button>
                         </div>
-                        <div className="text-zinc-500 font-medium text-xs truncate opacity-40 italic">
+                        <div className="text-zinc-500 font-medium text-lg truncate opacity-40 italic">
                             {bccList}
                         </div>
-                        <p className="text-[9px] font-bold text-zinc-400">Pro Tip: For massive lists, copy this BCC list and paste it manually into Gmail's "BCC" field.</p>
                     </div>
 
-                    <div className="space-y-4">
-                        <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.3em] ml-6">Email Subject</label>
-                        <input value={emailSubject} onChange={(e) => setEmailSubject(e.target.value)} placeholder="Enter the headline of your broadcast..." className="w-full bg-zinc-50 dark:bg-[#070708] border border-zinc-100 dark:border-white/5 rounded-[28px] px-8 py-5 text-zinc-900 dark:text-white outline-none focus:ring-[12px] focus:ring-pink-500/5 focus:border-pink-500 font-bold text-lg transition-all" />
+                    <div className="space-y-6">
+                        <label className="text-sm font-black uppercase text-zinc-400 tracking-[0.5em] ml-10">Broadcast Headline</label>
+                        <input value={emailSubject} onChange={(e) => setEmailSubject(e.target.value)} placeholder="What's the big news today?" className="w-full bg-zinc-50 dark:bg-[#070708] border border-zinc-100 dark:border-white/5 rounded-[40px] px-10 py-8 text-zinc-900 dark:text-white outline-none focus:ring-[15px] focus:ring-pink-500/5 focus:border-pink-500 font-black text-2xl transition-all shadow-inner" />
                     </div>
 
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center px-6">
-                            <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.3em]">Message Body</label>
-                            <span className="text-[9px] font-black text-pink-500 uppercase tracking-widest">Gmail handles formatting</span>
-                        </div>
-                        <textarea value={emailBody} onChange={(e) => setEmailBody(e.target.value)} rows={6} placeholder="Draft your message content here. You can refine the look and add images directly in Gmail after launching." className="w-full bg-zinc-50 dark:bg-[#070708] border border-zinc-100 dark:border-white/5 rounded-[40px] px-10 py-10 text-zinc-900 dark:text-white outline-none focus:ring-[12px] focus:ring-pink-500/5 focus:border-pink-500 font-bold text-lg leading-relaxed resize-none transition-all shadow-inner" />
+                    <div className="space-y-6">
+                        <label className="text-sm font-black uppercase text-zinc-400 tracking-[0.5em] ml-10">Studio Narrative</label>
+                        <textarea value={emailBody} onChange={(e) => setEmailBody(e.target.value)} rows={8} placeholder="Draft your professional message. You'll refine the media in Gmail." className="w-full bg-zinc-50 dark:bg-[#070708] border border-zinc-100 dark:border-white/5 rounded-[56px] px-12 py-12 text-zinc-900 dark:text-white outline-none focus:ring-[15px] focus:ring-pink-500/5 focus:border-pink-500 font-black text-2xl leading-[1.3] resize-none transition-all shadow-inner" />
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-10 border-t border-zinc-100 dark:border-white/5">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><Mail size={20} /></div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Native Bridge Active</p>
+                <div className="flex flex-col md:flex-row items-center justify-between gap-10 pt-16 border-t border-zinc-100 dark:border-white/5">
+                    <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 rounded-[28px] bg-blue-500/10 text-blue-500 flex items-center justify-center shadow-lg"><Mail size={32} /></div>
+                        <p className="text-sm font-black uppercase tracking-[0.4em] text-zinc-400">Postal Bridge Ready</p>
                     </div>
-                    <button onClick={openMailClient} className="w-full md:w-auto bg-pink-500 hover:bg-pink-600 text-white font-black px-12 py-5 rounded-[24px] shadow-2xl flex items-center justify-center gap-4 text-lg transition-all active:scale-95">
-                        <ExternalLink size={24} /> Launch Gmail Studio
+                    <button onClick={openMailClient} className="w-full md:w-auto bg-pink-500 hover:bg-pink-600 text-white font-black px-20 py-8 rounded-[40px] shadow-[0_40px_80px_-20px_rgba(236,72,153,0.4)] flex items-center justify-center gap-6 text-3xl transition-all active:scale-95">
+                        <ExternalLink size={36} /> Launch Studio
                     </button>
                 </div>
             </div>
 
-            {/* STUDIO GUIDELINES */}
-            <div className="lg:col-span-5 space-y-8">
-                <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-3xl border border-zinc-200 dark:border-white/5 rounded-[48px] p-10 shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:scale-110 transition-transform duration-1000"><RefreshCcw size={120} /></div>
-                    <h3 className="text-xl font-black dark:text-white tracking-tighter mb-8 flex items-center gap-3"><Sparkles className="text-pink-500" size={20} /> Postal Workflow</h3>
+            <div className="xl:col-span-4 space-y-12">
+                <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[72px] p-16 shadow-sm relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:scale-110 transition-transform duration-1000"><RefreshCcw size={180} /></div>
+                    <h3 className="text-4xl font-black dark:text-white tracking-tighter mb-12 flex items-center gap-6"><Sparkles className="text-pink-500" size={32} /> Rules</h3>
                     
-                    <div className="space-y-8 relative z-10">
+                    <div className="space-y-12 relative z-10">
                         {[
-                          { title: 'Launch Draft', desc: 'Click "Launch Gmail Studio" to open your device\'s native mail app with your user list pre-populated in the BCC field.', icon: ExternalLink, color: 'text-blue-500' },
-                          { title: 'Rich Formatting', desc: 'Once in Gmail, use their built-in tools to change fonts, colors, and layouts to match Facebook/Amazon standards.', icon: PenTool, color: 'text-purple-500' },
-                          { title: 'No Storage Limits', desc: 'Drag-and-drop high-res images and documents directly into the Gmail window. Gmail hosts them for free.', icon: Image, color: 'text-orange-500' },
-                          { title: 'Document Support', desc: 'Attach PDF reports or platform manuals without uploading anything to Firebase. Everything stays in your mail ecosystem.', icon: FileText, color: 'text-green-500' },
+                          { title: 'Launch Draft', desc: 'Pre-populates your native client with the entire BCC list instantly.', icon: ExternalLink, color: 'text-blue-500' },
+                          { title: 'Rich Formatting', desc: 'Use Gmail\'s internal layout engine for that premium Amazon look.', icon: PenTool, color: 'text-purple-500' },
+                          { title: 'Asset Embedding', desc: 'Drag images directly into the Gmail frame. Zero server costs.', icon: Image, color: 'text-orange-500' },
                         ].map((item, idx) => (
-                            <div key={idx} className="flex gap-5">
-                                <div className={`shrink-0 w-10 h-10 rounded-xl bg-zinc-100 dark:bg-white/5 flex items-center justify-center ${item.color}`}><item.icon size={18} /></div>
-                                <div className="space-y-1">
-                                    <h4 className="font-black text-sm dark:text-white tracking-tight">{item.title}</h4>
-                                    <p className="text-xs font-bold text-zinc-500 leading-relaxed">{item.desc}</p>
+                            <div key={idx} className="flex gap-8">
+                                <div className={`shrink-0 w-16 h-16 rounded-[24px] bg-zinc-100 dark:bg-white/5 flex items-center justify-center ${item.color} shadow-lg shadow-black/5`}><item.icon size={28} /></div>
+                                <div className="space-y-2">
+                                    <h4 className="font-black text-2xl dark:text-white tracking-tight leading-none">{item.title}</h4>
+                                    <p className="text-lg font-bold text-zinc-500 leading-relaxed">{item.desc}</p>
                                 </div>
                             </div>
                         ))}
-                    </div>
-                </div>
-
-                <div className="bg-zinc-950 rounded-[48px] p-10 text-center shadow-2xl relative group overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-transparent opacity-50 group-hover:opacity-70 transition-opacity"></div>
-                    <div className="relative z-10 space-y-6">
-                        <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto text-white border border-white/10 shadow-xl"><Globe size={32} /></div>
-                        <h3 className="text-2xl font-black text-white tracking-tighter">Global Reach</h3>
-                        <p className="text-white/50 font-bold text-sm leading-relaxed">Broadcast to your community instantly. Gmail ensures the highest delivery rates for your platform's growth.</p>
                     </div>
                 </div>
             </div>
@@ -324,13 +306,13 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon: Icon, trend, 
     }[color];
 
     return (
-        <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-3xl border border-zinc-200 dark:border-white/5 p-8 rounded-[40px] shadow-sm relative overflow-hidden group">
-            <div className="flex justify-between items-start mb-6">
-                <div className={`w-14 h-14 rounded-[24px] flex items-center justify-center ${colorStyles} transition-transform group-hover:scale-110 shadow-lg`}><Icon size={28} /></div>
-                {trend && <div className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${trendUp ? 'text-green-500 bg-green-500/10' : 'text-red-500 bg-red-500/10'}`}>{trend}</div>}
+        <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 p-12 rounded-[64px] shadow-sm relative overflow-hidden group">
+            <div className="flex justify-between items-start mb-10">
+                <div className={`w-20 h-20 rounded-[32px] flex items-center justify-center ${colorStyles} transition-transform group-hover:scale-110 shadow-xl shadow-black/5`}><Icon size={40} /></div>
+                {trend && <div className={`flex items-center gap-2 text-[12px] font-black uppercase tracking-[0.2em] px-5 py-2.5 rounded-full ${trendUp ? 'text-green-500 bg-green-500/10' : 'text-red-500 bg-red-500/10'}`}>{trend}</div>}
             </div>
-            <h3 className="text-4xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none mb-2">{value}</h3>
-            <p className="text-zinc-500 text-[11px] font-black uppercase tracking-[0.2em]">{title} {subtitle && <span className="opacity-40 ml-1">({subtitle})</span>}</p>
+            <h3 className="text-7xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none mb-4">{value}</h3>
+            <p className="text-zinc-500 text-[12px] font-black uppercase tracking-[0.4em] leading-none">{title} {subtitle && <span className="opacity-40 ml-2">({subtitle})</span>}</p>
         </div>
     );
 };
