@@ -508,7 +508,7 @@ const Settings = () => {
                     <MessageCircle size={18} /> Contact Architect
                   </a>
                   <div className="flex items-center gap-3 px-6 py-3 bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 rounded-2xl font-black text-xs uppercase tracking-widest border border-zinc-200 dark:border-white/10">
-                    <Heart size={18} className="text-pink-500 fill-pink-500" /> Made in Nigeria
+                    <Heart size={18} className="text-pink-500 fill-pink-500" /> Crafted in Nigeria
                   </div>
                 </div>
              </div>

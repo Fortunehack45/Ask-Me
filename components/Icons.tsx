@@ -47,7 +47,19 @@ import {
   Trash2,
   RefreshCcw,
   ShieldCheck,
-  Globe
+  Globe,
+  Mail,
+  AlertCircle,
+  PenTool,
+  ImagePlus,
+  Paperclip,
+  FileText,
+  Type,
+  Bold,
+  Italic,
+  List,
+  Link as LinkIcon,
+  FileType
 } from 'lucide-react';
 
 export {
@@ -98,5 +110,17 @@ export {
   Trash2,
   RefreshCcw,
   ShieldCheck,
-  Globe
+  Globe,
+  Mail,
+  AlertCircle,
+  PenTool,
+  ImagePlus,
+  Paperclip,
+  FileText,
+  Type,
+  Bold,
+  Italic,
+  List,
+  LinkIcon,
+  FileType
 };
