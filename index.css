@@ -10,14 +10,14 @@
 }
 
 html.dark {
-  --bg-primary: #020617;
+  --bg-primary: #050506;
   --text-primary: #f8fafc;
 }
 
 html {
   height: 100%;
   background-color: var(--bg-primary);
-  transition: background-color 0.3s ease;
+  transition: background-color 0.5s ease;
   scroll-behavior: smooth;
 }
 
@@ -29,7 +29,7 @@ body {
   overflow-x: hidden;
   min-height: 100%;
   position: relative;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.5s ease, color 0.5s ease;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -47,22 +47,25 @@ body {
   height: 100dvh;
   pointer-events: none !important;
   z-index: -1;
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* Premium Mesh Gradient */
-.bg-mesh-pink {
-  background-color: #ec4899;
-  background-image: 
-    radial-gradient(at 0% 0%, hsla(339, 81%, 59%, 1) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(27, 96%, 53%, 1) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(339, 81%, 59%, 1) 0, transparent 50%), 
-    radial-gradient(at 0% 100%, hsla(27, 96%, 53%, 1) 0, transparent 50%), 
-    radial-gradient(at 50% 100%, hsla(339, 81%, 59%, 1) 0, transparent 50%), 
-    radial-gradient(at 100% 100%, hsla(339, 81%, 59%, 1) 0, transparent 50%);
-  pointer-events: none !important;
-  z-index: -2 !important;
+/* Premium Liquid Glass Utilities */
+.glass-liquid {
+  @apply backdrop-blur-[50px] bg-white/40 dark:bg-white/[0.03] border border-white/30 dark:border-white/10 shadow-2xl;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+html.dark .glass {
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -84,31 +87,43 @@ html.dark ::-webkit-scrollbar-thumb {
   background: #1e293b;
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-html.dark .glass {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
 .premium-shadow {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.15);
 }
 
-@keyframes pulse-slow {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.5; }
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(40px, -60px) scale(1.15); }
+  66% { transform: translate(-30px, 30px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
 }
-.animate-pulse-slow {
-  animation: pulse-slow 4s infinite ease-in-out;
+
+.animate-blob {
+  animation: blob 15s infinite ease-in-out;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
 }
 
 /* Ensure inputs are legible on mobile without auto-zoom issues */
 input, textarea {
   font-size: 16px !important;
+}
+
+/* Custom Safe Area Padding */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.h-18 {
+  height: 4.5rem;
+}
+
+.w-76 {
+  width: 19rem;
+}
+
+.md\:pl-76 {
+  padding-left: 19rem;
 }
