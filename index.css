@@ -51,13 +51,13 @@ body {
 
 /* Premium Glass Variants */
 .glass-liquid-v2 {
-  background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(48px);
-  -webkit-backdrop-filter: blur(48px);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(50px);
 }
 
 html.dark .glass-liquid-v2 {
-  background: rgba(8, 8, 10, 0.5);
+  background: rgba(10, 10, 12, 0.7);
 }
 
 /* Hide Scrollbars but keep functionality */
@@ -72,27 +72,27 @@ html.dark .glass-liquid-v2 {
 /* Custom Scrollbar for desktop */
 @media (min-width: 768px) {
   ::-webkit-scrollbar {
-    width: 5px;
+    width: 6px;
   }
   ::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
   }
   html.dark ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
   }
 }
 
 /* Blob Animation */
 @keyframes blob {
   0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(60px, -80px) scale(1.1); }
-  66% { transform: translate(-40px, 40px) scale(0.9); }
+  33% { transform: translate(80px, -100px) scale(1.15); }
+  66% { transform: translate(-50px, 50px) scale(0.9); }
   100% { transform: translate(0px, 0px) scale(1); }
 }
 
 .animate-blob {
-  animation: blob 20s infinite ease-in-out;
+  animation: blob 25s infinite ease-in-out;
 }
 
 .animation-delay-2000 {
@@ -107,6 +107,14 @@ input, textarea {
 /* Spacing and Dimensions */
 .h-18 {
   height: 4.5rem;
+}
+
+.h-20 {
+  height: 5rem;
+}
+
+.pt-24 {
+  padding-top: 6rem;
 }
 
 .md\:pl-70 {
