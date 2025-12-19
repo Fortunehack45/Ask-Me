@@ -148,12 +148,18 @@ const ProfileHeader = ({ profile, onShareRequest }: { profile: UserProfile, onSh
             <img src={profile.avatar} alt={profile.username} className="relative w-24 h-24 md:w-28 md:h-28 rounded-full object-cover border-[4px] border-white dark:border-zinc-900 shadow-xl" />
             {profile.premiumStatus && <div className="absolute -right-1 bottom-1 bg-pink-500 text-white p-1.5 rounded-lg border-2 border-white dark:border-zinc-950 shadow-lg"><Sparkles size={12} fill="white" /></div>}
         </motion.div>
-        <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="space-y-2">
+        <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="space-y-2 flex flex-col items-center">
             <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">{profile.fullName}</h1>
             <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm tracking-tight">@{profile.username}</p>
             {profile.bio && <p className="text-zinc-600 dark:text-zinc-400 text-base font-medium max-w-md mx-auto leading-relaxed">{profile.bio}</p>}
-            <div className="pt-3">
-                <button onClick={onShareRequest} className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-transparent dark:border-zinc-800 text-[10px] font-black text-zinc-900 dark:text-white hover:bg-zinc-200 transition-all active:scale-95 shadow-sm uppercase tracking-widest"><Palette size={14} className="text-pink-500" /> Studio Asset</button>
+            <div className="pt-5 w-full flex justify-center">
+                <button 
+                  onClick={onShareRequest} 
+                  className="flex items-center justify-center gap-3 px-8 py-3.5 rounded-[22px] bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-[11px] font-black text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all active:scale-95 shadow-md uppercase tracking-[0.2em] group/share"
+                >
+                  <Share2 size={16} className="text-pink-500 transition-transform group-hover/share:scale-110" /> 
+                  Share Profile Link
+                </button>
             </div>
         </motion.div>
     </div>
