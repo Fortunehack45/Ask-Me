@@ -37,6 +37,9 @@ const PublicProfile = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showShareStudio, setShowShareStudio] = useState(false);
+  const [shareTheme, setShareTheme] = useState(THEMES[0]);
+  const [isSharing, setIsSharing] = useState(false);
   const shareCaptureRef = useRef<HTMLDivElement>(null);
 
   const isOwner = user && profile && user.uid === profile.uid;
@@ -58,12 +61,10 @@ const PublicProfile = () => {
     return () => { document.title = 'Ask Me'; };
   }, [username]);
 
-  // PROFESSIONAL NATIVE SHARE LOGIC
   const handleNativeShare = async () => {
     if (!profile || !shareCaptureRef.current) return;
-    
+    setIsSharing(true);
     try {
-      // 1. Generate High-Res Image
       const dataUrl = await toPng(shareCaptureRef.current, { 
         pixelRatio: 3, 
         cacheBust: true,
@@ -71,30 +72,27 @@ const PublicProfile = () => {
         height: 1920 
       });
 
-      // 2. Convert to File object
       const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], `askme-${profile.username}.png`, { type: 'image/png' });
 
-      const shareData = {
-        title: `Ask @${profile.username} Anything!`,
-        text: `Send me an anonymous message here:`,
-        url: window.location.href,
-        files: [file],
-      };
-
-      // 3. Native Share with Image support check
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: `Ask @${profile.username} Anything!`,
+          text: `Send me an anonymous message here:`,
+          url: window.location.href,
+          files: [file],
+        });
       } else if (navigator.share) {
-        // Fallback to text share + manual download if file share fails
-        await navigator.share({ title: shareData.title, text: shareData.text, url: shareData.url });
+        await navigator.share({ title: `Ask @${profile.username}`, url: window.location.href });
       } else {
-        // Fallback for desktop: Copy Link
         await copyToClipboard(window.location.href);
         alert("Link copied! Share it on your stories.");
       }
+      setShowShareStudio(false);
     } catch (err) {
       console.error("Share failed", err);
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -121,27 +119,24 @@ const PublicProfile = () => {
   return (
     <div className="min-h-screen w-full flex flex-col items-center pb-24 relative overflow-x-hidden">
       
-      {/* HIDDEN SHARE ASSET GENERATOR (BLUE THEME) */}
+      {/* HIDDEN SHARE ASSET GENERATOR (Dynamic Theme) */}
       <div className="fixed left-[-9999px] top-0 overflow-hidden" style={{ width: '1080px', height: '1920px', pointerEvents: 'none' }}>
-          <div ref={shareCaptureRef} className="w-full h-full flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900">
+          <div ref={shareCaptureRef} className={clsx("w-full h-full flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
               <div className="absolute inset-0 opacity-[0.08] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
-              
               <div className="absolute top-24 flex items-center gap-6">
                 <div className="w-20 h-20 rounded-[28px] bg-white/20 backdrop-blur-3xl flex items-center justify-center border border-white/20 shadow-2xl">
                   <span className="text-white font-black text-4xl">A</span>
                 </div>
                 <span className="text-white font-black uppercase tracking-[0.5em] text-2xl">ASK ME</span>
               </div>
-
               <div className="relative z-10 flex flex-col items-center w-full">
                   <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl">
                       <img src={profile.avatar} className="w-full h-full object-cover" alt="Profile" />
                   </div>
-                  <div className="p-24 rounded-[100px] shadow-[0_60px_120px_-20px_rgba(0,0,0,0.4)] w-full max-w-4xl border bg-white/10 backdrop-blur-2xl border-white/20">
-                      <h2 className="font-black text-8xl leading-tight tracking-tight text-center text-white">Send me anonymous messages!</h2>
+                  <div className={clsx("p-24 rounded-[100px] shadow-2xl w-full max-w-4xl border", shareTheme.card)}>
+                      <h2 className={clsx("font-black text-8xl leading-tight tracking-tight text-center", shareTheme.text)}>Send me anonymous messages!</h2>
                   </div>
               </div>
-
               <div className="absolute bottom-24 w-full flex justify-center">
                   <div className="bg-black/30 backdrop-blur-3xl px-16 py-8 rounded-full border border-white/10 shadow-2xl">
                     <p className="text-white font-black text-4xl tracking-tighter">askme.app<span className="text-white/40">/u/{profile.username}</span></p>
@@ -151,24 +146,83 @@ const PublicProfile = () => {
       </div>
 
       <div className="w-full flex flex-col items-center pt-10 md:pt-16">
-        <ProfileHeader profile={profile} onShare={handleNativeShare} />
+        <ProfileHeader profile={profile} onShareRequest={() => setShowShareStudio(true)} />
         <div className="w-full transition-all duration-700 ease-out mt-12">
             {isOwner ? <OwnerView profile={profile} /> : <VisitorView profile={profile} />}
         </div>
       </div>
+
+      {/* SHARE STUDIO MODAL */}
+      <AnimatePresence>
+        {showShareStudio && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-zinc-950/90 backdrop-blur-md" onClick={() => setShowShareStudio(false)} />
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative bg-white dark:bg-zinc-900 w-full max-w-lg rounded-[40px] shadow-2xl overflow-hidden flex flex-col">
+                <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-pink-500 text-white flex items-center justify-center shadow-lg"><Palette size={20} /></div>
+                        <h3 className="text-xl font-black dark:text-white tracking-tight">Invite Studio</h3>
+                    </div>
+                    <button onClick={() => setShowShareStudio(false)} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all"><X size={24} /></button>
+                </div>
+
+                <div className="p-8 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/50">
+                    <div className="relative shadow-2xl rounded-[32px] overflow-hidden group" style={{ height: '400px', width: '225px' }}>
+                        <div className={clsx("w-full h-full flex flex-col items-center justify-center p-6 text-center relative bg-gradient-to-br transition-all duration-500", shareTheme.gradient)}>
+                             <div className="absolute top-6 flex items-center gap-2 scale-75 opacity-80">
+                                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white"><span className="font-black text-xs">A</span></div>
+                                <span className="text-white font-black uppercase tracking-widest text-[8px]">ASK ME</span>
+                             </div>
+                             <div className="w-20 h-20 rounded-full border-[6px] border-white/30 mb-6 shadow-xl overflow-hidden">
+                                <img src={profile.avatar} className="w-full h-full object-cover" alt="" />
+                             </div>
+                             <div className={clsx("p-6 rounded-[30px] border shadow-xl w-full text-[14px] font-black leading-tight", shareTheme.card, shareTheme.text)}>
+                                Send me anonymous messages!
+                             </div>
+                             <div className="absolute bottom-6 scale-75">
+                                <div className="bg-black/30 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10 shadow-lg">
+                                  <p className="text-white font-black text-[8px] tracking-tight">askme.app/u/{profile.username}</p>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div className="w-full flex flex-wrap justify-center gap-3">
+                        {THEMES.map((t) => (
+                            <button 
+                                key={t.id} 
+                                onClick={() => setShareTheme(t)} 
+                                className={clsx(
+                                    "w-10 h-10 rounded-full border-4 transition-all hover:scale-110",
+                                    t.css,
+                                    shareTheme.id === t.id ? "border-pink-500 ring-4 ring-pink-500/10 shadow-lg" : "border-white/10 opacity-70"
+                                )} 
+                                title={t.name}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                <div className="p-8 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                    <button 
+                        onClick={handleNativeShare} 
+                        disabled={isSharing}
+                        className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-5 rounded-[24px] shadow-xl flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 text-xl"
+                    >
+                        {isSharing ? <Loader2 className="animate-spin" size={24} /> : <Share2 size={24} />}
+                        {isSharing ? 'Generating...' : 'Share to Stories'}
+                    </button>
+                    <p className="text-center text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mt-4">HD Studio Card Export</p>
+                </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
-const ProfileHeader = ({ profile, onShare }: { profile: UserProfile, onShare: () => Promise<void> }) => {
-    const [sharing, setSharing] = useState(false);
-
-    const handleShareClick = async () => {
-        setSharing(true);
-        await onShare();
-        setSharing(false);
-    };
-
+const ProfileHeader = ({ profile, onShareRequest }: { profile: UserProfile, onShareRequest: () => void }) => {
     return (
         <div className="flex flex-col items-center text-center px-6 w-full max-w-4xl">
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative mb-8 group">
@@ -190,12 +244,11 @@ const ProfileHeader = ({ profile, onShare }: { profile: UserProfile, onShare: ()
                 {profile.bio && <p className="text-zinc-600 dark:text-zinc-400 text-lg font-medium max-w-lg leading-relaxed">{profile.bio}</p>}
                 <div className="pt-4 flex justify-center">
                     <button 
-                      onClick={handleShareClick} 
-                      disabled={sharing}
-                      className="group flex items-center gap-3 px-8 py-3 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-transparent dark:border-zinc-800 text-sm font-black text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all active:scale-95 shadow-sm disabled:opacity-70"
+                      onClick={onShareRequest} 
+                      className="group flex items-center gap-3 px-8 py-3 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-transparent dark:border-zinc-800 text-sm font-black text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all active:scale-95 shadow-sm"
                     >
-                        {sharing ? <Loader2 className="animate-spin text-pink-500" size={18} /> : <Share2 size={18} className="text-pink-500" />}
-                        {sharing ? 'Generating Card...' : 'Share Profile'}
+                        <Share2 size={18} className="text-pink-500" />
+                        Share Profile
                     </button>
                 </div>
             </motion.div>

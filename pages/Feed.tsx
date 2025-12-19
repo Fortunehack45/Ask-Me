@@ -4,13 +4,24 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { 
   Inbox, User, Loader2, Sparkles, Check, 
-  MessageSquare, Heart, Copy, Shield, Share2
+  MessageSquare, Heart, Copy, Shield, Share2, X, Palette
 } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getUserFeed, getUserStats } from '../services/db';
 import { Answer } from '../types';
 import { timeAgo, copyToClipboard } from '../utils';
 import { toPng } from 'html-to-image';
+import clsx from 'clsx';
+
+const THEMES = [
+  { id: 'ocean', name: 'Ocean', css: 'bg-blue-600', gradient: 'from-blue-600 via-blue-700 to-indigo-900', text: 'text-white', card: 'bg-white/10 backdrop-blur-2xl border-white/20' },
+  { id: 'noir', name: 'Noir', css: 'bg-zinc-950', gradient: 'from-zinc-900 via-zinc-950 to-black', text: 'text-white', card: 'bg-white/5 backdrop-blur-2xl border-white/10' },
+  { id: 'crimson', name: 'Crimson', css: 'bg-rose-600', gradient: 'from-rose-500 via-pink-600 to-rose-900', text: 'text-white', card: 'bg-white/10 backdrop-blur-2xl border-white/20' },
+  { id: 'aurora', name: 'Aurora', css: 'bg-emerald-600', gradient: 'from-emerald-400 via-teal-500 to-emerald-900', text: 'text-white', card: 'bg-white/10 backdrop-blur-2xl border-white/20' },
+  { id: 'sunset', name: 'Sunset', css: 'bg-orange-500', gradient: 'from-orange-400 via-pink-500 to-rose-600', text: 'text-white', card: 'bg-white/10 backdrop-blur-2xl border-white/20' },
+  { id: 'nebula', name: 'Nebula', css: 'bg-purple-600', gradient: 'from-violet-400 via-purple-600 to-indigo-900', text: 'text-white', card: 'bg-white/10 backdrop-blur-2xl border-white/20' },
+  { id: 'lemonade', name: 'Lemonade', css: 'bg-yellow-400', gradient: 'from-yellow-300 via-orange-400 to-amber-600', text: 'text-zinc-900', card: 'bg-black/5 backdrop-blur-2xl border-black/10' },
+];
 
 const Feed: React.FC = () => {
   const { user, userProfile, loading: authLoading } = useAuth();
@@ -18,6 +29,8 @@ const Feed: React.FC = () => {
   const [stats, setStats] = useState({ answers: 0, likes: 0 });
   const [loading, setLoading] = useState(true);
   const [sharing, setSharing] = useState(false);
+  const [showStudio, setShowStudio] = useState(false);
+  const [shareTheme, setShareTheme] = useState(THEMES[0]);
   const [showToast, setShowToast] = useState(false);
   const shareCaptureRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +61,6 @@ const Feed: React.FC = () => {
 
   const handleShareLink = async () => {
     if (!userProfile || !shareCaptureRef.current) return;
-    
     setSharing(true);
     try {
       const dataUrl = await toPng(shareCaptureRef.current, { 
@@ -67,16 +79,13 @@ const Feed: React.FC = () => {
           files: [file]
         });
       } else if (navigator.share) {
-        await navigator.share({
-          title: 'Ask Me',
-          text: `Ask @${userProfile.username} anything anonymously!`,
-          url: shareUrl,
-        });
+        await navigator.share({ title: 'Ask Me', text: `Ask @${userProfile.username}`, url: shareUrl });
       } else {
         await copyToClipboard(shareUrl);
         setShowToast(true);
         setTimeout(() => setShowToast(false), 3000);
       }
+      setShowStudio(false);
     } catch (err) {
       console.log("Share failed", err);
     } finally {
@@ -91,25 +100,22 @@ const Feed: React.FC = () => {
       
       {/* HIDDEN SHARE ASSET GENERATOR */}
       <div className="fixed left-[-9999px] top-0 overflow-hidden" style={{ width: '1080px', height: '1920px', pointerEvents: 'none' }}>
-          <div ref={shareCaptureRef} className="w-full h-full flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900">
+          <div ref={shareCaptureRef} className={clsx("w-full h-full flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
               <div className="absolute inset-0 opacity-[0.08] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
-              
               <div className="absolute top-24 flex items-center gap-6">
                 <div className="w-20 h-20 rounded-[28px] bg-white/20 backdrop-blur-3xl flex items-center justify-center border border-white/20 shadow-2xl">
                   <span className="text-white font-black text-4xl">A</span>
                 </div>
                 <span className="text-white font-black uppercase tracking-[0.5em] text-2xl">ASK ME</span>
               </div>
-
               <div className="relative z-10 flex flex-col items-center w-full">
                   <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl">
                       <img src={userProfile?.avatar} className="w-full h-full object-cover" alt="Profile" />
                   </div>
-                  <div className="p-24 rounded-[100px] shadow-2xl w-full max-w-4xl border bg-white/10 backdrop-blur-2xl border-white/20">
-                      <h2 className="font-black text-8xl leading-tight tracking-tight text-center text-white">Send me anonymous messages!</h2>
+                  <div className={clsx("p-24 rounded-[100px] shadow-2xl w-full max-w-4xl border", shareTheme.card)}>
+                      <h2 className={clsx("font-black text-8xl leading-tight tracking-tight text-center", shareTheme.text)}>Send me anonymous messages!</h2>
                   </div>
               </div>
-
               <div className="absolute bottom-24 w-full flex justify-center">
                   <div className="bg-black/30 backdrop-blur-3xl px-16 py-8 rounded-full border border-white/10 shadow-2xl">
                     <p className="text-white font-black text-4xl tracking-tighter">askme.app<span className="text-white/40">/u/{userProfile?.username}</span></p>
@@ -134,7 +140,7 @@ const Feed: React.FC = () => {
 
       <div className="px-1">
         <h1 className="text-4xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-3">
-          Feed <span className="text-yellow-500" size={32} />
+          Feed <Sparkles className="text-yellow-500" size={32} />
         </h1>
         <p className="text-zinc-500 dark:text-zinc-400 font-medium text-lg mt-1">
           Welcome, <span className="text-zinc-900 dark:text-white font-bold">{userProfile?.fullName || 'User'}</span>.
@@ -142,7 +148,6 @@ const Feed: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Left Column: Stats & Link */}
         <div className="lg:col-span-5 space-y-6">
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -151,18 +156,17 @@ const Feed: React.FC = () => {
             >
                 <div className="relative z-10">
                   <h2 className="text-2xl font-black tracking-tight mb-2">Share Profile</h2>
-                  <p className="text-pink-100 font-medium text-sm mb-8">Share your custom card to get questions.</p>
+                  <p className="text-pink-100 font-medium text-sm mb-8">Choose your color and share your card.</p>
                 
                   <button 
-                      className="bg-black/20 backdrop-blur-md rounded-2xl p-4 flex items-center gap-4 transition-all border border-white/10 w-full cursor-pointer hover:bg-black/30 text-left disabled:opacity-70"
-                      onClick={handleShareLink}
-                      disabled={sharing}
+                      className="bg-black/20 backdrop-blur-md rounded-2xl p-4 flex items-center gap-4 transition-all border border-white/10 w-full cursor-pointer hover:bg-black/30 text-left"
+                      onClick={() => setShowStudio(true)}
                   >
                       <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-pink-600 shadow-lg shrink-0">
-                        {sharing ? <Loader2 className="animate-spin" size={24} /> : <Share2 size={24} />}
+                        <Share2 size={24} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] uppercase font-black text-white/50 tracking-wider mb-0.5">{sharing ? 'generating card...' : 'tap to share card'}</p>
+                        <p className="text-[10px] uppercase font-black text-white/50 tracking-wider mb-0.5">tap to customize card</p>
                         <p className="text-base font-black truncate">
                             {userProfile?.username ? `askme.app/u/${userProfile.username}` : 'Loading...'}
                         </p>
@@ -205,7 +209,6 @@ const Feed: React.FC = () => {
             </div>
         </div>
 
-        {/* Right Column: Activity */}
         <div className="lg:col-span-7">
             <div className="flex items-center gap-4 mb-6">
                 <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">Recent Activity</h3>
@@ -253,6 +256,60 @@ const Feed: React.FC = () => {
             )}
         </div>
       </div>
+
+      {/* SHARE STUDIO MODAL */}
+      <AnimatePresence>
+        {showStudio && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-zinc-950/90 backdrop-blur-md" onClick={() => setShowStudio(false)} />
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative bg-white dark:bg-zinc-900 w-full max-w-lg rounded-[40px] shadow-2xl overflow-hidden flex flex-col">
+                <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-pink-500 text-white flex items-center justify-center shadow-lg"><Palette size={20} /></div>
+                        <h3 className="text-xl font-black dark:text-white tracking-tight">Invite Studio</h3>
+                    </div>
+                    <button onClick={() => setShowStudio(false)} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all"><X size={24} /></button>
+                </div>
+
+                <div className="p-8 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/50">
+                    <div className="relative shadow-2xl rounded-[32px] overflow-hidden" style={{ height: '360px', width: '202px' }}>
+                        <div className={clsx("w-full h-full flex flex-col items-center justify-center p-6 text-center relative bg-gradient-to-br transition-all duration-500", shareTheme.gradient)}>
+                             <div className="absolute top-6 flex items-center gap-2 scale-75 opacity-80">
+                                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white font-black">A</div>
+                             </div>
+                             <div className="w-16 h-16 rounded-full border-[4px] border-white/30 mb-4 overflow-hidden shadow-lg">
+                                <img src={userProfile?.avatar} className="w-full h-full object-cover" alt="" />
+                             </div>
+                             <div className={clsx("p-4 rounded-[24px] border shadow-lg w-full text-[12px] font-black leading-tight", shareTheme.card, shareTheme.text)}>
+                                Send me anonymous messages!
+                             </div>
+                             <div className="absolute bottom-6 scale-75 opacity-70">
+                                <p className="text-white font-black text-[8px] tracking-tight">askme.app/u/{userProfile?.username}</p>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div className="w-full flex flex-wrap justify-center gap-3">
+                        {THEMES.map((t) => (
+                            <button key={t.id} onClick={() => setShareTheme(t)} className={clsx("w-9 h-9 rounded-full border-4 transition-all hover:scale-110", t.css, shareTheme.id === t.id ? "border-pink-500 ring-4 ring-pink-500/10 shadow-lg" : "border-white/10 opacity-70")} />
+                        ))}
+                    </div>
+                </div>
+
+                <div className="p-8 bg-white dark:bg-zinc-900">
+                    <button 
+                        onClick={handleShareLink} 
+                        disabled={sharing}
+                        className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-5 rounded-[24px] shadow-xl flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 text-xl"
+                    >
+                        {sharing ? <Loader2 className="animate-spin" size={24} /> : <Share2 size={24} />}
+                        {sharing ? 'Generating...' : 'Share to Stories'}
+                    </button>
+                </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
