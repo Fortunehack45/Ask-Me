@@ -47,7 +47,10 @@ import {
   Palette,
   Trash2,
   // Added RefreshCcw icon
-  RefreshCcw
+  RefreshCcw,
+  // Added ShieldCheck and Globe icons
+  ShieldCheck,
+  Globe
 } from 'lucide-react';
 
 export {
@@ -97,5 +100,8 @@ export {
   Palette,
   Trash2,
   // Exported RefreshCcw icon
-  RefreshCcw
+  RefreshCcw,
+  // Exported missing icons
+  ShieldCheck,
+  Globe
 };
