@@ -59,7 +59,11 @@ import {
   Italic,
   List,
   Link as LinkIcon,
-  FileType
+  FileType,
+  /* Added missing icons for Admin panel */
+  BarChart3,
+  PieChart,
+  Filter
 } from 'lucide-react';
 
 export {
@@ -122,5 +126,9 @@ export {
   Italic,
   List,
   LinkIcon,
-  FileType
+  FileType,
+  /* Exported missing icons */
+  BarChart3,
+  PieChart,
+  Filter
 };
