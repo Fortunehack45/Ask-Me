@@ -37,6 +37,7 @@ const PublicProfile = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const shareCaptureRef = useRef<HTMLDivElement>(null);
 
   const isOwner = user && profile && user.uid === profile.uid;
 
@@ -56,6 +57,46 @@ const PublicProfile = () => {
     loadData();
     return () => { document.title = 'Ask Me'; };
   }, [username]);
+
+  // PROFESSIONAL NATIVE SHARE LOGIC
+  const handleNativeShare = async () => {
+    if (!profile || !shareCaptureRef.current) return;
+    
+    try {
+      // 1. Generate High-Res Image
+      const dataUrl = await toPng(shareCaptureRef.current, { 
+        pixelRatio: 3, 
+        cacheBust: true,
+        width: 1080,
+        height: 1920 
+      });
+
+      // 2. Convert to File object
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], `askme-${profile.username}.png`, { type: 'image/png' });
+
+      const shareData = {
+        title: `Ask @${profile.username} Anything!`,
+        text: `Send me an anonymous message here:`,
+        url: window.location.href,
+        files: [file],
+      };
+
+      // 3. Native Share with Image support check
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share(shareData);
+      } else if (navigator.share) {
+        // Fallback to text share + manual download if file share fails
+        await navigator.share({ title: shareData.title, text: shareData.text, url: shareData.url });
+      } else {
+        // Fallback for desktop: Copy Link
+        await copyToClipboard(window.location.href);
+        alert("Link copied! Share it on your stories.");
+      }
+    } catch (err) {
+      console.error("Share failed", err);
+    }
+  };
 
   if (!username || username === 'undefined') return <Navigate to="/" />;
 
@@ -79,8 +120,38 @@ const PublicProfile = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center pb-24 relative overflow-x-hidden">
+      
+      {/* HIDDEN SHARE ASSET GENERATOR (BLUE THEME) */}
+      <div className="fixed left-[-9999px] top-0 overflow-hidden" style={{ width: '1080px', height: '1920px', pointerEvents: 'none' }}>
+          <div ref={shareCaptureRef} className="w-full h-full flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900">
+              <div className="absolute inset-0 opacity-[0.08] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
+              
+              <div className="absolute top-24 flex items-center gap-6">
+                <div className="w-20 h-20 rounded-[28px] bg-white/20 backdrop-blur-3xl flex items-center justify-center border border-white/20 shadow-2xl">
+                  <span className="text-white font-black text-4xl">A</span>
+                </div>
+                <span className="text-white font-black uppercase tracking-[0.5em] text-2xl">ASK ME</span>
+              </div>
+
+              <div className="relative z-10 flex flex-col items-center w-full">
+                  <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl">
+                      <img src={profile.avatar} className="w-full h-full object-cover" alt="Profile" />
+                  </div>
+                  <div className="p-24 rounded-[100px] shadow-[0_60px_120px_-20px_rgba(0,0,0,0.4)] w-full max-w-4xl border bg-white/10 backdrop-blur-2xl border-white/20">
+                      <h2 className="font-black text-8xl leading-tight tracking-tight text-center text-white">Send me anonymous messages!</h2>
+                  </div>
+              </div>
+
+              <div className="absolute bottom-24 w-full flex justify-center">
+                  <div className="bg-black/30 backdrop-blur-3xl px-16 py-8 rounded-full border border-white/10 shadow-2xl">
+                    <p className="text-white font-black text-4xl tracking-tighter">askme.app<span className="text-white/40">/u/{profile.username}</span></p>
+                  </div>
+              </div>
+          </div>
+      </div>
+
       <div className="w-full flex flex-col items-center pt-10 md:pt-16">
-        <ProfileHeader profile={profile} />
+        <ProfileHeader profile={profile} onShare={handleNativeShare} />
         <div className="w-full transition-all duration-700 ease-out mt-12">
             {isOwner ? <OwnerView profile={profile} /> : <VisitorView profile={profile} />}
         </div>
@@ -89,26 +160,13 @@ const PublicProfile = () => {
   );
 };
 
-const ProfileHeader = ({ profile }: { profile: UserProfile }) => {
-    const [copied, setCopied] = useState(false);
+const ProfileHeader = ({ profile, onShare }: { profile: UserProfile, onShare: () => Promise<void> }) => {
+    const [sharing, setSharing] = useState(false);
 
-    const handleShare = async () => {
-        const url = window.location.href;
-        if (navigator.share) {
-          try {
-            await navigator.share({
-                title: `Ask @${profile.username}`,
-                text: `Send me an anonymous whisper!`,
-                url: url
-            });
-            return;
-          } catch (e) {}
-        }
-        const success = await copyToClipboard(url);
-        if (success) {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }
+    const handleShareClick = async () => {
+        setSharing(true);
+        await onShare();
+        setSharing(false);
     };
 
     return (
@@ -131,9 +189,13 @@ const ProfileHeader = ({ profile }: { profile: UserProfile }) => {
                 </div>
                 {profile.bio && <p className="text-zinc-600 dark:text-zinc-400 text-lg font-medium max-w-lg leading-relaxed">{profile.bio}</p>}
                 <div className="pt-4 flex justify-center">
-                    <button onClick={handleShare} className="group flex items-center gap-3 px-8 py-3 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-transparent dark:border-zinc-800 text-sm font-black text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all active:scale-95 shadow-sm">
-                        {copied ? <Check size={18} className="text-green-500" /> : <Share2 size={18} className="text-pink-500" />}
-                        {copied ? 'Link Copied' : 'Share Profile'}
+                    <button 
+                      onClick={handleShareClick} 
+                      disabled={sharing}
+                      className="group flex items-center gap-3 px-8 py-3 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-transparent dark:border-zinc-800 text-sm font-black text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all active:scale-95 shadow-sm disabled:opacity-70"
+                    >
+                        {sharing ? <Loader2 className="animate-spin text-pink-500" size={18} /> : <Share2 size={18} className="text-pink-500" />}
+                        {sharing ? 'Generating Card...' : 'Share Profile'}
                     </button>
                 </div>
             </motion.div>

@@ -1,23 +1,25 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { 
   Inbox, User, Loader2, Sparkles, Check, 
-  MessageSquare, Heart, Copy, Shield 
+  MessageSquare, Heart, Copy, Shield, Share2
 } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getUserFeed, getUserStats } from '../services/db';
 import { Answer } from '../types';
 import { timeAgo, copyToClipboard } from '../utils';
+import { toPng } from 'html-to-image';
 
 const Feed: React.FC = () => {
   const { user, userProfile, loading: authLoading } = useAuth();
   const [myAnswers, setMyAnswers] = useState<Answer[]>([]);
   const [stats, setStats] = useState({ answers: 0, likes: 0 });
   const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const shareCaptureRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadMyContent = async () => {
@@ -45,27 +47,40 @@ const Feed: React.FC = () => {
     : '';
 
   const handleShareLink = async () => {
-    if (!shareUrl) return;
+    if (!userProfile || !shareCaptureRef.current) return;
+    
+    setSharing(true);
+    try {
+      const dataUrl = await toPng(shareCaptureRef.current, { 
+        pixelRatio: 3, 
+        width: 1080, 
+        height: 1920 
+      });
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], `askme-${userProfile.username}.png`, { type: 'image/png' });
 
-    if (navigator.share) {
-      try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'Ask Me Anything!',
+          text: `Ask @${userProfile.username} anything anonymously!`,
+          url: shareUrl,
+          files: [file]
+        });
+      } else if (navigator.share) {
         await navigator.share({
           title: 'Ask Me',
-          text: `Ask @${userProfile?.username} anything anonymously!`,
+          text: `Ask @${userProfile.username} anything anonymously!`,
           url: shareUrl,
         });
-        return; 
-      } catch (err) { 
-        console.log("Share skipped", err);
+      } else {
+        await copyToClipboard(shareUrl);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
       }
-    }
-
-    const success = await copyToClipboard(shareUrl);
-    if (success) {
-      setCopied(true);
-      setShowToast(true);
-      setTimeout(() => setCopied(false), 2000);
-      setTimeout(() => setShowToast(false), 3000);
+    } catch (err) {
+      console.log("Share failed", err);
+    } finally {
+      setSharing(false);
     }
   };
 
@@ -73,6 +88,36 @@ const Feed: React.FC = () => {
 
   return (
     <div className="space-y-10 w-full max-w-full">
+      
+      {/* HIDDEN SHARE ASSET GENERATOR */}
+      <div className="fixed left-[-9999px] top-0 overflow-hidden" style={{ width: '1080px', height: '1920px', pointerEvents: 'none' }}>
+          <div ref={shareCaptureRef} className="w-full h-full flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900">
+              <div className="absolute inset-0 opacity-[0.08] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
+              
+              <div className="absolute top-24 flex items-center gap-6">
+                <div className="w-20 h-20 rounded-[28px] bg-white/20 backdrop-blur-3xl flex items-center justify-center border border-white/20 shadow-2xl">
+                  <span className="text-white font-black text-4xl">A</span>
+                </div>
+                <span className="text-white font-black uppercase tracking-[0.5em] text-2xl">ASK ME</span>
+              </div>
+
+              <div className="relative z-10 flex flex-col items-center w-full">
+                  <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl">
+                      <img src={userProfile?.avatar} className="w-full h-full object-cover" alt="Profile" />
+                  </div>
+                  <div className="p-24 rounded-[100px] shadow-2xl w-full max-w-4xl border bg-white/10 backdrop-blur-2xl border-white/20">
+                      <h2 className="font-black text-8xl leading-tight tracking-tight text-center text-white">Send me anonymous messages!</h2>
+                  </div>
+              </div>
+
+              <div className="absolute bottom-24 w-full flex justify-center">
+                  <div className="bg-black/30 backdrop-blur-3xl px-16 py-8 rounded-full border border-white/10 shadow-2xl">
+                    <p className="text-white font-black text-4xl tracking-tighter">askme.app<span className="text-white/40">/u/{userProfile?.username}</span></p>
+                  </div>
+              </div>
+          </div>
+      </div>
+
       <AnimatePresence>
         {showToast && (
           <motion.div 
@@ -89,7 +134,7 @@ const Feed: React.FC = () => {
 
       <div className="px-1">
         <h1 className="text-4xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-3">
-          Feed <span className="text-yellow-500" size={32} />
+          Feed <Sparkles className="text-yellow-500" size={32} />
         </h1>
         <p className="text-zinc-500 dark:text-zinc-400 font-medium text-lg mt-1">
           Welcome, <span className="text-zinc-900 dark:text-white font-bold">{userProfile?.fullName || 'User'}</span>.
@@ -105,23 +150,24 @@ const Feed: React.FC = () => {
                 className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-pink-500 via-pink-600 to-orange-500 p-8 text-white shadow-xl group"
             >
                 <div className="relative z-10">
-                  <h2 className="text-2xl font-black tracking-tight mb-2">Share Link</h2>
-                  <p className="text-pink-100 font-medium text-sm mb-8">Get more questions by sharing your link.</p>
+                  <h2 className="text-2xl font-black tracking-tight mb-2">Share Profile</h2>
+                  <p className="text-pink-100 font-medium text-sm mb-8">Share your custom card to get questions.</p>
                 
-                  <div 
-                      className="bg-black/20 backdrop-blur-md rounded-2xl p-4 flex items-center gap-4 transition-all border border-white/10 w-full cursor-pointer hover:bg-black/30"
+                  <button 
+                      className="bg-black/20 backdrop-blur-md rounded-2xl p-4 flex items-center gap-4 transition-all border border-white/10 w-full cursor-pointer hover:bg-black/30 text-left disabled:opacity-70"
                       onClick={handleShareLink}
+                      disabled={sharing}
                   >
                       <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-pink-600 shadow-lg shrink-0">
-                        {copied ? <Check size={24} /> : <Copy size={24} />}
+                        {sharing ? <Loader2 className="animate-spin" size={24} /> : <Share2 size={24} />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] uppercase font-black text-white/50 tracking-wider mb-0.5">tap to copy</p>
+                        <p className="text-[10px] uppercase font-black text-white/50 tracking-wider mb-0.5">{sharing ? 'generating card...' : 'tap to share card'}</p>
                         <p className="text-base font-black truncate">
                             {userProfile?.username ? `askme.app/u/${userProfile.username}` : 'Loading...'}
                         </p>
                       </div>
-                  </div>
+                  </button>
                 </div>
                 <div className="absolute top-[-50px] right-[-50px] w-64 h-64 bg-white/10 rounded-full blur-[60px] pointer-events-none"></div>
             </motion.div>

@@ -1,9 +1,8 @@
 
 import { initializeApp, getApps, getApp } from "firebase/app";
 import type { FirebaseApp } from "firebase/app";
-// Fix: Explicitly use 'import type' for interfaces to resolve "no exported member" errors in strict environments
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import type { Auth } from "firebase/auth";
+// Fix: Consolidated modular imports to ensure correct resolution of named exports in strict environments
+import { getAuth, GoogleAuthProvider, Auth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
 // Fix: Consolidate modular imports for analytics and ensure standard value resolution
