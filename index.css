@@ -56,6 +56,16 @@ body {
   @apply backdrop-blur-[50px] bg-white/40 dark:bg-white/[0.03] border border-white/30 dark:border-white/10 shadow-2xl;
 }
 
+.glass-liquid-v2 {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(48px);
+  -webkit-backdrop-filter: blur(48px);
+}
+
+html.dark .glass-liquid-v2 {
+  background: rgba(10, 10, 12, 0.5);
+}
+
 .glass {
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(30px);
