@@ -60,25 +60,51 @@ const Feed: React.FC = () => {
     ? `${window.location.origin}/#/u/${userProfile.username}`
     : '';
 
+  const handleCopyOnly = async () => {
+    await copyToClipboard(shareUrl);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
   const handleShareLink = async () => {
     if (!userProfile || !shareCaptureRef.current) return;
     setSharing(true);
     try {
-      const dataUrl = await toPng(shareCaptureRef.current, { pixelRatio: 3, width: 1080, height: 1920 });
-      const blob = await (await fetch(dataUrl)).blob();
+      // Warm up call for html-to-image fonts/images
+      await toPng(shareCaptureRef.current, { cacheBust: true });
+      
+      const dataUrl = await toPng(shareCaptureRef.current, { 
+        pixelRatio: 2, // 2 is safer for mobile performance
+        width: 1080, 
+        height: 1920,
+        cacheBust: true
+      });
+
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
       const file = new File([blob], `askme-${userProfile.username}.png`, { type: 'image/png' });
+      
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ title: 'Ask Me!', text: `Ask @${userProfile.username} anonymously!`, url: shareUrl, files: [file] });
+        await navigator.share({ 
+          title: 'Ask Me!', 
+          text: `Ask @${userProfile.username} anonymously!`, 
+          url: shareUrl, 
+          files: [file] 
+        });
       } else if (navigator.share) {
-        await navigator.share({ title: 'Ask Me', text: `Ask @${userProfile.username}`, url: shareUrl });
+        await navigator.share({ 
+          title: 'Ask Me', 
+          text: `Ask @${userProfile.username}`, 
+          url: shareUrl 
+        });
       } else {
-        await copyToClipboard(shareUrl);
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
+        handleCopyOnly();
       }
       setShowStudio(false);
     } catch (err) {
-      console.log("Share failed", err);
+      console.error("Share failed", err);
+      // Fail gracefully with copy
+      handleCopyOnly();
     } finally {
       setSharing(false);
     }
@@ -89,9 +115,9 @@ const Feed: React.FC = () => {
   return (
     <div className="w-full space-y-10 animate-in fade-in duration-1000">
       
-      {/* EXPORT NODE (HIDDEN) */}
-      <div className="fixed left-[-9999px] top-0 overflow-hidden" style={{ width: '1080px', height: '1920px', pointerEvents: 'none' }}>
-          <div ref={shareCaptureRef} className={clsx("w-full h-full flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
+      {/* EXPORT NODE (HIDDEN OFF-SCREEN BUT RENDERED) */}
+      <div className="fixed top-0 left-[-2000px] pointer-events-none" style={{ width: '1080px', height: '1920px' }}>
+          <div ref={shareCaptureRef} className={clsx("w-[1080px] h-[1920px] flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
               <div className="relative z-10 flex flex-col items-center w-full">
                   <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl">
                       <img src={userProfile?.avatar} className="w-full h-full object-cover" alt="Profile" />
@@ -100,23 +126,24 @@ const Feed: React.FC = () => {
                       <h2 className={clsx("font-black text-8xl tracking-tight text-center", shareTheme.text)}>Send me anonymous messages!</h2>
                   </div>
               </div>
+              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 text-white/40 font-black text-4xl tracking-widest uppercase">askme.app</div>
           </div>
       </div>
 
       <AnimatePresence>
         {showToast && (
-          <motion.div initial={{ opacity: 0, y: -20, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: -20, x: '-50%' }} className="fixed top-12 left-1/2 -translate-x-1/2 z-[100] bg-zinc-950 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-white/10 backdrop-blur-xl">
-            <Check size={16} className="text-green-500" />
-            <span className="font-black text-[10px] uppercase tracking-[0.2em]">Link copied to clipboard</span>
+          <motion.div initial={{ opacity: 0, y: -20, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: -20, x: '-50%' }} className="fixed top-24 left-1/2 -translate-x-1/2 z-[150] bg-zinc-950 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-4 border border-white/10 backdrop-blur-2xl">
+            <Check size={20} className="text-emerald-500" />
+            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Portal Link Copied</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* DASHBOARD TOP ACTION BAR - HIGH DENSITY */}
+      {/* DASHBOARD TOP ACTION BAR */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
         <div className="space-y-2">
           <h1 className="text-5xl md:text-7xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-4">
-            Dashboard <span className="text-pink-500" size={36} />
+            Dashboard <Sparkles className="text-pink-500" size={36} />
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 font-bold text-xl opacity-80 leading-relaxed">
             Welcome back, <span className="text-pink-600 dark:text-pink-500 font-black">{userProfile?.fullName}</span>
@@ -230,20 +257,10 @@ const Feed: React.FC = () => {
                     ))}
                 </div>
             )}
-            
-            {/* FOOTER CALL TO ACTION */}
-            <div className="bg-zinc-950 dark:bg-white rounded-[56px] p-12 md:p-16 text-white dark:text-black flex flex-col md:flex-row items-center justify-between gap-12 shadow-2xl overflow-hidden relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative z-10 text-center md:text-left space-y-4">
-                   <h4 className="text-4xl font-black tracking-tighter leading-none">Upgrade to Studio Pro</h4>
-                   <p className="text-zinc-500 font-bold text-lg leading-relaxed max-w-md">Unlock full acquisition metrics, custom branding tools, and high-fidelity themes.</p>
-                </div>
-                <button className="relative z-10 shrink-0 px-14 py-6 bg-pink-500 text-white rounded-full font-black text-sm uppercase tracking-[0.4em] shadow-[0_20px_40px_-10px_rgba(236,72,153,0.5)] active:scale-95 transition-all hover:scale-105">Activate Now <Zap size={20} className="inline ml-3" /></button>
-            </div>
         </div>
       </div>
 
-      {/* STUDIO ASSET MODAL - FULL OVERLAY */}
+      {/* STUDIO ASSET MODAL */}
       <AnimatePresence>
         {showStudio && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
@@ -273,11 +290,13 @@ const Feed: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="p-14 bg-white dark:bg-zinc-900 border-t border-zinc-100 dark:border-white/5">
-                    <button onClick={handleShareLink} disabled={sharing} className="w-full bg-pink-500 text-white font-black py-8 rounded-[40px] shadow-[0_30px_60px_-10px_rgba(236,72,153,0.5)] flex items-center justify-center gap-6 transition-all active:scale-95 disabled:opacity-50 text-2xl">
+                <div className="p-10 bg-white dark:bg-zinc-900 border-t border-zinc-100 dark:border-white/5 flex flex-col gap-4">
+                    <button onClick={handleShareLink} disabled={sharing} className="w-full bg-pink-500 text-white font-black py-6 rounded-[40px] shadow-[0_30px_60px_-10px_rgba(236,72,153,0.5)] flex items-center justify-center gap-6 transition-all active:scale-95 disabled:opacity-50 text-2xl">
                         {sharing ? <Loader2 className="animate-spin" size={32} /> : <Share2 size={32} />} {sharing ? 'Rendering...' : 'Share Profile'}
                     </button>
-                    <p className="text-center text-[11px] font-black uppercase tracking-[0.5em] text-zinc-400 mt-8 opacity-50">Studio Native Identity System</p>
+                    <button onClick={handleCopyOnly} className="w-full py-5 text-sm font-black uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 hover:text-pink-500 transition-colors flex items-center justify-center gap-3">
+                      <Copy size={16} /> Copy URL Instead
+                    </button>
                 </div>
             </motion.div>
           </div>

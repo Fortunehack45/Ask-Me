@@ -1,6 +1,8 @@
 
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
+// Separated value and type imports to resolve member resolution issues in some environments
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import type { Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 

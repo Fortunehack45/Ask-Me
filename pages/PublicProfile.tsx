@@ -1,11 +1,10 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserByUsername, sendQuestion, getUserFeed } from '../services/db';
 import { UserProfile, Answer } from '../types';
 import { 
-  Send, Dice5, Shield, Loader2, Share2, Check, Sparkles, Lock, Palette, X
+  Send, Dice5, Shield, Loader2, Share2, Check, Sparkles, Lock, Palette, X, MessageCircle, Copy
 } from '../components/Icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { copyToClipboard } from '../utils';
@@ -39,6 +38,7 @@ const PublicProfile = () => {
   const [showShareStudio, setShowShareStudio] = useState(false);
   const [shareTheme, setShareTheme] = useState(THEMES[0]);
   const [isSharing, setIsSharing] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState(false);
   const shareCaptureRef = useRef<HTMLDivElement>(null);
 
   const isOwner = user && profile && user.uid === profile.uid;
@@ -59,19 +59,42 @@ const PublicProfile = () => {
     if (!profile || !shareCaptureRef.current) return;
     setIsSharing(true);
     try {
-      const dataUrl = await toPng(shareCaptureRef.current, { pixelRatio: 3, cacheBust: true, width: 1080, height: 1920 });
+      await toPng(shareCaptureRef.current, { cacheBust: true });
+      const dataUrl = await toPng(shareCaptureRef.current, { 
+        pixelRatio: 2, 
+        cacheBust: true, 
+        width: 1080, 
+        height: 1920 
+      });
+
       const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], `askme-${profile.username}.png`, { type: 'image/png' });
+      
+      const shareUrl = window.location.href;
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ title: `Ask @${profile.username} Anything!`, text: `Send me an anonymous message here:`, url: window.location.href, files: [file] });
+        await navigator.share({ 
+          title: `Ask @${profile.username} Anything!`, 
+          text: `Send me an anonymous message here:`, 
+          url: shareUrl, 
+          files: [file] 
+        });
       } else if (navigator.share) {
-        await navigator.share({ title: `Ask @${profile.username}`, url: window.location.href });
+        await navigator.share({ 
+          title: `Ask @${profile.username}`, 
+          url: shareUrl 
+        });
       } else {
-        await copyToClipboard(window.location.href);
-        alert("Link copied!");
+        await copyToClipboard(shareUrl);
+        setCopyFeedback(true);
+        setTimeout(() => setCopyFeedback(false), 3000);
       }
       setShowShareStudio(false);
-    } catch (err) { console.error("Share failed", err); } finally { setIsSharing(false); }
+    } catch (err) { 
+      console.error("Share failed", err);
+      await copyToClipboard(window.location.href);
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 3000);
+    } finally { setIsSharing(false); }
   };
 
   if (!username || username === 'undefined') return <Navigate to="/" />;
@@ -93,6 +116,31 @@ const PublicProfile = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center pb-24 relative">
+      
+      {/* HIDDEN CAPTURE NODE */}
+      <div className="fixed top-0 left-[-2000px] pointer-events-none" style={{ width: '1080px', height: '1920px' }}>
+          <div ref={shareCaptureRef} className={clsx("w-[1080px] h-[1920px] flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
+              <div className="relative z-10 flex flex-col items-center w-full">
+                  <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl">
+                      <img src={profile.avatar} className="w-full h-full object-cover" alt="" />
+                  </div>
+                  <div className={clsx("p-24 rounded-[100px] shadow-2xl w-full max-w-4xl border", shareTheme.card)}>
+                      <h2 className={clsx("font-black text-8xl tracking-tight text-center", shareTheme.text)}>Send me anonymous messages!</h2>
+                  </div>
+              </div>
+              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 text-white/40 font-black text-4xl tracking-widest uppercase">askme.app</div>
+          </div>
+      </div>
+
+      <AnimatePresence>
+        {copyFeedback && (
+          <motion.div initial={{ opacity: 0, y: -20, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: -20, x: '-50%' }} className="fixed top-24 left-1/2 -translate-x-1/2 z-[150] bg-zinc-950 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-4 border border-white/10 backdrop-blur-2xl">
+            <Check size={20} className="text-emerald-500" />
+            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Profile Link Copied</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="w-full flex flex-col items-center pt-8 md:pt-12">
         <ProfileHeader profile={profile} onShareRequest={() => setShowShareStudio(true)} />
         <div className="w-full mt-10">
@@ -104,11 +152,11 @@ const PublicProfile = () => {
         {showShareStudio && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-zinc-950/90 backdrop-blur-md" onClick={() => setShowShareStudio(false)} />
-            <motion.div initial={{ scale: 0.98, opacity: 0, y: 15 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.98, opacity: 0, y: 15 }} className="relative bg-white dark:bg-zinc-900 w-full max-w-md rounded-[40px] shadow-2xl overflow-hidden flex flex-col">
+            <motion.div initial={{ scale: 0.98, opacity: 0, y: 15 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.98, opacity: 0, y: 15 }} className="relative bg-white dark:bg-zinc-900 w-full max-w-md rounded-[40px] shadow-2xl overflow-hidden flex flex-col border border-white/10">
                 <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-xl bg-pink-500 text-white flex items-center justify-center shadow-lg"><Palette size={18} /></div>
-                        <h3 className="text-lg font-black dark:text-white tracking-tight">Share Profile</h3>
+                        <h3 className="text-lg font-black dark:text-white tracking-tight">Share Identity</h3>
                     </div>
                     <button onClick={() => setShowShareStudio(false)} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all"><X size={20} /></button>
                 </div>
@@ -127,10 +175,11 @@ const PublicProfile = () => {
                         ))}
                     </div>
                 </div>
-                <div className="p-8 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                <div className="p-8 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col gap-4">
                     <button onClick={handleNativeShare} disabled={isSharing} className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-5 rounded-[24px] shadow-xl flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 text-lg">
                         {isSharing ? <Loader2 className="animate-spin" size={20} /> : <Share2 size={20} />} {isSharing ? 'Generating...' : 'Share Profile'}
                     </button>
+                    <button onClick={async () => { await copyToClipboard(window.location.href); setCopyFeedback(true); setTimeout(() => setCopyFeedback(false), 3000); setShowShareStudio(false); }} className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-pink-500 transition-colors">Copy URL Instead</button>
                 </div>
             </motion.div>
           </div>
@@ -212,10 +261,11 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
                         </button>
                     </motion.div>
                 ) : (
-                    <motion.div key="success" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-lg text-center py-16 px-10 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[40px] shadow-2xl">
-                        <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white shadow-lg"><Check size={32} strokeWidth={4} /></div>
+                    <motion.div key="success" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-lg text-center py-16 px-10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-[50px] border border-zinc-100 dark:border-white/5 rounded-[40px] shadow-2xl">
+                        <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white shadow-xl ring-8 ring-emerald-500/10"><Check size={40} strokeWidth={4} /></div>
                         <h2 className="text-3xl font-black text-zinc-900 dark:text-white mb-2 tracking-tighter">Whisper Sent!</h2>
-                        <button onClick={() => setSent(false)} className="mt-8 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-black px-8 py-3 rounded-xl text-xs uppercase tracking-widest">Send Another</button>
+                        <p className="text-zinc-500 font-bold mb-8">Your message is now in @{profile.username}'s portal.</p>
+                        <button onClick={() => setSent(false)} className="w-full bg-zinc-950 dark:bg-white text-white dark:text-black font-black py-4 rounded-2xl text-xs uppercase tracking-[0.3em] active:scale-95 transition-transform">Send Another</button>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -224,10 +274,10 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
                 <div className="flex items-center gap-6 mb-10"><h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight shrink-0">Studio Feed</h3><div className="h-px bg-zinc-100 dark:bg-zinc-800 flex-1"></div></div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {answers.map(ans => (
-                        <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800 rounded-[32px] p-8 shadow-sm transition-all hover:shadow-lg relative overflow-hidden">
+                        <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-white/5 rounded-[32px] p-8 shadow-sm transition-all hover:shadow-lg relative overflow-hidden">
                             {!ans.isPublic ? <div className="py-10 text-center opacity-30"><Lock size={24} className="mx-auto mb-2" /><p className="text-[10px] font-black uppercase tracking-widest">Private</p></div> : (
                                 <>
-                                    <span className="text-[9px] font-black text-pink-500 uppercase tracking-widest mb-3 block">Anonymous Whisper</span>
+                                    <span className="text-[9px] font-black text-pink-500 uppercase tracking-widest mb-3 block flex items-center gap-2"><MessageCircle size={12} /> Public Response</span>
                                     <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight mb-6">{ans.questionText}</h3>
                                     <div className="pt-6 border-t border-zinc-100 dark:border-white/5"><p className="text-zinc-600 dark:text-zinc-300 font-bold italic text-lg leading-relaxed">"{ans.answerText}"</p></div>
                                 </>
@@ -262,7 +312,7 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
             
             <div className="w-full max-w-4xl mt-16 space-y-6">
                 {answers.length === 0 ? <div className="py-20 text-center text-zinc-400 font-bold">No whispers found.</div> : answers.map(ans => (
-                    <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800 rounded-[32px] p-8 shadow-sm">
+                    <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-white/5 rounded-[32px] p-8 shadow-sm">
                         <div className="flex items-center gap-3 mb-4"><span className="text-[9px] font-black text-pink-500 uppercase tracking-widest">Question</span><div className={clsx("px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border", ans.isPublic ? "bg-pink-500/10 text-pink-500 border-pink-500/20" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500")}>{ans.isPublic ? 'Public' : 'Hidden'}</div></div>
                         <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight mb-6 leading-tight">{ans.questionText}</h3>
                         <div className="pt-6 border-t border-zinc-100 dark:border-white/5"><p className="text-zinc-600 dark:text-zinc-300 font-bold italic text-lg opacity-80 leading-relaxed">"{ans.answerText}"</p></div>
