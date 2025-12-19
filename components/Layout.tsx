@@ -101,7 +101,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </button>
       </header>
 
-      {/* REFINED SIDEBAR */}
+      {/* REFINED SIDEBAR (Desktop) */}
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-72 border-r border-zinc-200 dark:border-white/[0.05] bg-white dark:bg-[#09090b] z-40 flex-col py-8 px-5 shadow-sm">
         {/* Branding Area */}
         <div className="px-4 mb-10">
@@ -152,25 +152,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </Link>
             );
           })}
-
-          <div className="pt-6">
-            <p className="px-4 text-[10px] font-bold text-zinc-400 uppercase tracking-[0.15em] mb-3">Settings & Alerts</p>
-            {notificationPermission === 'default' && (
-              <button 
-                onClick={enableNotifications}
-                className="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-all font-semibold text-[14px]"
-              >
-                <div className="relative">
-                  <Bell size={20} />
-                  <div className="absolute top-0 right-0 w-2 h-2 bg-pink-500 rounded-full border-2 border-white dark:border-zinc-950"></div>
-                </div>
-                <span>Enable Alerts</span>
-              </button>
-            )}
-          </div>
         </nav>
 
-        {/* REFINED USER FOOTER */}
+        {/* USER FOOTER */}
         <div className="mt-auto border-t border-zinc-100 dark:border-white/[0.03] pt-6 px-1">
           <div className="group bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.03] p-3 rounded-2xl flex items-center gap-3 transition-all hover:border-zinc-200 dark:hover:border-white/[0.08]">
              <div className="relative">
@@ -188,7 +172,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
              <button 
                 onClick={handleLogout} 
                 className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all active:scale-90"
-                title="Logout"
               >
                 <LogOut size={18} />
              </button>
@@ -205,8 +188,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* LIQUID GLASS MOBILE BOTTOM NAV */}
       <nav className="md:hidden fixed bottom-6 left-6 right-6 z-50 rounded-[32px] overflow-hidden group">
+        {/* Surface Material */}
         <div className="absolute inset-0 bg-white/40 dark:bg-black/40 backdrop-blur-[32px] border border-white/20 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] pointer-events-none"></div>
-        {/* Shine highlight */}
+        
+        {/* Top Edge Highlight */}
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"></div>
         
         <div className="flex justify-around items-center h-16 px-4 relative">
@@ -221,7 +206,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   isActive ? "text-pink-500" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
                 )}
               >
-                {/* LIQUID PILL BACKGROUND */}
+                {/* LIQUID PILL ACTIVE INDICATOR */}
                 {isActive && (
                   <motion.div 
                     layoutId="liquidPill"
@@ -237,7 +222,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
                 </div>
                 
-                {/* Glow Dot */}
+                {/* Subtle Glow Dot */}
                 {isActive && (
                   <motion.div 
                     layoutId="mobileGlowDot"
