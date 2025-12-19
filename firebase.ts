@@ -1,11 +1,10 @@
 
 import { initializeApp, getApps, getApp } from "firebase/app";
 import type { FirebaseApp } from "firebase/app";
-// Fix: Consolidated modular imports to ensure correct resolution of named exports in strict environments
-import { getAuth, GoogleAuthProvider, Auth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import type { Auth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
-// Fix: Consolidate modular imports for analytics and ensure standard value resolution
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
@@ -18,14 +17,15 @@ const firebaseConfig = {
   measurementId: "G-CZS08SWWE6"
 };
 
+// Initialize Firebase App
 const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Initializing core services with proper types and explicit modular functions
+// Initialize Modular Services
 export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 
-// Safe initialization of Analytics using the resolved isSupported function
+// Safe Analytics Initialization
 isSupported().then(supported => {
   if (supported) {
     getAnalytics(app);
@@ -37,7 +37,6 @@ isSupported().then(supported => {
  */
 export const getMessagingInstance = async () => {
   try {
-    // Dynamic import to handle environments without messaging support
     const { getMessaging, isSupported: isMessagingSupported } = await import("firebase/messaging");
     const supported = await isMessagingSupported();
     if (supported) {
