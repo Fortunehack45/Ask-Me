@@ -119,66 +119,62 @@ const Inbox = () => {
     }
   };
 
-  if (loading) return <div className="flex h-[50vh] justify-center items-center"><Loader2 className="animate-spin text-pink-500" size={48} /></div>;
+  if (loading) return <div className="flex h-[50vh] justify-center items-center"><Loader2 className="animate-spin text-pink-500" size={32} /></div>;
 
   return (
-    <div className="w-full space-y-12">
+    <div className="w-full space-y-10">
       <header className="px-1 flex flex-col md:flex-row md:items-end justify-between gap-6">
            <div>
-              <h1 className="text-6xl md:text-8xl font-black text-zinc-900 dark:text-white tracking-tighter">Inbox</h1>
-              <p className="text-zinc-500 dark:text-zinc-400 text-2xl font-bold mt-2">
+              <h1 className="text-4xl md:text-6xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">Inbox</h1>
+              <p className="text-zinc-500 dark:text-zinc-400 text-lg font-bold mt-2 opacity-80">
                 Unread whispers: <span className="text-pink-500 font-black">{questions.length}</span>
               </p>
            </div>
            {questions.length > 0 && (
-             <button onClick={copyLink} className="bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 px-8 py-4 rounded-[24px] font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:scale-105 transition-all active:scale-95">
-               {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
-               Share My Link
+             <button onClick={copyLink} className="bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 px-6 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-3 hover:scale-105 transition-all">
+               {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />} Share Link
              </button>
            )}
       </header>
 
       {questions.length === 0 ? (
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white/40 dark:bg-zinc-900/20 backdrop-blur-3xl border border-zinc-200 dark:border-white/10 rounded-[64px] p-24 text-center flex flex-col items-center max-w-4xl mx-auto shadow-sm">
-          <div className="w-28 h-28 bg-pink-500/10 text-pink-500 rounded-full flex items-center justify-center mb-10 shadow-inner">
-            <MessageSquare size={48} />
-          </div>
-          <h3 className="text-4xl font-black mb-6 dark:text-white tracking-tight">The portal is quiet.</h3>
-          <p className="text-zinc-500 dark:text-zinc-400 mb-12 text-2xl font-bold leading-relaxed max-w-lg">Invite whispers into your studio by sharing your unique link.</p>
-          <button onClick={copyLink} className="w-full sm:w-auto bg-pink-500 text-white px-16 py-7 rounded-[32px] font-black text-2xl flex items-center justify-center gap-5 shadow-[0_24px_48px_rgba(236,72,153,0.3)] hover:scale-110 transition-all active:scale-95">
-            {copied ? <Check size={28} strokeWidth={3} /> : <Copy size={28} strokeWidth={3} />}
-            {copied ? 'Link Copied!' : 'Copy My Studio Link'}
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="bg-white/40 dark:bg-zinc-900/20 backdrop-blur-3xl border border-zinc-100 dark:border-white/5 rounded-[48px] p-20 text-center flex flex-col items-center max-w-3xl mx-auto shadow-sm">
+          <div className="w-20 h-20 bg-pink-500/10 text-pink-500 rounded-full flex items-center justify-center mb-8 shadow-inner"><MessageSquare size={36} /></div>
+          <h3 className="text-3xl font-black mb-4 dark:text-white tracking-tight">The portal is quiet.</h3>
+          <p className="text-zinc-500 dark:text-zinc-400 mb-10 text-lg font-bold leading-relaxed max-w-sm">Invite whispers into your studio by sharing your unique link.</p>
+          <button onClick={copyLink} className="w-full sm:w-auto bg-pink-500 text-white px-12 py-5 rounded-[28px] font-black text-xl flex items-center justify-center gap-4 shadow-xl hover:scale-105 active:scale-95 transition-all">
+            {copied ? <Check size={24} strokeWidth={3} /> : <Copy size={24} strokeWidth={3} />} {copied ? 'Link Copied!' : 'Copy Link'}
           </button>
         </motion.div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {questions.map((q, i) => {
              const styles = THEME_STYLES[q.theme || 'noir'] || THEME_STYLES['noir'];
              return (
               <motion.div 
                 key={q.id} 
-                initial={{ scale: 0.95, opacity: 0, y: 30 }} 
+                initial={{ scale: 0.98, opacity: 0, y: 15 }} 
                 animate={{ scale: 1, opacity: 1, y: 0 }} 
-                transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }} 
+                transition={{ delay: i * 0.03 }} 
                 onClick={() => setSelectedQuestion(q)} 
                 className={clsx(
-                  "border p-10 rounded-[48px] cursor-pointer group transition-all relative overflow-hidden shadow-sm hover:shadow-2xl hover:border-pink-500/20 min-h-[320px] flex flex-col justify-between", 
+                  "border p-8 rounded-[40px] cursor-pointer group transition-all relative overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 min-h-[260px] flex flex-col justify-between", 
                   styles.card
                 )}
               >
                 <div>
-                    <div className="flex justify-between items-center mb-8 relative z-10">
-                        <div className="flex items-center gap-3 bg-black/30 backdrop-blur-xl rounded-full px-5 py-2 border border-white/10">
-                            <Shield size={14} className="text-pink-500" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">SECRET</span>
+                    <div className="flex justify-between items-center mb-6 relative z-10">
+                        <div className="flex items-center gap-2 bg-black/40 backdrop-blur-xl rounded-full px-4 py-1.5 border border-white/10">
+                            <Shield size={12} className="text-pink-500" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-white">SECRET</span>
                         </div>
-                        <button onClick={(e) => handleDelete(e, q.id)} className="p-2.5 rounded-full hover:bg-red-500/20 text-white/40 hover:text-red-500 transition-all active:scale-90 opacity-0 group-hover:opacity-100"><Trash2 size={20} /></button>
+                        <button onClick={(e) => handleDelete(e, q.id)} className="p-2 rounded-full hover:bg-red-500/20 text-white/30 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"><Trash2 size={16} /></button>
                     </div>
-                    <p className={clsx("text-3xl font-black leading-[1.15] line-clamp-4 tracking-tighter", styles.text)}>{q.text}</p>
+                    <p className={clsx("text-xl font-black leading-tight line-clamp-3 tracking-tighter", styles.text)}>{q.text}</p>
                 </div>
-                <div className="mt-10 flex justify-between items-center relative z-10">
-                   <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 text-white">{timeAgo(q.timestamp)}</span>
-                   <span className="text-[10px] font-black uppercase tracking-[0.3em] px-8 py-3.5 rounded-full border bg-white/10 text-white border-white/20 backdrop-blur-3xl group-hover:bg-pink-500 group-hover:border-pink-500 transition-all">Reply</span>
+                <div className="mt-8 flex justify-between items-center relative z-10">
+                   <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 text-white">{timeAgo(q.timestamp)}</span>
+                   <span className="text-[9px] font-black uppercase tracking-[0.3em] px-6 py-3 rounded-full border bg-white/10 text-white border-white/20 backdrop-blur-3xl group-hover:bg-pink-500 transition-all">Reply</span>
                 </div>
                 <div className={clsx("absolute inset-0 opacity-[0.05] bg-gradient-to-br", styles.gradient)}></div>
               </motion.div>
@@ -187,86 +183,73 @@ const Inbox = () => {
         </div>
       )}
 
-      {/* REFINED MODAL EXPERIENCE */}
+      {/* Editor Modal */}
       <AnimatePresence>
         {selectedQuestion && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-zinc-950/95 backdrop-blur-[40px]" onClick={() => setSelectedQuestion(null)}/>
             <motion.div 
-              initial={{ scale: 0.9, y: 50, opacity: 0 }} 
+              initial={{ scale: 0.98, y: 20, opacity: 0 }} 
               animate={{ scale: 1, y: 0, opacity: 1 }} 
-              exit={{ scale: 0.9, y: 50, opacity: 0 }} 
-              className="w-full max-w-[1400px] h-[90dvh] flex flex-col lg:flex-row bg-white dark:bg-zinc-900 border border-white/10 rounded-[64px] overflow-hidden shadow-[0_60px_120px_rgba(0,0,0,0.5)] relative z-10"
+              exit={{ scale: 0.98, y: 20, opacity: 0 }} 
+              className="w-full max-w-5xl h-[85dvh] flex flex-col lg:flex-row bg-white dark:bg-zinc-900 border border-white/10 rounded-[48px] overflow-hidden shadow-2xl relative z-10"
             >
-              <button onClick={() => setSelectedQuestion(null)} className="absolute top-10 right-10 z-50 text-zinc-400 hover:text-white bg-zinc-100 dark:bg-white/5 rounded-full p-4 transition-all active:scale-90"><X size={32} /></button>
+              <button onClick={() => setSelectedQuestion(null)} className="absolute top-6 right-6 z-50 text-zinc-400 hover:text-white bg-zinc-100 dark:bg-white/5 rounded-full p-3 transition-all"><X size={24} /></button>
               
-              <div className="flex-1 bg-zinc-50 dark:bg-[#0c0c0e] relative flex flex-col items-center justify-center p-10 lg:p-20 overflow-hidden border-b lg:border-b-0 lg:border-r border-white/5">
-                 <div className="absolute top-10 left-1/2 -translate-x-1/2 z-30 flex items-center gap-6 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-3xl px-8 py-4 rounded-[28px] border border-white/10 shadow-2xl">
-                    <Palette size={20} className="text-pink-500" />
-                    <div className="flex gap-3">
+              <div className="flex-[0.8] bg-zinc-50 dark:bg-[#0c0c0e] relative flex flex-col items-center justify-center p-8 border-b lg:border-b-0 lg:border-r border-white/5">
+                 <div className="absolute top-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-2xl px-6 py-3 rounded-[24px] border border-white/10 shadow-lg scale-90 md:scale-100">
+                    <Palette size={16} className="text-pink-500" />
+                    <div className="flex gap-2">
                       {Object.keys(THEME_STYLES).map((t) => (
-                        <button key={t} onClick={() => setModalTheme(t)} className={clsx("w-8 h-8 rounded-full border-4 transition-all hover:scale-125 bg-gradient-to-br", THEME_STYLES[t].gradient, modalTheme === t ? 'border-pink-500 ring-[10px] ring-pink-500/10' : 'border-white/20 opacity-60')} />
+                        <button key={t} onClick={() => setModalTheme(t)} className={clsx("w-6 h-6 rounded-full border-2 transition-all hover:scale-110 bg-gradient-to-br", THEME_STYLES[t].gradient, modalTheme === t ? 'border-pink-500 ring-4 ring-pink-500/10' : 'border-white/20 opacity-60')} />
                       ))}
                     </div>
                  </div>
 
-                 <div className="relative shadow-[0_80px_160px_-40px_rgba(0,0,0,0.6)] rounded-[56px] overflow-hidden" style={{ height: '540px', aspectRatio: '9/16' }}>
-                    <div className={clsx("w-full h-full flex flex-col items-center justify-center relative p-12 text-center bg-gradient-to-br transition-all duration-1000", THEME_STYLES[modalTheme].gradient)}>
-                         <div className="absolute inset-0 opacity-[0.08] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-                         <div className="absolute top-12 flex flex-col items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-3xl flex items-center justify-center border border-white/20 shadow-2xl"><Shield size={24} className="text-white" /></div>
-                            <span className="text-white font-black uppercase tracking-[0.5em] text-[10px] opacity-60">Secret Whisper</span>
-                         </div>
-                         <div className="relative z-10 bg-white/10 backdrop-blur-[40px] border border-white/30 p-12 rounded-[48px] shadow-2xl w-full rotate-2">
-                             <p className={clsx("font-black text-3xl leading-tight tracking-tighter drop-shadow-2xl", THEME_STYLES[modalTheme].text)}>
-                                {selectedQuestion.text}
-                             </p>
+                 <div className="relative shadow-2xl rounded-[40px] overflow-hidden" style={{ height: '420px', aspectRatio: '9/16' }}>
+                    <div className={clsx("w-full h-full flex flex-col items-center justify-center relative p-8 text-center bg-gradient-to-br transition-all duration-700", THEME_STYLES[modalTheme].gradient)}>
+                         <div className="relative z-10 bg-white/10 backdrop-blur-[40px] border border-white/30 p-8 rounded-[36px] shadow-2xl w-full rotate-1">
+                             <p className={clsx("font-black text-2xl leading-tight tracking-tighter", THEME_STYLES[modalTheme].text)}>{selectedQuestion.text}</p>
                          </div>
                     </div>
                  </div>
 
-                 <div className="mt-12 z-20 w-full max-w-xs">
-                     <button onClick={handleDownloadImage} disabled={downloading} className="w-full bg-zinc-950 dark:bg-white dark:text-black text-white text-lg font-black px-10 py-5 rounded-[28px] shadow-2xl flex items-center justify-center gap-4 hover:scale-105 active:scale-95 transition-all">
-                       {downloading ? <Loader2 className="animate-spin" size={24} /> : <Download size={24} strokeWidth={3} />}
-                       {downloading ? 'Preparing...' : 'Export Asset'}
+                 <div className="mt-8 z-20 w-full max-w-[200px]">
+                     <button onClick={handleDownloadImage} disabled={downloading} className="w-full bg-zinc-950 dark:bg-white dark:text-black text-white text-xs font-black px-6 py-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 hover:scale-105 active:scale-95 transition-all">
+                       {downloading ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} strokeWidth={3} />} {downloading ? 'Preparing...' : 'Export Asset'}
                     </button>
                  </div>
               </div>
 
-              <div className="flex-1 bg-white dark:bg-zinc-900 p-12 lg:p-24 flex flex-col justify-center overflow-y-auto no-scrollbar">
-                 <div className="max-w-lg mx-auto w-full">
-                    <div className="flex items-start justify-between mb-12">
+              <div className="flex-1 bg-white dark:bg-zinc-900 p-8 lg:p-16 flex flex-col justify-center overflow-y-auto no-scrollbar">
+                 <div className="max-w-md mx-auto w-full">
+                    <div className="flex items-start justify-between mb-8">
                         <div>
-                          <h3 className="text-5xl font-black mb-3 dark:text-white tracking-tighter leading-none">Post Reply</h3>
-                          <p className="text-zinc-500 dark:text-zinc-400 text-xl font-bold tracking-tight">Broadcast this to your public studio feed.</p>
+                          <h3 className="text-3xl font-black mb-2 dark:text-white tracking-tighter leading-none">Post Reply</h3>
+                          <p className="text-zinc-500 dark:text-zinc-400 text-sm font-bold opacity-80">Broadcast this to your portal feed.</p>
                         </div>
-                        <button onClick={handleAISuggest} disabled={aiLoading} className="p-5 bg-pink-500/10 text-pink-500 rounded-[28px] hover:scale-110 active:rotate-12 transition-all shadow-lg border border-pink-500/5">
-                            {aiLoading ? <Loader2 className="animate-spin" size={32} /> : <Sparkles size={32} />}
+                        <button onClick={handleAISuggest} disabled={aiLoading} className="p-4 bg-pink-500/10 text-pink-500 rounded-2xl hover:scale-110 transition-all border border-pink-500/5">
+                            {aiLoading ? <Loader2 className="animate-spin" size={24} /> : <Sparkles size={24} />}
                         </button>
                     </div>
                     
-                    <div className="relative mb-12">
-                        <textarea value={answerText} onChange={(e) => setAnswerText(e.target.value)} placeholder="Whisper your reply..." autoFocus className="w-full bg-zinc-50 dark:bg-[#070708] border border-zinc-200 dark:border-white/5 rounded-[48px] p-10 text-zinc-900 dark:text-white outline-none resize-none text-3xl font-black min-h-[220px] focus:ring-[16px] focus:ring-pink-500/5 focus:border-pink-500 transition-all placeholder-zinc-300 dark:placeholder-white/5 shadow-inner leading-tight" />
-                        <div className="absolute bottom-8 right-10 text-[10px] font-black text-zinc-400 uppercase tracking-widest">{answerText.length} / 500</div>
-                    </div>
+                    <textarea value={answerText} onChange={(e) => setAnswerText(e.target.value)} placeholder="Whisper your reply..." autoFocus className="w-full bg-zinc-50 dark:bg-[#070708] border border-zinc-100 dark:border-white/5 rounded-[32px] p-8 text-zinc-900 dark:text-white outline-none resize-none text-xl font-black min-h-[160px] focus:ring-[12px] focus:ring-pink-500/5 focus:border-pink-500 transition-all shadow-inner leading-tight mb-8" />
 
-                    <div className="bg-zinc-50 dark:bg-[#070708] border border-zinc-200 dark:border-white/5 p-8 rounded-[36px] mb-12 flex items-center justify-between group cursor-pointer hover:border-pink-500/30 transition-all" onClick={() => setIsPublic(!isPublic)}>
-                        <div className="flex items-center gap-5">
-                          <div className={clsx("w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-lg", isPublic ? "bg-pink-500 text-white" : "bg-zinc-200 dark:bg-white/5 text-zinc-500")}>
-                            {isPublic ? <Eye size={28} /> : <Lock size={28} />}
-                          </div>
+                    <div className="bg-zinc-50 dark:bg-[#070708] border border-zinc-100 dark:border-white/5 p-6 rounded-[28px] mb-8 flex items-center justify-between group cursor-pointer" onClick={() => setIsPublic(!isPublic)}>
+                        <div className="flex items-center gap-4">
+                          <div className={clsx("w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-md", isPublic ? "bg-pink-500 text-white" : "bg-zinc-200 dark:bg-white/5 text-zinc-500")}><Eye size={20} /></div>
                           <div>
-                            <p className="text-xl font-black dark:text-white leading-none mb-1.5">Public Feed</p>
-                            <p className="text-sm font-bold text-zinc-500">Feature this in your portal</p>
+                            <p className="text-sm font-black dark:text-white leading-none mb-1">Public Feed</p>
+                            <p className="text-[10px] font-bold text-zinc-500">Show in your portal</p>
                           </div>
                         </div>
-                        <div className={clsx("relative w-16 h-8 rounded-full transition-all p-1.5", isPublic ? "bg-pink-500" : "bg-zinc-300 dark:bg-white/10")}>
-                          <motion.div animate={{ x: isPublic ? 32 : 0 }} className="w-5 h-5 bg-white rounded-full shadow-2xl"/>
+                        <div className={clsx("relative w-12 h-6 rounded-full transition-all p-1", isPublic ? "bg-pink-500" : "bg-zinc-300 dark:bg-white/10")}>
+                          <motion.div animate={{ x: isPublic ? 24 : 0 }} className="w-4 h-4 bg-white rounded-full shadow-md"/>
                         </div>
                     </div>
 
-                    <button onClick={handlePublish} disabled={!answerText.trim() || publishing} className="w-full bg-pink-500 text-white font-black text-2xl py-8 rounded-[36px] shadow-[0_32px_64px_rgba(236,72,153,0.3)] hover:bg-pink-600 active:scale-95 transition-all disabled:opacity-50">
-                        {publishing ? <Loader2 className="animate-spin" size={32} /> : 'Publish Whisper'}
+                    <button onClick={handlePublish} disabled={!answerText.trim() || publishing} className="w-full bg-pink-500 text-white font-black text-xl py-6 rounded-[28px] shadow-[0_20px_40px_rgba(236,72,153,0.3)] hover:bg-pink-600 active:scale-95 transition-all disabled:opacity-50">
+                        {publishing ? <Loader2 className="animate-spin" size={24} /> : 'Publish Whisper'}
                     </button>
                  </div>
               </div>
@@ -274,34 +257,6 @@ const Inbox = () => {
           </div>
         )}
       </AnimatePresence>
-
-      {/* HIDDEN CAPTURE LAYER FOR HIGH-RES EXPORT */}
-      <div className="fixed left-[-9999px] top-0 overflow-hidden" style={{ width: '1080px', height: '1920px', pointerEvents: 'none' }}>
-          {selectedQuestion && (
-            <div ref={captureRef} className={clsx("w-full h-full flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", (THEME_STYLES[modalTheme] || THEME_STYLES.noir).gradient)}>
-                 <div className="absolute inset-0 opacity-[0.08] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-                 <div className="absolute top-24 flex flex-col items-center gap-10">
-                    <div className="w-32 h-32 rounded-[40px] bg-white/20 backdrop-blur-3xl flex items-center justify-center border border-white/20 shadow-2xl">
-                      <Shield size={64} className="text-white" />
-                    </div>
-                    <span className="text-white font-black uppercase tracking-[0.6em] text-3xl opacity-60">Secret Whisper</span>
-                 </div>
-                 <div className="relative z-10 bg-white/10 backdrop-blur-[60px] border border-white/30 p-24 rounded-[100px] shadow-[0_60px_120px_rgba(0,0,0,0.4)] w-full rotate-2">
-                     <p className={clsx("font-black text-7xl leading-[1.1] tracking-tighter drop-shadow-2xl", (THEME_STYLES[modalTheme] || THEME_STYLES.noir).text)}>
-                        {selectedQuestion.text}
-                     </p>
-                 </div>
-                 <div className="absolute bottom-24 flex flex-col items-center gap-10">
-                     <p className="text-2xl text-white/40 uppercase tracking-[0.6em] font-black">Tap to reply</p>
-                     <div className="bg-black/40 backdrop-blur-3xl px-16 py-8 rounded-full border border-white/10 shadow-2xl">
-                        <p className="text-white font-black text-4xl tracking-tighter uppercase">
-                          askme.app<span className="text-white/40">/u/{userProfile?.username}</span>
-                        </p>
-                     </div>
-                 </div>
-            </div>
-          )}
-      </div>
     </div>
   );
 };
