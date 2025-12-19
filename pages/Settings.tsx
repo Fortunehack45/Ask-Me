@@ -5,7 +5,7 @@ import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Sun, Moon, Lock, Check, Shield, Loader2, Eye, EyeOff, LogOut, RefreshCcw, Info, User, ShieldCheck, Palette, Bell, Globe, ChevronRight, Copy, Trash2, Camera, Sparkles
+  Sun, Moon, Lock, Check, Shield, Loader2, Eye, EyeOff, LogOut, RefreshCcw, Info, User, ShieldCheck, Palette, Bell, Globe, ChevronRight, Copy, Trash2, Camera, Sparkles, Settings as SettingsIcon
 } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { updateUserProfile, isUsernameTaken } from '../services/db';
@@ -158,7 +158,7 @@ const Settings = () => {
       {/* Page Heading */}
       <header className="mb-12">
         <div className="flex items-center gap-3 mb-2">
-          <Settings className="text-pink-500" size={28} />
+          <SettingsIcon className="text-pink-500" size={28} />
           <h1 className="text-4xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tighter">Account</h1>
         </div>
         <p className="text-zinc-500 dark:text-zinc-400 font-medium text-lg">Manage your identity and app preferences.</p>
