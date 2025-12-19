@@ -6,7 +6,7 @@ import { getToken } from 'firebase/messaging';
 import { saveFCMToken } from '../services/db';
 import { Home, Inbox, User, LogOut, LayoutDashboard, Bell, Settings } from './Icons';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -203,9 +203,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </main>
 
-      {/* SLICK MOBILE BOTTOM NAV */}
-      <nav className="md:hidden fixed bottom-6 left-6 right-6 z-50 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-zinc-200 dark:border-white/10 rounded-[28px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden">
-        <div className="flex justify-around items-center h-16 px-2">
+      {/* LIQUID GLASS MOBILE BOTTOM NAV */}
+      <nav className="md:hidden fixed bottom-6 left-6 right-6 z-50 rounded-[32px] overflow-hidden group">
+        <div className="absolute inset-0 bg-white/40 dark:bg-black/40 backdrop-blur-[32px] border border-white/20 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] pointer-events-none"></div>
+        {/* Shine highlight */}
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"></div>
+        
+        <div className="flex justify-around items-center h-16 px-4 relative">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
             return (
@@ -213,20 +217,32 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 key={item.name} 
                 to={item.path}
                 className={clsx(
-                  "flex flex-col items-center justify-center w-full h-full transition-all relative",
-                  isActive ? "text-pink-500" : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
+                  "flex flex-col items-center justify-center w-full h-full transition-all relative z-10",
+                  isActive ? "text-pink-500" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
                 )}
               >
+                {/* LIQUID PILL BACKGROUND */}
+                {isActive && (
+                  <motion.div 
+                    layoutId="liquidPill"
+                    className="absolute inset-1.5 rounded-2xl bg-pink-500/10 dark:bg-pink-500/20 shadow-[inset_0_0_12px_rgba(236,72,153,0.1)] border border-pink-500/20"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                )}
+
                 <div className={clsx(
-                  "p-2 rounded-xl transition-all duration-300",
-                  isActive && "bg-pink-500/10 scale-110"
+                  "relative z-10 p-2 transition-all duration-300",
+                  isActive && "scale-110"
                 )}>
                   <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
                 </div>
+                
+                {/* Glow Dot */}
                 {isActive && (
                   <motion.div 
-                    layoutId="mobileActiveDot"
-                    className="absolute bottom-1 w-1 h-1 bg-pink-500 rounded-full"
+                    layoutId="mobileGlowDot"
+                    className="absolute bottom-1 w-1 h-1 bg-pink-500 rounded-full shadow-[0_0_8px_rgba(236,72,153,0.8)]"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
                 )}
               </Link>
