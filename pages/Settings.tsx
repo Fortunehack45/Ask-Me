@@ -1,13 +1,11 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
-// Fixed: Added missing MessageCircle icon import to resolve "Cannot find name 'MessageCircle'" error
 import { 
-  Sun, Moon, Lock, Check, Shield, Loader2, Eye, EyeOff, LogOut, RefreshCcw, Info, User, ShieldCheck, Palette, Bell, Globe, ChevronRight, Copy, Trash2, Camera, Sparkles, Settings as SettingsIcon, Code2, Heart, MessageCircle
+  Sun, Moon, Lock, Check, Shield, Loader2, Eye, EyeOff, LogOut, RefreshCcw, Info, User, ShieldCheck, Palette, Bell, Globe, ChevronRight, Copy, Trash2, Camera, Sparkles, Settings as SettingsIcon, Code2, Heart, MessageCircle, GraduationCap, Zap
 } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { updateUserProfile, isUsernameTaken } from '../services/db';
@@ -491,15 +489,26 @@ const Settings = () => {
                     <ShieldCheck size={14} /> Verified Architect
                   </span>
                 </div>
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-4">
+                    <div className="flex items-center gap-2 px-4 py-1.5 bg-blue-500/5 text-blue-500 rounded-xl border border-blue-500/10 text-xs font-black tracking-tight">
+                        <GraduationCap size={14} />
+                        IS @ FUTA
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-1.5 bg-amber-500/5 text-amber-500 rounded-xl border border-amber-500/10 text-xs font-black tracking-tight">
+                        <Zap size={14} />
+                        Self-Taught Visionary
+                    </div>
+                </div>
                 <p className="text-zinc-500 dark:text-zinc-400 font-bold text-lg max-w-xl leading-relaxed">
-                  Crafting high-fidelity digital experiences with a focus on speed, security, and world-class aesthetics. Built with passion to empower anonymous expression.
+                  A dedicated student of <span className="text-zinc-900 dark:text-white">Information Systems (IFS/IS)</span> at the <span className="text-zinc-900 dark:text-white">Federal University of Technology Akure (FUTA)</span>. 
+                  As a talented self-taught engineer, I bridge the gap between complex system architecture and high-fidelity user experiences. 
                 </p>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
                   <a href="https://wa.me/2349167689200" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-6 py-3 bg-zinc-950 dark:bg-white text-white dark:text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
                     <MessageCircle size={18} /> Contact Architect
                   </a>
                   <div className="flex items-center gap-3 px-6 py-3 bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 rounded-2xl font-black text-xs uppercase tracking-widest border border-zinc-200 dark:border-white/10">
-                    <Heart size={18} className="text-pink-500 fill-pink-500" /> Handcrafted in Nigeria
+                    <Heart size={18} className="text-pink-500 fill-pink-500" /> Crafted in Nigeria
                   </div>
                 </div>
              </div>

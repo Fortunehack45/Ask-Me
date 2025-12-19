@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { auth, getMessagingInstance } from '../firebase';
 import { getToken } from 'firebase/messaging';
 import { saveFCMToken } from '../services/db';
-import { Home, Inbox, User, LogOut, LayoutDashboard, Bell, Settings, Code2 } from './Icons';
+import { Home, Inbox, User, LogOut, LayoutDashboard, Bell, Settings, Code2, GraduationCap } from './Icons';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -174,10 +174,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             href="https://wa.me/2349167689200" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 py-2 text-zinc-300 dark:text-zinc-600 hover:text-pink-500 transition-all group"
+            className="flex items-center justify-between px-4 py-2 text-zinc-300 dark:text-zinc-600 hover:text-pink-500 transition-all group"
           >
-            <Code2 size={12} className="group-hover:rotate-12 transition-transform" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Handcrafted by Esho</span>
+            <div className="flex items-center gap-2">
+              <Code2 size={12} className="group-hover:rotate-12 transition-transform" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Esho Fortune</span>
+            </div>
+            <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+               <GraduationCap size={12} />
+               <span className="text-[8px] font-black">FUTA</span>
+            </div>
           </a>
         </div>
       </aside>
