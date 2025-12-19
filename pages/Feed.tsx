@@ -60,8 +60,11 @@ const Feed: React.FC = () => {
     ? `${window.location.origin}/#/u/${userProfile.username}`
     : '';
 
+  const invitationText = `Ask me anything anonymously! 🤫 Send your whispers here:`;
+
   const handleCopyOnly = async () => {
-    await copyToClipboard(shareUrl);
+    const fullTextToCopy = `${invitationText}\n${shareUrl}`;
+    await copyToClipboard(fullTextToCopy);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
   };
@@ -74,7 +77,7 @@ const Feed: React.FC = () => {
       await toPng(shareCaptureRef.current, { cacheBust: true });
       
       const dataUrl = await toPng(shareCaptureRef.current, { 
-        pixelRatio: 2, // 2 is safer for mobile performance
+        pixelRatio: 2, 
         width: 1080, 
         height: 1920,
         cacheBust: true
@@ -87,14 +90,14 @@ const Feed: React.FC = () => {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ 
           title: 'Ask Me!', 
-          text: `Ask @${userProfile.username} anonymously!`, 
+          text: invitationText, 
           url: shareUrl, 
           files: [file] 
         });
       } else if (navigator.share) {
         await navigator.share({ 
           title: 'Ask Me', 
-          text: `Ask @${userProfile.username}`, 
+          text: invitationText, 
           url: shareUrl 
         });
       } else {
@@ -103,7 +106,6 @@ const Feed: React.FC = () => {
       setShowStudio(false);
     } catch (err) {
       console.error("Share failed", err);
-      // Fail gracefully with copy
       handleCopyOnly();
     } finally {
       setSharing(false);
@@ -134,7 +136,7 @@ const Feed: React.FC = () => {
         {showToast && (
           <motion.div initial={{ opacity: 0, y: -20, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: -20, x: '-50%' }} className="fixed top-24 left-1/2 -translate-x-1/2 z-[150] bg-zinc-950 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-4 border border-white/10 backdrop-blur-2xl">
             <Check size={20} className="text-emerald-500" />
-            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Portal Link Copied</span>
+            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Invitation Copied</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -143,7 +145,7 @@ const Feed: React.FC = () => {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
         <div className="space-y-2">
           <h1 className="text-5xl md:text-7xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-4">
-            Dashboard <span className="text-pink-500" size={36} />
+            Dashboard <Sparkles className="text-pink-500" size={36} />
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 font-bold text-xl opacity-80 leading-relaxed">
             Welcome back, <span className="text-pink-600 dark:text-pink-500 font-black">{userProfile?.fullName}</span>
@@ -295,7 +297,7 @@ const Feed: React.FC = () => {
                         {sharing ? <Loader2 className="animate-spin" size={32} /> : <Share2 size={32} />} {sharing ? 'Rendering...' : 'Share Profile'}
                     </button>
                     <button onClick={handleCopyOnly} className="w-full py-5 text-sm font-black uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 hover:text-pink-500 transition-colors flex items-center justify-center gap-3">
-                      <Copy size={16} /> Copy URL Instead
+                      <Copy size={16} /> Copy Invitation Instead
                     </button>
                 </div>
             </motion.div>

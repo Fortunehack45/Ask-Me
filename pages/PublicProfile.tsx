@@ -42,6 +42,7 @@ const PublicProfile = () => {
   const shareCaptureRef = useRef<HTMLDivElement>(null);
 
   const isOwner = user && profile && user.uid === profile.uid;
+  const invitationText = `Ask me anything anonymously! 🤫 Send your whispers here:`;
 
   useEffect(() => {
     const loadData = async () => {
@@ -54,6 +55,15 @@ const PublicProfile = () => {
     loadData();
     return () => { document.title = 'Ask Me'; };
   }, [username]);
+
+  const handleCopyLink = async () => {
+    const shareUrl = window.location.href;
+    const fullTextToCopy = `${invitationText}\n${shareUrl}`;
+    await copyToClipboard(fullTextToCopy);
+    setCopyFeedback(true);
+    setTimeout(() => setCopyFeedback(false), 3000);
+    setShowShareStudio(false);
+  };
 
   const handleNativeShare = async () => {
     if (!profile || !shareCaptureRef.current) return;
@@ -74,26 +84,23 @@ const PublicProfile = () => {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ 
           title: `Ask @${profile.username} Anything!`, 
-          text: `Send me an anonymous message here:`, 
+          text: invitationText, 
           url: shareUrl, 
           files: [file] 
         });
       } else if (navigator.share) {
         await navigator.share({ 
           title: `Ask @${profile.username}`, 
+          text: invitationText,
           url: shareUrl 
         });
       } else {
-        await copyToClipboard(shareUrl);
-        setCopyFeedback(true);
-        setTimeout(() => setCopyFeedback(false), 3000);
+        handleCopyLink();
       }
       setShowShareStudio(false);
     } catch (err) { 
       console.error("Share failed", err);
-      await copyToClipboard(window.location.href);
-      setCopyFeedback(true);
-      setTimeout(() => setCopyFeedback(false), 3000);
+      handleCopyLink();
     } finally { setIsSharing(false); }
   };
 
@@ -136,7 +143,7 @@ const PublicProfile = () => {
         {copyFeedback && (
           <motion.div initial={{ opacity: 0, y: -20, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: -20, x: '-50%' }} className="fixed top-24 left-1/2 -translate-x-1/2 z-[150] bg-zinc-950 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-4 border border-white/10 backdrop-blur-2xl">
             <Check size={20} className="text-emerald-500" />
-            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Profile Link Copied</span>
+            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Invitation Copied</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -179,7 +186,7 @@ const PublicProfile = () => {
                     <button onClick={handleNativeShare} disabled={isSharing} className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-5 rounded-[24px] shadow-xl flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 text-lg">
                         {isSharing ? <Loader2 className="animate-spin" size={20} /> : <Share2 size={20} />} {isSharing ? 'Generating...' : 'Share Profile'}
                     </button>
-                    <button onClick={async () => { await copyToClipboard(window.location.href); setCopyFeedback(true); setTimeout(() => setCopyFeedback(false), 3000); setShowShareStudio(false); }} className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-pink-500 transition-colors">Copy URL Instead</button>
+                    <button onClick={handleCopyLink} className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-pink-500 transition-colors">Copy Invitation Instead</button>
                 </div>
             </motion.div>
           </div>

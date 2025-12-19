@@ -1,8 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Corrected separate type import for User to resolve member resolution issues
-import { onAuthStateChanged } from 'firebase/auth';
-import type { User } from 'firebase/auth';
+// Merging value and type imports from firebase/auth for better compiler resolution
+import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '../firebase';
 import { getUserProfile, updateUserLastActive } from '../services/db';
 import { UserProfile } from '../types';
