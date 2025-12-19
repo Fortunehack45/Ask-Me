@@ -37,7 +37,7 @@ messaging.onBackgroundMessage(function(payload) {
   const notificationTitle = payload.notification?.title || 'New Question!';
   const notificationOptions = {
     body: payload.notification?.body || 'You have a new anonymous message.',
-    icon: 'data:image/svg+xml,%3Csvg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Crect width="192" height="192" rx="48" fill="url(%23grad)" /%3E%3Cdefs%3E%3ClinearGradient id="grad" x1="0" y1="0" x2="192" y2="192" gradientUnits="userSpaceOnUse"%3E%3Cstop stop-color="%23db2777" /%3E%3Cstop offset="1" stop-color="%23f97316" /%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x="50%25" y="50%25" dominant-baseline="central" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="900" font-size="110"%3EA%3C/text%3E%3C/svg%3E',
+    icon: 'data:image/svg+xml,%3Csvg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Crect width="192" height="192" rx="48" fill="url(%23grad)" /%3E%3Cdefs%3E%3ClinearGradient id="grad" x1="0" y1="0" x2="192" y2="192" gradientUnits="userSpaceOnUse"%3E%3Cstop stop-color="%23ff0080" /%3E%3Cstop offset="1" stop-color="%23ff8c00" /%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x="50%25" y="55%25" dominant-baseline="central" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="900" font-size="104" letter-spacing="-0.05em"%3EAm%3C/text%3E%3C/svg%3E',
     data: {
       url: '/#/inbox'
     }

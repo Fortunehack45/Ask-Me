@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   createUserWithEmailAndPassword, 
@@ -148,9 +147,9 @@ const Auth: React.FC = () => {
         <div className="text-center mb-12">
           <motion.div 
             whileHover={{ scale: 1.05, rotate: 5 }}
-            className="w-20 h-20 bg-gradient-to-br from-pink-500 to-orange-500 rounded-3xl mx-auto mb-8 flex items-center justify-center font-black text-white text-4xl shadow-2xl shadow-pink-500/30"
+            className="w-24 h-24 bg-gradient-to-br from-[#ff0080] to-[#ff8c00] rounded-[32px] mx-auto mb-8 flex items-center justify-center font-black text-white text-5xl shadow-2xl shadow-pink-500/30 pt-1 tracking-tighter"
           >
-            A
+            Am
           </motion.div>
           <h1 className="text-5xl font-black text-zinc-900 dark:text-white tracking-tighter mb-3 leading-none">
             {isCompletingProfile ? 'Final Touch' : view === 'login' ? 'Welcome Back' : view === 'signup' ? 'Join Studio' : 'Reset Key'}

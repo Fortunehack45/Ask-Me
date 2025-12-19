@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -82,7 +81,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Mobile Top Header */}
       <header className="md:hidden fixed top-0 inset-x-0 z-40 px-6 h-16 flex justify-between items-center backdrop-blur-[32px] bg-white/70 dark:bg-[#070708]/70 border-b border-zinc-100 dark:border-white/5 shadow-sm">
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-pink-500/20">A</div>
+          <div className="w-10 h-10 bg-gradient-to-br from-[#ff0080] to-[#ff8c00] rounded-[11px] flex items-center justify-center text-white font-black shadow-lg shadow-pink-500/20 text-lg tracking-tighter pt-0.5">Am</div>
           <span className="text-xl font-black text-zinc-900 dark:text-white tracking-tighter">Ask Me</span>
         </Link>
         <button onClick={handleLogout} className="text-zinc-400 p-2 hover:text-red-500 transition-colors active:scale-90">
@@ -97,7 +96,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <Link to="/" className="flex items-center gap-4 group">
             <div className="relative">
               <div className="absolute inset-0 bg-pink-500 blur-lg opacity-20 group-hover:opacity-40 transition-opacity"></div>
-              <div className="relative w-12 h-12 bg-gradient-to-br from-pink-500 to-orange-500 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-2xl shadow-pink-500/20 group-hover:scale-105 transition-transform">A</div>
+              <div className="relative w-14 h-14 bg-gradient-to-br from-[#ff0080] to-[#ff8c00] rounded-[16px] flex items-center justify-center text-white font-black text-2xl shadow-2xl shadow-pink-500/20 group-hover:scale-105 transition-transform tracking-tighter pt-1">Am</div>
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none mb-1">Ask Me</span>
