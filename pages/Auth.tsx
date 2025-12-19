@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-// Consolidated modular auth imports for better resolution
+// Fix: Consolidated modular auth imports for better resolution and fixed "no exported member" errors by removing 'type' keyword
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signInWithPopup, 
   updateProfile, 
   sendPasswordResetEmail,
-  type User
+  User
 } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
 import { useNavigate } from 'react-router-dom';

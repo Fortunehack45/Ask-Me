@@ -1,9 +1,9 @@
 
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
-// Consolidated modular auth imports for better resolution in various environments
-import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
+// Fix: Remove 'type' keyword from named imports to resolve potential compatibility issues with modular exports
+import { getAuth, GoogleAuthProvider, Auth } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
-// Consolidated modular analytics imports for better resolution
+// Fix: Ensure correct modular imports for analytics
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {

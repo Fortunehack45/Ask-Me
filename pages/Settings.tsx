@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-// Consolidated modular auth imports for better resolution
-import { updatePassword, EmailAuthProvider, reauthenticateWithCredential, type User } from 'firebase/auth';
+// Fix: Fixed "no exported member" errors by removing 'type' keyword and ensuring modular resolution
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential, User } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { 
