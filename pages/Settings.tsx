@@ -77,7 +77,7 @@ const Settings = () => {
         avatar: editAvatar
       };
 
-      if (editUsername.toLowerCase() !== userProfile.username.toLowerCase()) {
+      if (editUsername && editUsername.toLowerCase() !== userProfile.username.toLowerCase()) {
         const lastChangeVal = userProfile.lastUsernameChange;
         let lastChangeMs = 0;
         
