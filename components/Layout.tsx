@@ -184,9 +184,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </aside>
 
-      {/* FULL HORIZON CONTENT AREA - Stretch to fill viewport */}
+      {/* FULL HORIZON CONTENT AREA - Expanded to use all available space */}
       <main className="w-full md:pl-72 min-h-screen relative z-10 flex flex-col">
-        <div className="flex-1 w-full px-4 md:px-8 lg:px-10 pt-24 pb-32 md:pt-16 md:pb-16 max-w-[2560px] mx-auto transition-all">
+        <div className="flex-1 w-full px-4 md:px-10 lg:px-12 pt-24 pb-32 md:pt-16 md:pb-16 transition-all">
            {children}
         </div>
       </main>

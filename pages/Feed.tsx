@@ -86,7 +86,7 @@ const Feed: React.FC = () => {
   if (authLoading) return null;
 
   return (
-    <div className="space-y-12 w-full animate-in fade-in duration-700">
+    <div className="space-y-12 w-full animate-in fade-in duration-700 max-w-full">
       
       {/* EXPORT NODE (HIDDEN) */}
       <div className="fixed left-[-9999px] top-0 overflow-hidden" style={{ width: '1080px', height: '1920px', pointerEvents: 'none' }}>
@@ -127,52 +127,52 @@ const Feed: React.FC = () => {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 w-full">
         {/* Left Control Center - Wide and Vibrant */}
-        <div className="lg:col-span-5 space-y-8 lg:space-y-10">
+        <div className="lg:col-span-4 xl:col-span-3 space-y-8 lg:space-y-10">
             <motion.div 
                 whileHover={{ y: -6, scale: 1.01 }}
-                className="relative overflow-hidden rounded-[56px] bg-gradient-to-br from-pink-500 via-rose-600 to-orange-600 p-12 text-white shadow-[0_40px_80px_-20px_rgba(236,72,153,0.3)] group cursor-pointer h-full flex flex-col justify-between"
+                className="relative overflow-hidden rounded-[56px] bg-gradient-to-br from-pink-500 via-rose-600 to-orange-600 p-10 md:p-12 text-white shadow-[0_40px_80px_-20px_rgba(236,72,153,0.3)] group cursor-pointer flex flex-col justify-between h-fit"
                 onClick={() => setShowStudio(true)}
             >
                 <div className="relative z-10">
-                  <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6 leading-none">Share Profile</h2>
-                  <p className="text-white/80 font-bold text-xl mb-12 opacity-90 leading-relaxed max-w-sm">Grow your studio uninhibited. Let the anonymous whispers flow into your portal.</p>
-                  <div className="bg-black/20 backdrop-blur-[40px] rounded-[36px] p-8 flex items-center gap-6 border border-white/10 shadow-inner">
-                      <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center text-pink-600 shadow-2xl shrink-0"><Share2 size={32} /></div>
+                  <h2 className="text-4xl font-black tracking-tight mb-6 leading-none">Share Profile</h2>
+                  <p className="text-white/80 font-bold text-lg mb-10 opacity-90 leading-relaxed">Grow your studio. Let the anonymous whispers flow.</p>
+                  <div className="bg-black/20 backdrop-blur-[40px] rounded-[36px] p-6 flex items-center gap-4 border border-white/10 shadow-inner">
+                      <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-pink-600 shadow-2xl shrink-0"><Share2 size={24} /></div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] uppercase font-black text-white/50 tracking-[0.4em] mb-2">Studio URL</p>
-                        <p className="text-2xl font-black truncate tracking-tighter">askme.app/u/{userProfile?.username}</p>
+                        <p className="text-[10px] uppercase font-black text-white/50 tracking-[0.4em] mb-1">Studio URL</p>
+                        <p className="text-lg font-black truncate tracking-tighter">askme.app/u/{userProfile?.username}</p>
                       </div>
                   </div>
                 </div>
-                <div className="absolute top-[-80px] right-[-80px] w-[450px] h-[450px] bg-white/10 rounded-full blur-[100px] group-hover:scale-125 transition-transform duration-1000"></div>
+                <div className="absolute top-[-80px] right-[-80px] w-[300px] h-[300px] bg-white/10 rounded-full blur-[80px] group-hover:scale-125 transition-transform duration-1000"></div>
             </motion.div>
 
-            <div className="grid grid-cols-2 gap-8">
-               <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 p-10 rounded-[56px] shadow-sm flex flex-col items-center text-center group transition-all hover:bg-white dark:hover:bg-zinc-900">
-                  <div className="w-16 h-16 rounded-[28px] bg-pink-500/10 text-pink-500 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-lg shadow-pink-500/5"><MessageSquare size={32} /></div>
-                  <span className="text-7xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">{loading ? '...' : stats.answers}</span>
-                  <span className="text-[12px] font-black uppercase tracking-[0.3em] text-zinc-400 mt-5">Published</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
+               <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 p-8 rounded-[48px] shadow-sm flex flex-col items-center text-center group transition-all hover:bg-white dark:hover:bg-zinc-900">
+                  <div className="w-14 h-14 rounded-[24px] bg-pink-500/10 text-pink-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-pink-500/5"><MessageSquare size={28} /></div>
+                  <span className="text-6xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">{loading ? '...' : stats.answers}</span>
+                  <span className="text-[11px] font-black uppercase tracking-[0.3em] text-zinc-400 mt-4">Published</span>
                </div>
-               <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 p-10 rounded-[56px] shadow-sm flex flex-col items-center text-center group transition-all hover:bg-white dark:hover:bg-zinc-900">
-                  <div className="w-16 h-16 rounded-[28px] bg-orange-500/10 text-orange-500 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-lg shadow-orange-500/5"><Heart size={32} /></div>
-                  <span className="text-7xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">{loading ? '...' : stats.likes}</span>
-                  <span className="text-[12px] font-black uppercase tracking-[0.3em] text-zinc-400 mt-5">Studio Love</span>
+               <div className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 p-8 rounded-[48px] shadow-sm flex flex-col items-center text-center group transition-all hover:bg-white dark:hover:bg-zinc-900">
+                  <div className="w-14 h-14 rounded-[24px] bg-orange-500/10 text-orange-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-orange-500/5"><Heart size={28} /></div>
+                  <span className="text-6xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">{loading ? '...' : stats.likes}</span>
+                  <span className="text-[11px] font-black uppercase tracking-[0.3em] text-zinc-400 mt-4">Studio Love</span>
                </div>
             </div>
         </div>
 
-        {/* Right Content Stream - Filling all space */}
-        <div className="lg:col-span-7 space-y-10">
+        {/* Right Content Stream - Adaptive for large monitors */}
+        <div className="lg:col-span-8 xl:col-span-9 space-y-10">
             <div className="flex items-center gap-8">
                 <h3 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tighter shrink-0">Recent Activity</h3>
                 <div className="h-px bg-zinc-100 dark:bg-white/10 flex-1"></div>
             </div>
             
             {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                   {[1,2,3,4].map(i => <div key={i} className="h-64 bg-zinc-100 dark:bg-white/5 rounded-[56px] animate-pulse"></div>)}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                   {[1,2,3,4,5,6].map(i => <div key={i} className="h-64 bg-zinc-100 dark:bg-white/5 rounded-[56px] animate-pulse"></div>)}
                 </div>
             ) : myAnswers.length === 0 ? (
             <div className="text-center py-48 bg-zinc-50 dark:bg-white/[0.02] rounded-[72px] border-2 border-dashed border-zinc-200 dark:border-white/10 flex flex-col items-center justify-center">
@@ -181,7 +181,7 @@ const Feed: React.FC = () => {
                 <Link to="/inbox" className="px-14 py-6 bg-pink-500 text-white rounded-3xl font-black text-sm uppercase tracking-widest shadow-[0_30px_60px_rgba(236,72,153,0.3)] hover:scale-110 active:scale-95 transition-all">Check My Inbox</Link>
             </div>
             ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
                 {myAnswers.map((item, i) => (
                 <motion.div 
                     key={item.id}
@@ -189,18 +189,18 @@ const Feed: React.FC = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.05 * i, type: 'spring', stiffness: 100 }}
-                    className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[56px] p-10 shadow-sm hover:shadow-2xl hover:border-pink-500/20 transition-all group relative overflow-hidden"
+                    className="bg-white/50 dark:bg-zinc-900/40 backdrop-blur-[60px] border border-zinc-200 dark:border-white/5 rounded-[48px] p-8 shadow-sm hover:shadow-2xl hover:border-pink-500/20 transition-all group relative overflow-hidden flex flex-col h-fit min-h-[320px]"
                 >
-                    <div className="flex items-center gap-4 mb-8 text-[10px] font-black uppercase text-pink-500 tracking-[0.4em] opacity-80">
+                    <div className="flex items-center gap-4 mb-6 text-[10px] font-black uppercase text-pink-500 tracking-[0.4em] opacity-80">
                         <MessageSquare size={16} /> <span>Public Response</span>
                     </div>
-                    <p className="text-zinc-900 dark:text-white text-3xl font-black leading-[1.1] mb-10 tracking-tighter">{item.questionText}</p>
-                    <div className="pt-10 border-t border-zinc-100 dark:border-white/10 relative">
-                        <p className="text-zinc-600 dark:text-zinc-300 text-xl font-bold italic opacity-90 leading-relaxed">"{item.answerText}"</p>
+                    <p className="text-zinc-900 dark:text-white text-2xl font-black leading-[1.2] mb-8 tracking-tighter flex-1">{item.questionText}</p>
+                    <div className="pt-6 border-t border-zinc-100 dark:border-white/10 relative">
+                        <p className="text-zinc-600 dark:text-zinc-300 text-lg font-bold italic opacity-90 leading-relaxed">"{item.answerText}"</p>
                     </div>
-                    <div className="mt-10 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">
-                       <span className="flex items-center gap-3 bg-zinc-50 dark:bg-white/5 px-6 py-3 rounded-full border border-zinc-100 dark:border-white/10"><Clock size={16} /> {timeAgo(item.timestamp)}</span>
-                       <span className="flex items-center gap-3 bg-pink-500/10 text-pink-500 px-6 py-3 rounded-full border border-pink-500/10 group-hover:bg-pink-500 group-hover:text-white transition-all"><Heart size={16} className="fill-current" /> {item.likes}</span>
+                    <div className="mt-8 flex justify-between items-center text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400">
+                       <span className="flex items-center gap-2"><Clock size={14} /> {timeAgo(item.timestamp)}</span>
+                       <span className="flex items-center gap-2 text-pink-500"><Heart size={14} className="fill-current" /> {item.likes}</span>
                     </div>
                 </motion.div>
                 ))}
