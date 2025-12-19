@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { auth, getMessagingInstance } from '../firebase';
 import { getToken } from 'firebase/messaging';
 import { saveFCMToken } from '../services/db';
-import { Home, Inbox, User, LogOut, LayoutDashboard, Bell, Settings } from './Icons';
+import { Home, Inbox, User, LogOut, LayoutDashboard, Bell, Settings, Code2 } from './Icons';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -147,8 +147,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </nav>
 
         {/* Profile Footer (Fixed) */}
-        <div className="mt-auto p-5 pb-10 shrink-0 border-t border-zinc-100 dark:border-white/5">
-          <div className="bg-zinc-50/80 dark:bg-white/5 p-4 rounded-[30px] flex items-center gap-3.5 transition-all hover:bg-zinc-100 dark:hover:bg-white/10">
+        <div className="mt-auto p-5 pb-4 shrink-0 border-t border-zinc-100 dark:border-white/5">
+          <div className="bg-zinc-50/80 dark:bg-white/5 p-4 rounded-[30px] flex items-center gap-3.5 transition-all hover:bg-zinc-100 dark:hover:bg-white/10 mb-4">
              <div className="relative shrink-0">
                <img 
                  src={userProfile.avatar} 
@@ -168,6 +168,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <LogOut size={20} />
              </button>
           </div>
+          
+          {/* Subtle Dev Signature */}
+          <a 
+            href="https://wa.me/2349167689200" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 py-2 text-zinc-300 dark:text-zinc-600 hover:text-pink-500 transition-all group"
+          >
+            <Code2 size={12} className="group-hover:rotate-12 transition-transform" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Handcrafted by Esho</span>
+          </a>
         </div>
       </aside>
 

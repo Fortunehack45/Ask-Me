@@ -1,11 +1,13 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
+// Fixed: Added missing MessageCircle icon import to resolve "Cannot find name 'MessageCircle'" error
 import { 
-  Sun, Moon, Lock, Check, Shield, Loader2, Eye, EyeOff, LogOut, RefreshCcw, Info, User, ShieldCheck, Palette, Bell, Globe, ChevronRight, Copy, Trash2, Camera, Sparkles, Settings as SettingsIcon
+  Sun, Moon, Lock, Check, Shield, Loader2, Eye, EyeOff, LogOut, RefreshCcw, Info, User, ShieldCheck, Palette, Bell, Globe, ChevronRight, Copy, Trash2, Camera, Sparkles, Settings as SettingsIcon, Code2, Heart, MessageCircle
 } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { updateUserProfile, isUsernameTaken } from '../services/db';
@@ -457,6 +459,56 @@ const Settings = () => {
             <LogOut size={32} className="group-hover/logout:-translate-x-2 transition-transform" />
             Sign Out
           </button>
+        </section>
+        
+        {/* BILLION-DOLLAR STUDIO CREDITS */}
+        <section className="bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900/40 dark:to-zinc-950/40 backdrop-blur-[40px] border border-zinc-200 dark:border-white/5 rounded-[64px] shadow-sm overflow-hidden relative group/credits">
+          <div className="absolute inset-0 bg-noise opacity-[0.02]"></div>
+          <div className="p-12 md:p-14 border-b border-zinc-100 dark:border-white/5 flex items-center gap-6 relative z-10">
+            <div className="w-16 h-16 rounded-[28px] bg-pink-500 text-white flex items-center justify-center shadow-xl shadow-pink-500/20">
+              <Code2 size={32} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h2 className="text-4xl font-black text-zinc-900 dark:text-white tracking-tight">Studio Credits</h2>
+              <p className="text-lg font-medium text-zinc-500 mt-1">The architect behind the platform.</p>
+            </div>
+          </div>
+          
+          <div className="p-12 md:p-16 flex flex-col md:flex-row items-center gap-12 relative z-10">
+             <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-pink-500 to-orange-500 blur-2xl opacity-20 group-hover/credits:opacity-40 transition-opacity"></div>
+                <div className="w-32 h-32 rounded-[40px] bg-zinc-100 dark:bg-zinc-800 border-4 border-white dark:border-zinc-900 shadow-2xl flex items-center justify-center text-5xl font-black text-pink-500 relative">
+                  E
+                </div>
+             </div>
+             
+             <div className="flex-1 text-center md:text-left space-y-4">
+                <div className="flex flex-col md:flex-row items-center gap-4">
+                  <h3 className="text-3xl font-black bg-gradient-to-r from-pink-600 to-orange-500 bg-clip-text text-transparent tracking-tighter">
+                    Esho Fortune Adebayo
+                  </h3>
+                  <span className="px-4 py-1.5 bg-green-500/10 text-green-500 text-[10px] font-black uppercase tracking-widest rounded-full border border-green-500/20 flex items-center gap-2">
+                    <ShieldCheck size={14} /> Verified Architect
+                  </span>
+                </div>
+                <p className="text-zinc-500 dark:text-zinc-400 font-bold text-lg max-w-xl leading-relaxed">
+                  Crafting high-fidelity digital experiences with a focus on speed, security, and world-class aesthetics. Built with passion to empower anonymous expression.
+                </p>
+                <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
+                  <a href="https://wa.me/2349167689200" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-6 py-3 bg-zinc-950 dark:bg-white text-white dark:text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
+                    <MessageCircle size={18} /> Contact Architect
+                  </a>
+                  <div className="flex items-center gap-3 px-6 py-3 bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 rounded-2xl font-black text-xs uppercase tracking-widest border border-zinc-200 dark:border-white/10">
+                    <Heart size={18} className="text-pink-500 fill-pink-500" /> Handcrafted in Nigeria
+                  </div>
+                </div>
+             </div>
+          </div>
+          
+          <div className="bg-zinc-100/50 dark:bg-black/20 p-8 flex flex-col md:flex-row justify-between items-center gap-4 border-t border-zinc-100 dark:border-white/5 relative z-10">
+             <p className="text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400">Platform Version 1.0.4 - Studio Pro Edition</p>
+             <p className="text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400">© 2024 Ask Me Studio. All Rights Reserved.</p>
+          </div>
         </section>
       </div>
     </div>
