@@ -122,7 +122,7 @@ const Auth: React.FC = () => {
           fullName,
           avatar: `https://api.dicebear.com/7.x/notionists/svg?seed=${cleanUsername}`,
           createdAt: Date.now(),
-          bio: "Studio Guest"
+          bio: "Ask Me Guest"
         });
       }
       await refreshProfile();
@@ -238,7 +238,7 @@ const Auth: React.FC = () => {
             </button>
             
             <p className="text-center mt-12 text-zinc-500 font-bold text-lg">
-              {view === 'login' ? "New around here?" : "Part of the studio?"} 
+              {view === 'login' ? "New around here?" : "Part of the Ask Me?"} 
               <button onClick={() => setView(view === 'login' ? 'signup' : 'login')} className="ml-3 text-pink-500 font-black hover:underline underline-offset-8 decoration-2">
                 {view === 'login' ? 'Register' : 'Authenticate'}
               </button>
