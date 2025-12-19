@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
@@ -79,11 +78,19 @@ const Settings = () => {
       };
 
       if (editUsername.toLowerCase() !== userProfile.username.toLowerCase()) {
-        const lastChange = userProfile.lastUsernameChange || 0;
-        const now = Date.now();
-        const daysPassed = (now - lastChange) / (1000 * 60 * 60 * 24);
+        const lastChangeVal = userProfile.lastUsernameChange;
+        let lastChangeMs = 0;
+        
+        if (typeof lastChangeVal === 'number') {
+          lastChangeMs = lastChangeVal;
+        } else if (lastChangeVal && typeof (lastChangeVal as any).toMillis === 'function') {
+          lastChangeMs = (lastChangeVal as any).toMillis();
+        }
 
-        if (daysPassed < 7) {
+        const now = Date.now();
+        const daysPassed = (now - lastChangeMs) / (1000 * 60 * 60 * 24);
+
+        if (lastChangeMs > 0 && daysPassed < 7) {
           const remainingDays = Math.ceil(7 - daysPassed);
           throw new Error(`Username change locked for ${remainingDays} days.`);
         }
@@ -127,14 +134,22 @@ const Settings = () => {
     }
   };
 
-  const usernameCooldown = (() => {
+  const usernameCooldown = useMemo(() => {
     if (!userProfile?.lastUsernameChange) return 0;
-    const lastChange = typeof userProfile.lastUsernameChange === 'number' 
-      ? userProfile.lastUsernameChange 
-      : (userProfile.lastUsernameChange as any).toMillis?.() || 0;
-    const daysPassed = (Date.now() - lastChange) / (1000 * 60 * 60 * 24);
+    const lastChangeVal = userProfile.lastUsernameChange;
+    let lastChangeMs = 0;
+    
+    if (typeof lastChangeVal === 'number') {
+      lastChangeMs = lastChangeVal;
+    } else if (lastChangeVal && typeof (lastChangeVal as any).toMillis === 'function') {
+      lastChangeMs = (lastChangeVal as any).toMillis();
+    }
+    
+    if (lastChangeMs === 0) return 0;
+    
+    const daysPassed = (Date.now() - lastChangeMs) / (1000 * 60 * 60 * 24);
     return Math.max(0, Math.ceil(7 - daysPassed));
-  })();
+  }, [userProfile?.lastUsernameChange]);
 
   const profileUrl = userProfile ? `askme.app/u/${userProfile.username}` : '';
 
