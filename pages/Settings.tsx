@@ -2,9 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-// Consolidated modular auth imports with explicit type separation to resolve "no exported member" errors
-import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
-import type { User } from 'firebase/auth';
+// Consolidated modular auth imports for better resolution
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential, type User } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -116,7 +115,7 @@ const Settings = () => {
       setPassMessage({ type: 'success', text: 'Password updated successfully!' });
       setCurrentPassword('');
       setNewPassword('');
-      setTimeout(() => setProfileMessage({ type: '', text: '' }), 3000);
+      setTimeout(() => setPassMessage({ type: '', text: '' }), 3000);
     } catch (err: any) {
       console.error("Password update failed:", err);
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {

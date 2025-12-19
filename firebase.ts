@@ -1,10 +1,9 @@
 
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
-// Consolidated modular auth imports with explicit type separation to resolve "no exported member" errors
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import type { Auth } from "firebase/auth";
+// Consolidated modular auth imports for better resolution in various environments
+import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
-// Consolidated modular analytics imports with explicit type separation to resolve "no exported member" errors
+// Consolidated modular analytics imports for better resolution
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {

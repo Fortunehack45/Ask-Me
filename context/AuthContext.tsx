@@ -1,8 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Consolidated modular auth imports with explicit type separation to resolve "no exported member" errors
-import { onAuthStateChanged } from 'firebase/auth';
-import type { User } from 'firebase/auth';
+// Consolidated modular auth imports for better resolution
+import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '../firebase';
 import { getUserProfile, updateUserLastActive } from '../services/db';
 import { UserProfile } from '../types';
