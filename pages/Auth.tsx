@@ -201,7 +201,11 @@ const Auth: React.FC = () => {
           )}
           
           <button type="submit" disabled={loading} className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-6 rounded-[28px] flex justify-center items-center gap-4 transition-all shadow-[0_24px_48px_rgba(236,72,153,0.3)] active:scale-95 disabled:opacity-50 text-xl">
-            {loading ? <Loader2 className="animate-spin" size={28} /> : isCompletingProfile ? <Check size={28} strokeWidth={3} /> : <Sparkles size={28} />}
+            {loading ? (
+              <Loader2 className="animate-spin" size={28} />
+            ) : isCompletingProfile ? (
+              <Check size={28} strokeWidth={3} />
+            ) : null}
             {isCompletingProfile ? 'Complete Setup' : view === 'login' ? 'Sign In' : view === 'signup' ? 'Sign Up' : 'Send Reset Link'}
           </button>
         </form>
@@ -216,7 +220,7 @@ const Auth: React.FC = () => {
           <>
             <div className="relative my-10">
               <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-zinc-200 dark:border-white/5"></span></div>
-              <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="bg-white dark:bg-zinc-900 px-4 text-zinc-400">Security Check</span></div>
+              <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="bg-white dark:bg-zinc-900 px-4 text-zinc-400">Or</span></div>
             </div>
 
             <button 
@@ -224,7 +228,7 @@ const Auth: React.FC = () => {
               disabled={loading}
               className="w-full bg-white dark:bg-white/5 hover:bg-zinc-50 dark:hover:bg-white/10 py-5 rounded-[28px] text-zinc-900 dark:text-white font-black flex items-center justify-center gap-4 transition-all shadow-sm border border-zinc-200 dark:border-white/10 active:scale-95 disabled:opacity-50 text-lg"
             >
-              {/* Fixed Google Logo with cleaner paths to avoid cuts */}
+              {/* Fixed Google Logo paths to eliminate rendering cuts */}
               <svg className="w-6 h-6" viewBox="0 0 48 48" shapeRendering="geometricPrecision">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
                 <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
