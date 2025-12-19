@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-// Fix: Fixed "no exported member" errors by removing 'type' keyword and ensuring modular resolution
-import { updatePassword, EmailAuthProvider, reauthenticateWithCredential, User } from 'firebase/auth';
+// Fix: Use 'import type' for interfaces like User and regular imports for classes and functions
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { 

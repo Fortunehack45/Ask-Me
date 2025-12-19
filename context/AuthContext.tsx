@@ -1,7 +1,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Fix: Remove 'type' keyword from named imports for better compatibility
-import { onAuthStateChanged, User } from 'firebase/auth';
+// Fix: Separate type and value imports to avoid resolution issues in strict build environments
+import { onAuthStateChanged } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { auth } from '../firebase';
 import { getUserProfile, updateUserLastActive } from '../services/db';
 import { UserProfile } from '../types';

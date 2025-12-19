@@ -1,9 +1,12 @@
 
-import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
-// Fix: Remove 'type' keyword from named imports to resolve potential compatibility issues with modular exports
-import { getAuth, GoogleAuthProvider, Auth } from "firebase/auth";
-import { getFirestore, Firestore } from "firebase/firestore";
-// Fix: Ensure correct modular imports for analytics
+import { initializeApp, getApps, getApp } from "firebase/app";
+import type { FirebaseApp } from "firebase/app";
+// Fix: Explicitly use 'import type' for interfaces to resolve "no exported member" errors in strict environments
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import type { Auth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import type { Firestore } from "firebase/firestore";
+// Fix: Consolidate modular imports for analytics and ensure standard value resolution
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
