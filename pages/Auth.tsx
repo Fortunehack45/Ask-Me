@@ -152,7 +152,7 @@ const Auth: React.FC = () => {
             Am
           </motion.div>
           <h1 className="text-5xl font-black text-zinc-900 dark:text-white tracking-tighter mb-3 leading-none">
-            {isCompletingProfile ? 'Final Touch' : view === 'login' ? 'Welcome Back' : view === 'signup' ? 'Join Studio' : 'Reset Key'}
+            {isCompletingProfile ? 'Final Touch' : view === 'login' ? 'Welcome Back' : view === 'signup' ? 'Join Ask Me' : 'Reset Key'}
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 font-bold text-lg tracking-tight px-4">
             {isCompletingProfile ? 'Complete your unique identity.' : 'Experience anonymous whispers in high-fidelity.'}
