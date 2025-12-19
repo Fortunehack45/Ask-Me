@@ -20,6 +20,7 @@ const THEMES = [
   { id: 'aurora', name: 'Aurora', css: 'bg-emerald-600', gradient: 'from-emerald-400 via-teal-500 to-emerald-900', text: 'text-white', card: 'bg-white/10 backdrop-blur-2xl border-white/20' },
   { id: 'sunset', name: 'Sunset', css: 'bg-orange-500', gradient: 'from-orange-400 via-pink-500 to-rose-600', text: 'text-white', card: 'bg-white/10 backdrop-blur-2xl border-white/20' },
   { id: 'nebula', name: 'Nebula', css: 'bg-purple-600', gradient: 'from-violet-400 via-purple-600 to-indigo-900', text: 'text-white', card: 'bg-white/10 backdrop-blur-2xl border-white/20' },
+  { id: 'midnight', name: 'Midnight', css: 'bg-slate-900', gradient: 'from-slate-800 via-slate-950 to-black', text: 'text-white', card: 'bg-white/5 border-white/10' },
   { id: 'lemonade', name: 'Lemonade', css: 'bg-yellow-400', gradient: 'from-yellow-300 via-orange-400 to-amber-600', text: 'text-zinc-900', card: 'bg-black/5 backdrop-blur-2xl border-black/10' },
 ];
 
@@ -166,7 +167,7 @@ const Feed: React.FC = () => {
                         <Share2 size={24} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] uppercase font-black text-white/50 tracking-wider mb-0.5">tap to customize card</p>
+                        <p className="text-[10px] uppercase font-black text-white/50 tracking-wider mb-0.5">tap to customize & share</p>
                         <p className="text-base font-black truncate">
                             {userProfile?.username ? `askme.app/u/${userProfile.username}` : 'Loading...'}
                         </p>
@@ -266,7 +267,7 @@ const Feed: React.FC = () => {
                 <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-pink-500 text-white flex items-center justify-center shadow-lg"><Palette size={20} /></div>
-                        <h3 className="text-xl font-black dark:text-white tracking-tight">Invite Studio</h3>
+                        <h3 className="text-xl font-black dark:text-white tracking-tight">Share Studio</h3>
                     </div>
                     <button onClick={() => setShowStudio(false)} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all"><X size={24} /></button>
                 </div>
@@ -291,7 +292,15 @@ const Feed: React.FC = () => {
 
                     <div className="w-full flex flex-wrap justify-center gap-3">
                         {THEMES.map((t) => (
-                            <button key={t.id} onClick={() => setShareTheme(t)} className={clsx("w-9 h-9 rounded-full border-4 transition-all hover:scale-110", t.css, shareTheme.id === t.id ? "border-pink-500 ring-4 ring-pink-500/10 shadow-lg" : "border-white/10 opacity-70")} />
+                            <button 
+                                key={t.id} 
+                                onClick={() => setShareTheme(t)} 
+                                className={clsx(
+                                    "w-9 h-9 rounded-full border-4 transition-all hover:scale-110",
+                                    t.css,
+                                    shareTheme.id === t.id ? "border-pink-500 ring-4 ring-pink-500/10 shadow-lg" : "border-white/10 opacity-70"
+                                )} 
+                            />
                         ))}
                     </div>
                 </div>
@@ -303,7 +312,7 @@ const Feed: React.FC = () => {
                         className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-5 rounded-[24px] shadow-xl flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 text-xl"
                     >
                         {sharing ? <Loader2 className="animate-spin" size={24} /> : <Share2 size={24} />}
-                        {sharing ? 'Generating...' : 'Share to Stories'}
+                        {sharing ? 'Generating Card...' : 'Share Profile Card'}
                     </button>
                 </div>
             </motion.div>

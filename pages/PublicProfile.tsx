@@ -21,6 +21,7 @@ const THEMES = [
   { id: 'aurora', name: 'Aurora', css: 'bg-emerald-600', gradient: 'from-emerald-400 via-teal-500 to-emerald-900', text: 'text-white', card: 'bg-white/10 backdrop-blur-2xl border-white/20' },
   { id: 'sunset', name: 'Sunset', css: 'bg-orange-500', gradient: 'from-orange-400 via-pink-500 to-rose-600', text: 'text-white', card: 'bg-white/10 backdrop-blur-2xl border-white/20' },
   { id: 'nebula', name: 'Nebula', css: 'bg-purple-600', gradient: 'from-violet-400 via-purple-600 to-indigo-900', text: 'text-white', card: 'bg-white/10 backdrop-blur-2xl border-white/20' },
+  { id: 'midnight', name: 'Midnight', css: 'bg-slate-900', gradient: 'from-slate-800 via-slate-950 to-black', text: 'text-white', card: 'bg-white/5 border-white/10' },
   { id: 'lemonade', name: 'Lemonade', css: 'bg-yellow-400', gradient: 'from-yellow-300 via-orange-400 to-amber-600', text: 'text-zinc-900', card: 'bg-black/5 backdrop-blur-2xl border-black/10' },
 ];
 
@@ -161,7 +162,7 @@ const PublicProfile = () => {
                 <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-pink-500 text-white flex items-center justify-center shadow-lg"><Palette size={20} /></div>
-                        <h3 className="text-xl font-black dark:text-white tracking-tight">Invite Studio</h3>
+                        <h3 className="text-xl font-black dark:text-white tracking-tight">Share Studio</h3>
                     </div>
                     <button onClick={() => setShowShareStudio(false)} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all"><X size={24} /></button>
                 </div>
@@ -210,9 +211,9 @@ const PublicProfile = () => {
                         className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-5 rounded-[24px] shadow-xl flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 text-xl"
                     >
                         {isSharing ? <Loader2 className="animate-spin" size={24} /> : <Share2 size={24} />}
-                        {isSharing ? 'Generating...' : 'Share to Stories'}
+                        {isSharing ? 'Generating...' : 'Share Profile'}
                     </button>
-                    <p className="text-center text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mt-4">HD Studio Card Export</p>
+                    <p className="text-center text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mt-4">Premium HD Asset Generation</p>
                 </div>
             </motion.div>
           </div>
@@ -247,8 +248,8 @@ const ProfileHeader = ({ profile, onShareRequest }: { profile: UserProfile, onSh
                       onClick={onShareRequest} 
                       className="group flex items-center gap-3 px-8 py-3 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-transparent dark:border-zinc-800 text-sm font-black text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all active:scale-95 shadow-sm"
                     >
-                        <Share2 size={18} className="text-pink-500" />
-                        Share Profile
+                        <Palette size={18} className="text-pink-500" />
+                        Customize & Share
                     </button>
                 </div>
             </motion.div>
