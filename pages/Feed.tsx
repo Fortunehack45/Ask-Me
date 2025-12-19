@@ -3,9 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { 
   Inbox, User, Loader2, Sparkles, Check, 
-  MessageSquare, Heart, Copy, Shield, Share2, X, Palette,
-  // Added Clock icon to fix reference error on line 248
-  Clock
+  MessageSquare, Heart, Copy, Shield, Share2, X, Palette, Clock
 } from '../components/Icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getUserFeed, getUserStats } from '../services/db';
@@ -98,7 +96,7 @@ const Feed: React.FC = () => {
   if (authLoading) return null;
 
   return (
-    <div className="space-y-12 w-full animate-in fade-in duration-500">
+    <div className="space-y-12 w-full animate-in fade-in duration-700">
       
       {/* HIDDEN SHARE ASSET GENERATOR */}
       <div className="fixed left-[-9999px] top-0 overflow-hidden" style={{ width: '1080px', height: '1920px', pointerEvents: 'none' }}>
@@ -135,122 +133,125 @@ const Feed: React.FC = () => {
         )}
       </AnimatePresence>
 
-      <div className="px-1 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="px-1 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-5xl md:text-6xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-3">
+          <h1 className="text-5xl md:text-7xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-3">
             Feed <Sparkles className="text-yellow-500" size={32} />
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 font-medium text-xl mt-2">
             Welcome, <span className="text-pink-500 font-black">{userProfile?.fullName || 'User'}</span>.
           </p>
         </div>
-        <div className="flex gap-2">
-           <Link to="/inbox" className="px-6 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-200 transition-colors">
-              <Inbox size={18} /> Inbox
+        <div className="flex gap-3">
+           <Link to="/inbox" className="px-8 py-4 bg-zinc-100 dark:bg-zinc-800 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all active:scale-95">
+              <Inbox size={20} /> Inbox
            </Link>
         </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
         {/* Left Column: Quick Actions & Stats */}
-        <div className="xl:col-span-4 space-y-8">
+        <div className="xl:col-span-5 space-y-10">
             <motion.div 
                 whileHover={{ y: -5 }}
-                className="relative overflow-hidden rounded-[40px] bg-gradient-to-br from-pink-500 via-pink-600 to-orange-500 p-10 text-white shadow-2xl group cursor-pointer"
+                className="relative overflow-hidden rounded-[48px] bg-gradient-to-br from-pink-500 via-pink-600 to-orange-500 p-12 text-white shadow-2xl group cursor-pointer"
                 onClick={() => setShowStudio(true)}
             >
                 <div className="relative z-10">
-                  <h2 className="text-3xl font-black tracking-tight mb-3">Share Profile</h2>
-                  <p className="text-pink-100 font-medium text-lg mb-10 opacity-90">Customize your mysterious identity and invite whispers.</p>
+                  <h2 className="text-4xl font-black tracking-tight mb-4">Share Profile</h2>
+                  <p className="text-pink-100 font-medium text-xl mb-12 opacity-90 leading-relaxed">Customize your mysterious identity and invite whispers into your inbox.</p>
                 
-                  <div className="bg-black/20 backdrop-blur-xl rounded-3xl p-6 flex items-center gap-5 border border-white/10 transition-all hover:bg-black/30">
-                      <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-pink-600 shadow-xl shrink-0">
-                        <Share2 size={28} />
+                  <div className="bg-black/20 backdrop-blur-xl rounded-[32px] p-8 flex items-center gap-6 border border-white/10 transition-all hover:bg-black/30">
+                      <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-pink-600 shadow-xl shrink-0">
+                        <Share2 size={32} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs uppercase font-black text-white/60 tracking-widest mb-1">Live URL</p>
-                        <p className="text-lg font-black truncate">askme.app/u/{userProfile?.username}</p>
+                        <p className="text-xl font-black truncate">askme.app/u/{userProfile?.username}</p>
                       </div>
                   </div>
                 </div>
-                <div className="absolute top-[-50px] right-[-50px] w-80 h-80 bg-white/10 rounded-full blur-[80px] pointer-events-none"></div>
+                <div className="absolute top-[-50px] right-[-50px] w-[400px] h-[400px] bg-white/10 rounded-full blur-[100px] pointer-events-none"></div>
             </motion.div>
 
-            <div className="grid grid-cols-2 gap-6">
-               <div className="bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 p-8 rounded-[36px] shadow-sm flex flex-col items-center text-center">
-                  <div className="w-12 h-12 rounded-2xl bg-pink-500/10 text-pink-500 flex items-center justify-center mb-4">
-                    <MessageSquare size={24} />
+            <div className="grid grid-cols-2 gap-8">
+               <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-10 rounded-[48px] shadow-sm flex flex-col items-center text-center group hover:border-pink-500/30 transition-all">
+                  <div className="w-14 h-14 rounded-2xl bg-pink-500/10 text-pink-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <MessageSquare size={28} />
                   </div>
-                  <span className="text-5xl font-black text-zinc-900 dark:text-white mb-1">{loading ? '...' : stats.answers}</span>
+                  <span className="text-6xl font-black text-zinc-900 dark:text-white mb-2">{loading ? '...' : stats.answers}</span>
                   <span className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Total Answers</span>
                </div>
-               <div className="bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 p-8 rounded-[36px] shadow-sm flex flex-col items-center text-center">
-                  <div className="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center mb-4">
-                    <Heart size={24} />
+               <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-10 rounded-[48px] shadow-sm flex flex-col items-center text-center group hover:border-orange-500/30 transition-all">
+                  <div className="w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <Heart size={28} />
                   </div>
-                  <span className="text-5xl font-black text-zinc-900 dark:text-white mb-1">{loading ? '...' : stats.likes}</span>
+                  <span className="text-6xl font-black text-zinc-900 dark:text-white mb-2">{loading ? '...' : stats.likes}</span>
                   <span className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Total Likes</span>
                </div>
             </div>
 
-            <div className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 p-10 rounded-[40px] shadow-xl">
-               <h3 className="text-2xl font-black mb-4 tracking-tight">Pro Tip</h3>
-               <p className="text-zinc-400 dark:text-zinc-500 font-medium text-lg leading-relaxed">
-                 Post your profile link to your Instagram Bio to increase question frequency by up to 300%.
+            <div className="bg-zinc-900 dark:bg-zinc-800/50 text-white p-12 rounded-[48px] shadow-xl relative overflow-hidden group">
+               <div className="absolute inset-0 bg-mesh-pink opacity-[0.03]"></div>
+               <h3 className="text-3xl font-black mb-6 tracking-tight relative z-10">Pro Tip 🚀</h3>
+               <p className="text-zinc-400 font-medium text-xl leading-relaxed mb-10 relative z-10">
+                 Post your profile link to your Instagram Bio or Snapchat story to increase question frequency by up to 300%.
                </p>
-               <button onClick={handleShareLink} className="mt-8 w-full py-4 bg-pink-500 hover:bg-pink-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all active:scale-95 shadow-lg shadow-pink-500/20">
+               <button onClick={handleShareLink} className="relative z-10 w-full py-5 bg-pink-500 hover:bg-pink-600 text-white rounded-3xl font-black uppercase tracking-widest text-sm transition-all active:scale-95 shadow-2xl shadow-pink-500/20">
                  Copy Link Now
                </button>
             </div>
         </div>
 
         {/* Right Column: Activity Feed */}
-        <div className="xl:col-span-8">
-            <div className="flex items-center gap-6 mb-8">
-                <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight shrink-0">Recent Activity</h3>
+        <div className="xl:col-span-7">
+            <div className="flex items-center gap-6 mb-10">
+                <h3 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight shrink-0">Recent Activity</h3>
                 <div className="h-px bg-zinc-200 dark:bg-zinc-800/50 flex-1"></div>
             </div>
             
             {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   {[1,2,3,4].map(i => <div key={i} className="h-48 bg-zinc-100 dark:bg-zinc-900/50 rounded-[40px] animate-pulse"></div>)}
+                <div className="grid grid-cols-1 gap-8">
+                   {[1,2,3].map(i => <div key={i} className="h-64 bg-zinc-100 dark:bg-zinc-900/50 rounded-[48px] animate-pulse"></div>)}
                 </div>
             ) : myAnswers.length === 0 ? (
-            <div className="text-center py-32 bg-zinc-50/50 dark:bg-zinc-900/20 rounded-[48px] border-2 border-dashed border-zinc-100 dark:border-zinc-800/50 flex flex-col items-center justify-center">
-                <div className="w-20 h-20 rounded-3xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 mb-6">
-                   <Shield size={32} />
+            <div className="text-center py-40 bg-zinc-50/50 dark:bg-zinc-900/20 rounded-[56px] border-2 border-dashed border-zinc-100 dark:border-zinc-800/50 flex flex-col items-center justify-center">
+                <div className="w-24 h-24 rounded-3xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 mb-8">
+                   <Shield size={40} />
                 </div>
-                <p className="text-zinc-500 font-black text-xl mb-4">No whispers found in the feed.</p>
-                <Link to="/inbox" className="px-8 py-3 bg-pink-500 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-pink-500/20 hover:scale-105 transition-all">Check Inbox</Link>
+                <p className="text-zinc-500 font-black text-2xl mb-6">No whispers found in the feed.</p>
+                <Link to="/inbox" className="px-10 py-4 bg-pink-500 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-pink-500/20 hover:scale-105 transition-all active:scale-95">Check Inbox</Link>
             </div>
             ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 gap-8">
                 {myAnswers.map((item, i) => (
                 <motion.div 
                     key={item.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.05 * i }}
-                    className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[40px] p-10 shadow-sm hover:shadow-xl transition-all group"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 * i }}
+                    className="bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-[48px] p-12 shadow-sm hover:shadow-2xl hover:border-pink-500/20 transition-all group"
                 >
-                    <div className="flex items-center gap-2 mb-6 text-[10px] font-black uppercase text-pink-500 tracking-[0.2em]">
-                        <MessageSquare size={14} />
-                        <span>Anonymous</span>
+                    <div className="flex items-center gap-3 mb-8 text-[11px] font-black uppercase text-pink-500 tracking-[0.25em]">
+                        <MessageSquare size={16} />
+                        <span>Anonymous Identity</span>
                     </div>
-                    <p className="text-zinc-900 dark:text-white text-3xl font-black leading-tight mb-8 tracking-tight">
+                    <p className="text-zinc-900 dark:text-white text-4xl font-black leading-tight mb-10 tracking-tight">
                         {item.questionText}
                     </p>
-                    <div className="pt-8 border-t border-zinc-100 dark:border-zinc-800/80">
-                        <p className="text-zinc-600 dark:text-zinc-300 text-xl font-medium leading-relaxed italic">
+                    <div className="pt-10 border-t border-zinc-100 dark:border-zinc-800/80 relative">
+                        <div className="absolute top-[-15px] left-8 px-4 bg-white dark:bg-[#0c0c0e] text-zinc-400 font-black text-[10px] uppercase tracking-widest">Public Response</div>
+                        <p className="text-zinc-600 dark:text-zinc-300 text-2xl font-medium leading-relaxed italic">
                           "{item.answerText}"
                         </p>
                     </div>
-                    <div className="mt-10 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                       <span className="flex items-center gap-2">
-                          <Clock size={14} /> {timeAgo(item.timestamp)}
+                    <div className="mt-12 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                       <span className="flex items-center gap-2.5 bg-zinc-50 dark:bg-zinc-800/50 px-5 py-2 rounded-full border border-zinc-100 dark:border-zinc-800">
+                          <Clock size={16} /> {timeAgo(item.timestamp)}
                        </span>
-                       <span className="flex items-center gap-2 bg-pink-500/10 text-pink-500 px-4 py-1.5 rounded-full">
-                          <Heart size={14} className="fill-pink-500" /> {item.likes}
+                       <span className="flex items-center gap-2.5 bg-pink-500/10 text-pink-500 px-6 py-2.5 rounded-full border border-pink-500/10">
+                          <Heart size={16} className="fill-pink-500" /> {item.likes} Likes
                        </span>
                     </div>
                 </motion.div>
@@ -260,56 +261,57 @@ const Feed: React.FC = () => {
         </div>
       </div>
 
-      {/* SHARE STUDIO MODAL (Identical but styled for consistency) */}
+      {/* SHARE STUDIO MODAL */}
       <AnimatePresence>
         {showStudio && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-zinc-950/90 backdrop-blur-md" onClick={() => setShowStudio(false)} />
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative bg-white dark:bg-zinc-900 w-full max-w-lg rounded-[48px] shadow-2xl overflow-hidden flex flex-col">
-                <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-pink-500 text-white flex items-center justify-center shadow-lg"><Palette size={24} /></div>
-                        <h3 className="text-2xl font-black dark:text-white tracking-tighter">Studio Pro</h3>
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative bg-white dark:bg-zinc-900 w-full max-w-xl rounded-[56px] shadow-2xl overflow-hidden flex flex-col">
+                <div className="p-10 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                    <div className="flex items-center gap-5">
+                        <div className="w-14 h-14 rounded-2xl bg-pink-500 text-white flex items-center justify-center shadow-2xl shadow-pink-500/20"><Palette size={28} /></div>
+                        <h3 className="text-3xl font-black dark:text-white tracking-tighter">Studio Pro</h3>
                     </div>
-                    <button onClick={() => setShowStudio(false)} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all"><X size={28} /></button>
+                    <button onClick={() => setShowStudio(false)} className="p-3 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all bg-zinc-50 dark:bg-zinc-800 rounded-full"><X size={28} /></button>
                 </div>
 
-                <div className="p-10 flex flex-col items-center gap-10 bg-zinc-50 dark:bg-zinc-950/50">
-                    <div className="relative shadow-2xl rounded-[40px] overflow-hidden" style={{ height: '400px', width: '225px' }}>
-                        <div className={clsx("w-full h-full flex flex-col items-center justify-center p-8 text-center relative bg-gradient-to-br transition-all duration-500", shareTheme.gradient)}>
-                             <div className="w-16 h-16 rounded-full border-[5px] border-white/30 mb-6 overflow-hidden shadow-xl">
+                <div className="p-12 flex flex-col items-center gap-12 bg-zinc-50 dark:bg-zinc-950/50">
+                    <div className="relative shadow-2xl rounded-[48px] overflow-hidden transition-all duration-500" style={{ height: '440px', width: '247px' }}>
+                        <div className={clsx("w-full h-full flex flex-col items-center justify-center p-10 text-center relative bg-gradient-to-br transition-all duration-500", shareTheme.gradient)}>
+                             <div className="w-20 h-20 rounded-full border-[6px] border-white/30 mb-8 overflow-hidden shadow-2xl">
                                 <img src={userProfile?.avatar} className="w-full h-full object-cover" alt="" />
                              </div>
-                             <div className={clsx("p-6 rounded-[32px] border shadow-2xl w-full text-[14px] font-black leading-tight", shareTheme.card, shareTheme.text)}>
+                             <div className={clsx("p-8 rounded-[36px] border shadow-2xl w-full text-[16px] font-black leading-tight", shareTheme.card, shareTheme.text)}>
                                 Send me anonymous messages!
                              </div>
                         </div>
                     </div>
 
-                    <div className="w-full flex flex-wrap justify-center gap-4">
+                    <div className="w-full flex flex-wrap justify-center gap-5">
                         {THEMES.map((t) => (
                             <button 
                                 key={t.id} 
                                 onClick={() => setShareTheme(t)} 
                                 className={clsx(
-                                    "w-10 h-10 rounded-full border-4 transition-all hover:scale-125",
+                                    "w-12 h-12 rounded-full border-4 transition-all hover:scale-125",
                                     t.css,
-                                    shareTheme.id === t.id ? "border-pink-500 ring-4 ring-pink-500/10 shadow-lg" : "border-white/10 opacity-70"
+                                    shareTheme.id === t.id ? "border-pink-500 ring-8 ring-pink-500/10 shadow-2xl" : "border-white/10 opacity-70"
                                 )} 
                             />
                         ))}
                     </div>
                 </div>
 
-                <div className="p-10 bg-white dark:bg-zinc-900">
+                <div className="p-12 bg-white dark:bg-zinc-900 border-t border-zinc-100 dark:border-zinc-800">
                     <button 
                         onClick={handleShareLink} 
                         disabled={sharing}
-                        className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-6 rounded-[28px] shadow-xl flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 text-xl"
+                        className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-7 rounded-[32px] shadow-2xl flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 text-2xl"
                     >
-                        {sharing ? <Loader2 className="animate-spin" size={28} /> : <Share2 size={28} />}
+                        {sharing ? <Loader2 className="animate-spin" size={32} /> : <Share2 size={32} />}
                         {sharing ? 'Generating...' : 'Share Profile'}
                     </button>
+                    <p className="text-center text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400 mt-6">Premium Studio Asset Export</p>
                 </div>
             </motion.div>
           </div>
