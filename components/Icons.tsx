@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Home, 
@@ -46,9 +45,7 @@ import {
   ChevronRight,
   Palette,
   Trash2,
-  // Added RefreshCcw icon
   RefreshCcw,
-  // Added ShieldCheck and Globe icons
   ShieldCheck,
   Globe
 } from 'lucide-react';
@@ -99,9 +96,7 @@ export {
   ChevronRight,
   Palette,
   Trash2,
-  // Exported RefreshCcw icon
   RefreshCcw,
-  // Exported missing icons
   ShieldCheck,
   Globe
 };
