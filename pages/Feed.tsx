@@ -117,7 +117,7 @@ const Feed: React.FC = () => {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1">
           <h1 className="text-4xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-4">
-            Studio Center <Sparkles className="text-pink-500" size={32} />
+            Dashboard <span className="text-pink-500" size={32} />
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 font-bold text-lg opacity-80 leading-relaxed">
             Welcome back, <span className="text-pink-600 dark:text-pink-500 font-black">{userProfile?.fullName}</span>
