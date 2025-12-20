@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
@@ -64,9 +65,11 @@ const Feed: React.FC = () => {
 
   const handleCopyOnly = async () => {
     const fullTextToCopy = `${invitationText}\n${shareUrl}`;
-    await copyToClipboard(fullTextToCopy);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+    const success = await copyToClipboard(fullTextToCopy);
+    if (success) {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
   };
 
   const handleShareLink = async () => {
@@ -74,43 +77,53 @@ const Feed: React.FC = () => {
     setSharing(true);
     
     try {
-      // Stage 1: Warm up call to ensure styles and fonts are captured
+      // Step 1: Warm up render to ensure fonts and external images (avatars) are loaded
       await toPng(shareCaptureRef.current, { cacheBust: true, pixelRatio: 1 });
       
-      // Stage 2: Final High-Res Capture
+      // Step 2: High quality capture for sharing
       const dataUrl = await toPng(shareCaptureRef.current, { 
         pixelRatio: 2, 
         width: 1080, 
         height: 1920,
         cacheBust: true,
-        backgroundColor: '#000000'
+        style: {
+          transform: 'scale(1)',
+          opacity: '1',
+          visibility: 'visible'
+        }
       });
 
-      const blob = await (await fetch(dataUrl)).blob();
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
       const file = new File([blob], `askme-${userProfile.username}.png`, { type: 'image/png' });
       
-      const fullSharePayload = {
-        title: 'Ask Me Anything!',
-        text: invitationText,
-        url: shareUrl,
-        files: [file]
-      };
+      // Mobile & modern desktop share attempt
+      if (navigator.share) {
+        const shareData: ShareData = {
+          title: 'Ask Me Anything!',
+          text: invitationText,
+          url: shareUrl,
+        };
 
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share(fullSharePayload);
-      } else if (navigator.share) {
-        // Text-only fallback for older mobile OS
-        await navigator.share({ 
-          title: 'Ask Me', 
-          text: invitationText, 
-          url: shareUrl 
-        });
+        // Try adding the file if supported
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          shareData.files = [file];
+        }
+
+        try {
+          await navigator.share(shareData);
+          setShowStudio(false);
+        } catch (shareErr: any) {
+          // If the user cancelled, don't fallback to clipboard unless it's a real error
+          if (shareErr.name !== 'AbortError') {
+            await handleCopyOnly();
+          }
+        }
       } else {
         await handleCopyOnly();
       }
-      setShowStudio(false);
     } catch (err) {
-      console.error("Share engine failed", err);
+      console.error("Capture or Share failed:", err);
       await handleCopyOnly();
     } finally {
       setSharing(false);
@@ -120,10 +133,14 @@ const Feed: React.FC = () => {
   if (authLoading) return null;
 
   return (
-    <div className="w-full space-y-10 animate-in fade-in duration-1000">
+    <div className="w-full space-y-10 animate-in fade-in duration-1000 min-h-screen">
       
-      {/* Hidden Capture Node - Robust Mobile Strategy */}
-      <div className="fixed top-0 left-0 opacity-0 pointer-events-none z-[-100] overflow-hidden" style={{ width: '1080px', height: '1920px' }}>
+      {/* 
+        CAPTURING NODE: Securely rendered but hidden from viewport. 
+        Note: We use absolute positioning and low opacity rather than display:none 
+        to ensure html-to-image can actually calculate dimensions and paint.
+      */}
+      <div className="fixed top-0 left-0 pointer-events-none opacity-0 z-[-100] overflow-hidden" style={{ width: '1080px', height: '1920px' }}>
           <div ref={shareCaptureRef} className={clsx("w-[1080px] h-[1920px] flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
               <div className="relative z-10 flex flex-col items-center w-full">
                   <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl bg-zinc-800">
@@ -146,7 +163,7 @@ const Feed: React.FC = () => {
         {showToast && (
           <motion.div initial={{ opacity: 0, y: -20, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: -20, x: '-50%' }} className="fixed top-24 left-1/2 -translate-x-1/2 z-[150] bg-zinc-950 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-4 border border-white/10 backdrop-blur-2xl">
             <Check size={20} className="text-emerald-500" />
-            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Invitation Text & Link Copied</span>
+            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Invitation & Link Copied</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -255,14 +272,14 @@ const Feed: React.FC = () => {
       <AnimatePresence>
         {showStudio && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-zinc-950/95 backdrop-blur-[64px]" onClick={() => setShowStudio(false)} />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-zinc-950/95 backdrop-blur-[64px]" onClick={() => !sharing && setShowStudio(false)} />
             <motion.div initial={{ scale: 0.95, opacity: 0, y: 60 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 60 }} className="relative bg-white dark:bg-zinc-900 w-full max-w-2xl rounded-[72px] shadow-[0_60px_120px_-20px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col border border-white/10">
                 <div className="p-10 border-b border-zinc-100 dark:border-white/5 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                         <div className="w-14 h-14 rounded-[22px] bg-pink-500 text-white flex items-center justify-center shadow-2xl shadow-pink-500/30"><Palette size={28} /></div>
                         <h3 className="text-3xl font-black dark:text-white tracking-tighter">Export Asset</h3>
                     </div>
-                    <button onClick={() => setShowStudio(false)} className="p-4 text-zinc-400 hover:text-white bg-zinc-100 dark:bg-white/5 rounded-full transition-all active:scale-90"><X size={32} /></button>
+                    <button onClick={() => setShowStudio(false)} disabled={sharing} className="p-4 text-zinc-400 hover:text-white bg-zinc-100 dark:bg-white/5 rounded-full transition-all active:scale-90 disabled:opacity-50"><X size={32} /></button>
                 </div>
 
                 <div className="p-12 flex flex-col items-center gap-12 bg-zinc-50 dark:bg-zinc-950/40">
@@ -281,16 +298,16 @@ const Feed: React.FC = () => {
                     </div>
                     <div className="w-full flex flex-wrap justify-center gap-5">
                         {THEMES.map((t) => (
-                            <button key={t.id} onClick={() => setShareTheme(t)} className={clsx("w-12 h-12 rounded-full border-4 transition-all hover:scale-110", t.css, shareTheme.id === t.id ? "border-pink-500 ring-[12px] ring-pink-500/10 shadow-2xl" : "border-white/10 opacity-70")} />
+                            <button key={t.id} onClick={() => setShareTheme(t)} disabled={sharing} className={clsx("w-12 h-12 rounded-full border-4 transition-all hover:scale-110", t.css, shareTheme.id === t.id ? "border-pink-500 ring-[12px] ring-pink-500/10 shadow-2xl" : "border-white/10 opacity-70")} />
                         ))}
                     </div>
                 </div>
 
                 <div className="p-10 bg-white dark:bg-zinc-900 border-t border-zinc-100 dark:border-white/5 flex flex-col gap-4">
                     <button onClick={handleShareLink} disabled={sharing} className="w-full bg-pink-500 text-white font-black py-6 rounded-[40px] shadow-[0_30px_60px_-10px_rgba(236,72,153,0.5)] flex items-center justify-center gap-6 transition-all active:scale-95 disabled:opacity-50 text-2xl">
-                        {sharing ? <Loader2 className="animate-spin" size={32} /> : <Share2 size={32} />} {sharing ? 'Rendering...' : 'Share Profile'}
+                        {sharing ? <Loader2 className="animate-spin" size={32} /> : <Share2 size={32} />} {sharing ? 'Rendering Asset...' : 'Share Profile'}
                     </button>
-                    <button onClick={handleCopyOnly} className="w-full py-5 text-sm font-black uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 hover:text-pink-500 transition-colors flex items-center justify-center gap-3">
+                    <button onClick={handleCopyOnly} disabled={sharing} className="w-full py-5 text-sm font-black uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 hover:text-pink-500 transition-colors flex items-center justify-center gap-3 disabled:opacity-50">
                       <Copy size={16} /> Copy Invitation & Link
                     </button>
                 </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -189,9 +190,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </aside>
 
       {/* FULL SCREEN MAIN CONTENT AREA */}
-      <main className="md:pl-[300px] pt-24 md:pt-0 min-h-screen">
-        <div className="p-5 md:p-10 lg:p-14 w-full animate-in fade-in slide-in-from-bottom-2 duration-700 pb-32 md:pb-10">
-          <div className="max-w-[1920px] mx-auto w-full">
+      <main className="md:pl-[300px] pt-24 md:pt-0 min-h-screen flex flex-col">
+        <div className="flex-1 p-5 md:p-10 lg:p-14 w-full animate-in fade-in slide-in-from-bottom-2 duration-700 pb-32 md:pb-10">
+          {/* Removed max-width constraint for true full-screen experience */}
+          <div className="w-full">
             {children}
           </div>
         </div>

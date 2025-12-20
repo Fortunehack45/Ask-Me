@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -59,10 +60,12 @@ const PublicProfile = () => {
   const handleCopyLink = async () => {
     const shareUrl = window.location.href;
     const fullTextToCopy = `${invitationText}\n${shareUrl}`;
-    await copyToClipboard(fullTextToCopy);
-    setCopyFeedback(true);
-    setTimeout(() => setCopyFeedback(false), 3000);
-    setShowShareStudio(false);
+    const success = await copyToClipboard(fullTextToCopy);
+    if (success) {
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 3000);
+      setShowShareStudio(false);
+    }
   };
 
   const handleNativeShare = async () => {
@@ -71,42 +74,46 @@ const PublicProfile = () => {
     const shareUrl = window.location.href;
 
     try {
-      // Stage 1: Warm up render
+      // Step 1: Warm up render
       await toPng(shareCaptureRef.current, { cacheBust: true, pixelRatio: 1 });
       
-      // Stage 2: HQ Capture
+      // Step 2: Final HQ capture
       const dataUrl = await toPng(shareCaptureRef.current, { 
         pixelRatio: 2, 
         cacheBust: true, 
         width: 1080, 
         height: 1920,
-        backgroundColor: '#000000'
+        backgroundColor: '#000000',
+        style: { visibility: 'visible', opacity: '1', transform: 'scale(1)' }
       });
 
       const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], `askme-${profile.username}.png`, { type: 'image/png' });
       
-      const sharePayload = {
-        title: `Ask @${profile.username} Anything!`,
-        text: invitationText,
-        url: shareUrl,
-        files: [file]
-      };
-
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share(sharePayload);
-      } else if (navigator.share) {
-        await navigator.share({ 
-          title: `Ask @${profile.username}`, 
+      if (navigator.share) {
+        const shareData: ShareData = {
+          title: `Ask @${profile.username} Anything!`,
           text: invitationText,
-          url: shareUrl 
-        });
+          url: shareUrl,
+        };
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          shareData.files = [file];
+        }
+
+        try {
+          await navigator.share(shareData);
+          setShowShareStudio(false);
+        } catch (shareErr: any) {
+          if (shareErr.name !== 'AbortError') {
+            await handleCopyLink();
+          }
+        }
       } else {
         await handleCopyLink();
       }
-      setShowShareStudio(false);
     } catch (err) { 
-      console.error("Share engine error", err);
+      console.error("Share engine error:", err);
       await handleCopyLink();
     } finally { setIsSharing(false); }
   };
@@ -129,17 +136,17 @@ const PublicProfile = () => {
   );
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center pb-24 relative">
+    <div className="min-h-screen w-full flex flex-col items-center pb-24 relative overflow-x-hidden">
       
-      {/* Immersive Capture Node */}
-      <div className="fixed top-0 left-0 opacity-0 pointer-events-none z-[-100] overflow-hidden" style={{ width: '1080px', height: '1920px' }}>
+      {/* CAPTURE NODE - Securely rendered but hidden from viewport */}
+      <div className="fixed top-0 left-0 pointer-events-none opacity-0 z-[-100] overflow-hidden" style={{ width: '1080px', height: '1920px' }}>
           <div ref={shareCaptureRef} className={clsx("w-[1080px] h-[1920px] flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
               <div className="relative z-10 flex flex-col items-center w-full">
                   <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl bg-zinc-800">
                       <img 
                         src={profile.avatar} 
                         className="w-full h-full object-cover" 
-                        alt="" 
+                        alt="Profile" 
                         crossOrigin="anonymous"
                       />
                   </div>
@@ -160,9 +167,9 @@ const PublicProfile = () => {
         )}
       </AnimatePresence>
 
-      <div className="w-full flex flex-col items-center pt-8 md:pt-12">
+      <div className="w-full flex flex-col items-center pt-8 md:pt-12 px-6">
         <ProfileHeader profile={profile} onShareRequest={() => setShowShareStudio(true)} />
-        <div className="w-full mt-10">
+        <div className="w-full mt-10 max-w-7xl mx-auto">
             {isOwner ? <OwnerView profile={profile} /> : <VisitorView profile={profile} />}
         </div>
       </div>
@@ -170,14 +177,14 @@ const PublicProfile = () => {
       <AnimatePresence>
         {showShareStudio && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-zinc-950/90 backdrop-blur-md" onClick={() => setShowShareStudio(false)} />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-zinc-950/90 backdrop-blur-md" onClick={() => !isSharing && setShowShareStudio(false)} />
             <motion.div initial={{ scale: 0.98, opacity: 0, y: 15 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.98, opacity: 0, y: 15 }} className="relative bg-white dark:bg-zinc-900 w-full max-w-md rounded-[40px] shadow-2xl overflow-hidden flex flex-col border border-white/10">
                 <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-xl bg-pink-500 text-white flex items-center justify-center shadow-lg"><Palette size={18} /></div>
                         <h3 className="text-lg font-black dark:text-white tracking-tight">Share Identity</h3>
                     </div>
-                    <button onClick={() => setShowShareStudio(false)} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all"><X size={20} /></button>
+                    <button onClick={() => setShowShareStudio(false)} disabled={isSharing} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all disabled:opacity-50"><X size={20} /></button>
                 </div>
                 <div className="p-8 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/50">
                     <div className="relative shadow-2xl rounded-[32px] overflow-hidden" style={{ height: '320px', width: '180px' }}>
@@ -195,15 +202,15 @@ const PublicProfile = () => {
                     </div>
                     <div className="w-full flex flex-wrap justify-center gap-3">
                         {THEMES.map((t) => (
-                            <button key={t.id} onClick={() => setShareTheme(t)} className={clsx("w-8 h-8 rounded-full border-2 transition-all hover:scale-110", t.css, shareTheme.id === t.id ? "border-pink-500 ring-4 ring-pink-500/10 shadow-lg" : "border-white/10 opacity-70")} />
+                            <button key={t.id} onClick={() => setShareTheme(t)} disabled={isSharing} className={clsx("w-8 h-8 rounded-full border-2 transition-all hover:scale-110", t.css, shareTheme.id === t.id ? "border-pink-500 ring-4 ring-pink-500/10 shadow-lg" : "border-white/10 opacity-70")} />
                         ))}
                     </div>
                 </div>
                 <div className="p-8 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col gap-4">
                     <button onClick={handleNativeShare} disabled={isSharing} className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-5 rounded-[24px] shadow-xl flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 text-lg">
-                        {isSharing ? <Loader2 className="animate-spin" size={20} /> : <Share2 size={20} />} {isSharing ? 'Generating...' : 'Share Profile'}
+                        {isSharing ? <Loader2 className="animate-spin" size={20} /> : <Share2 size={20} />} {isSharing ? 'Rendering Asset...' : 'Share Profile'}
                     </button>
-                    <button onClick={handleCopyLink} className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-pink-500 transition-colors">Copy Invitation & Link</button>
+                    <button onClick={handleCopyLink} disabled={isSharing} className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-pink-500 transition-colors disabled:opacity-50">Copy Invitation & Link</button>
                 </div>
             </motion.div>
           </div>
@@ -214,22 +221,22 @@ const PublicProfile = () => {
 };
 
 const ProfileHeader = ({ profile, onShareRequest }: { profile: UserProfile, onShareRequest: () => void }) => (
-    <div className="flex flex-col items-center text-center px-6 w-full max-w-none">
+    <div className="flex flex-col items-center text-center w-full">
         <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative mb-6 group">
             <div className="absolute inset-0 rounded-full bg-pink-500 blur-2xl opacity-10 group-hover:opacity-25 transition-opacity duration-700"></div>
-            <img src={profile.avatar} alt={profile.username} className="relative w-24 h-24 md:w-28 md:h-28 rounded-full object-cover border-[4px] border-white dark:border-zinc-900 shadow-xl" />
+            <img src={profile.avatar} alt={profile.username} className="relative w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-[4px] border-white dark:border-zinc-900 shadow-xl" />
             {profile.premiumStatus && <div className="absolute -right-1 bottom-1 bg-pink-500 text-white p-1.5 rounded-lg border-2 border-white dark:border-zinc-950 shadow-lg"><Sparkles size={12} fill="white" /></div>}
         </motion.div>
-        <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="space-y-2 flex flex-col items-center">
-            <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">{profile.fullName}</h1>
-            <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm tracking-tight">@{profile.username}</p>
-            {profile.bio && <p className="text-zinc-600 dark:text-zinc-400 text-base font-medium max-w-2xl mx-auto leading-relaxed">{profile.bio}</p>}
-            <div className="pt-5 w-full flex justify-center">
+        <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="space-y-2 flex flex-col items-center w-full">
+            <h1 className="text-4xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">{profile.fullName}</h1>
+            <p className="text-zinc-500 dark:text-zinc-400 font-bold text-lg md:text-xl tracking-tight">@{profile.username}</p>
+            {profile.bio && <p className="text-zinc-600 dark:text-zinc-400 text-lg md:text-2xl font-medium max-w-3xl mx-auto leading-relaxed mt-4">{profile.bio}</p>}
+            <div className="pt-8 w-full flex justify-center">
                 <button 
                   onClick={onShareRequest} 
-                  className="flex items-center justify-center gap-3 px-8 py-3.5 rounded-[22px] bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-[11px] font-black text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all active:scale-95 shadow-md uppercase tracking-[0.2em] group/share"
+                  className="flex items-center justify-center gap-3 px-10 py-4 rounded-[28px] bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-[12px] font-black text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all active:scale-95 shadow-md uppercase tracking-[0.25em] group/share"
                 >
-                  <Share2 size={16} className="text-pink-500 transition-transform group-hover/share:scale-110" /> 
+                  <Share2 size={18} className="text-pink-500 transition-transform group-hover/share:scale-110" /> 
                   Share Profile Link
                 </button>
             </div>
@@ -256,58 +263,59 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
     };
 
     return (
-        <div className="w-full flex flex-col items-center px-6">
+        <div className="w-full flex flex-col items-center">
             <AnimatePresence mode='wait'>
                 {!sent ? (
-                    <motion.div key="form" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl">
-                        <div className="relative bg-zinc-950 rounded-[40px] p-1 shadow-2xl">
-                            <div className={clsx("rounded-[36px] p-10 min-h-[320px] flex flex-col bg-gradient-to-br transition-all duration-700", theme.gradient)}>
-                                <div className="flex justify-between items-center mb-6 relative z-10">
-                                    <div className="flex items-center gap-2 bg-black/40 backdrop-blur-xl rounded-full px-4 py-1.5 border border-white/10">
-                                        <Shield size={12} className="text-white" />
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-white">Whisper Mode</span>
+                    <motion.div key="form" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-3xl">
+                        <div className="relative bg-zinc-950 rounded-[48px] p-1 shadow-2xl">
+                            <div className={clsx("rounded-[44px] p-12 min-h-[380px] flex flex-col bg-gradient-to-br transition-all duration-700", theme.gradient)}>
+                                <div className="flex justify-between items-center mb-8 relative z-10">
+                                    <div className="flex items-center gap-3 bg-black/40 backdrop-blur-xl rounded-full px-5 py-2 border border-white/10">
+                                        <Shield size={14} className="text-white" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-white">Whisper Mode</span>
                                     </div>
-                                    <button onClick={() => setText(placeholders[Math.floor(Math.random() * placeholders.length)])} className="text-white/70 hover:text-white transition-all"><Dice5 size={20} /></button>
+                                    <button onClick={() => setText(placeholders[Math.floor(Math.random() * placeholders.length)])} className="text-white/70 hover:text-white transition-all"><Dice5 size={24} /></button>
                                 </div>
-                                <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask anything anonymously..." className="w-full bg-transparent text-white placeholder-white/30 text-3xl font-black border-none focus:ring-0 resize-none flex-1 leading-tight p-0" maxLength={300} />
-                                <div className="flex justify-between items-end mt-6 relative z-10">
-                                    <div className="flex gap-2 p-1.5 bg-black/20 backdrop-blur-xl rounded-full border border-white/5">
+                                <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask anything anonymously..." className="w-full bg-transparent text-white placeholder-white/30 text-3xl md:text-4xl font-black border-none focus:ring-0 resize-none flex-1 leading-tight p-0" maxLength={300} />
+                                <div className="flex justify-between items-end mt-8 relative z-10">
+                                    <div className="flex gap-3 p-2 bg-black/20 backdrop-blur-xl rounded-full border border-white/5">
                                         {THEMES.map(t => (
-                                            <button key={t.id} onClick={() => setTheme(t)} className={clsx("w-5 h-5 rounded-full border-2 transition-all", t.css, theme.id === t.id ? "border-white" : "border-transparent opacity-60")} />
+                                            <button key={t.id} onClick={() => setTheme(t)} className={clsx("w-6 h-6 rounded-full border-2 transition-all", t.css, theme.id === t.id ? "border-white" : "border-transparent opacity-60")} />
                                         ))}
                                     </div>
-                                    <span className="text-[8px] font-black uppercase tracking-widest text-white/40">{text.length}/300</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40">{text.length}/300</span>
                                 </div>
                             </div>
                         </div>
-                        <button onClick={handleSend} disabled={!text.trim() || sending} className="w-full mt-6 bg-zinc-950 dark:bg-white text-white dark:text-black font-black text-lg py-5 rounded-[24px] shadow-xl hover:-translate-y-1 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
-                            {sending ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />} {sending ? 'Sending...' : 'Send Whisper'}
+                        <button onClick={handleSend} disabled={!text.trim() || sending} className="w-full mt-8 bg-zinc-950 dark:bg-white text-white dark:text-black font-black text-2xl py-6 rounded-[32px] shadow-xl hover:-translate-y-1 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-4">
+                            {sending ? <Loader2 className="animate-spin" size={24} /> : <Send size={24} />} {sending ? 'Sending...' : 'Send Whisper'}
                         </button>
                     </motion.div>
                 ) : (
-                    <motion.div key="success" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-xl text-center py-16 px-10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-[50px] border border-zinc-100 dark:border-white/5 rounded-[40px] shadow-2xl">
-                        <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white shadow-xl ring-8 ring-emerald-500/10"><Check size={40} strokeWidth={4} /></div>
-                        <h2 className="text-3xl font-black text-zinc-900 dark:text-white mb-2 tracking-tighter">Whisper Sent!</h2>
-                        <p className="text-zinc-500 font-bold mb-8">Your message is now in @{profile.username}'s portal.</p>
-                        <button onClick={() => setSent(false)} className="w-full bg-zinc-950 dark:bg-white text-white dark:text-black font-black py-4 rounded-2xl text-xs uppercase tracking-[0.3em] active:scale-95 transition-transform">Send Another</button>
+                    <motion.div key="success" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-2xl text-center py-24 px-12 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-[50px] border border-zinc-100 dark:border-white/5 rounded-[56px] shadow-2xl">
+                        <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-10 text-white shadow-xl ring-[12px] ring-emerald-500/10"><Check size={48} strokeWidth={4} /></div>
+                        <h2 className="text-4xl font-black text-zinc-900 dark:text-white mb-4 tracking-tighter">Whisper Sent!</h2>
+                        <p className="text-zinc-500 dark:text-zinc-400 font-bold text-xl mb-12">Your anonymous message is safely in @{profile.username}'s portal.</p>
+                        <button onClick={() => setSent(false)} className="w-full bg-zinc-950 dark:bg-white text-white dark:text-black font-black py-6 rounded-[28px] text-sm uppercase tracking-[0.3em] active:scale-95 transition-transform shadow-lg">Send Another</button>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            <div className="w-full max-w-none mt-20">
-                <div className="flex items-center gap-6 mb-10"><h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight shrink-0">Studio Feed</h3><div className="h-px bg-zinc-100 dark:bg-zinc-800 flex-1"></div></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="w-full mt-24">
+                <div className="flex items-center gap-8 mb-16"><h3 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white tracking-tight shrink-0">Studio Feed</h3><div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {answers.map(ans => (
-                        <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-white/5 rounded-[32px] p-8 shadow-sm transition-all hover:shadow-lg relative overflow-hidden">
-                            {!ans.isPublic ? <div className="py-10 text-center opacity-30"><Lock size={24} className="mx-auto mb-2" /><p className="text-[10px] font-black uppercase tracking-widest">Private</p></div> : (
+                        <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-white/5 rounded-[44px] p-10 shadow-sm transition-all hover:shadow-lg relative overflow-hidden group">
+                            {!ans.isPublic ? <div className="py-16 text-center opacity-30"><Lock size={32} className="mx-auto mb-4" /><p className="text-[11px] font-black uppercase tracking-widest">Private Whisper</p></div> : (
                                 <>
-                                    <span className="text-[9px] font-black text-pink-500 uppercase tracking-widest mb-3 block flex items-center gap-2"><MessageCircle size={12} /> Public Response</span>
-                                    <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight mb-6">{ans.questionText}</h3>
-                                    <div className="pt-6 border-t border-zinc-100 dark:border-white/5"><p className="text-zinc-600 dark:text-zinc-300 font-bold italic text-lg leading-relaxed">"{ans.answerText}"</p></div>
+                                    <span className="text-[10px] font-black text-pink-500 uppercase tracking-widest mb-4 block flex items-center gap-3"><MessageCircle size={14} /> Public Response</span>
+                                    <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight mb-8 leading-tight">{ans.questionText}</h3>
+                                    <div className="pt-8 border-t border-zinc-100 dark:border-white/5"><p className="text-zinc-600 dark:text-zinc-300 font-bold italic text-xl leading-relaxed opacity-90 group-hover:opacity-100 transition-opacity">"{ans.answerText}"</p></div>
                                 </>
                             )}
                         </div>
                     ))}
+                    {answers.length === 0 && <div className="col-span-full py-32 text-center text-zinc-400 font-black text-xl opacity-40 uppercase tracking-widest">No public whispers yet.</div>}
                 </div>
             </div>
         </div>
@@ -325,23 +333,24 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
     if (loading) return <div className="py-20 flex justify-center w-full"><Loader2 className="animate-spin text-pink-500" size={32} /></div>;
 
     return (
-        <div className="w-full flex flex-col items-center px-6">
-            <div className="w-full max-w-none bg-zinc-950 dark:bg-white rounded-[40px] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+        <div className="w-full flex flex-col items-center">
+            <div className="w-full bg-zinc-950 dark:bg-white rounded-[56px] p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-10 shadow-2xl">
                 <div className="text-center md:text-left">
-                    <h3 className="text-2xl font-black text-white dark:text-black tracking-tight leading-none mb-2">Studio Activity</h3>
-                    <p className="text-zinc-400 dark:text-zinc-500 font-bold text-sm">Manage your whispers and public presence.</p>
+                    <h3 className="text-3xl md:text-4xl font-black text-white dark:text-black tracking-tight leading-none mb-3">Studio Activity</h3>
+                    <p className="text-zinc-400 dark:text-zinc-500 font-bold text-lg md:text-xl">Manage your whispers and public presence.</p>
                 </div>
-                <Link to="/inbox" className="px-10 py-4 bg-pink-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl transition-all hover:scale-105 active:scale-95">Check Inbox</Link>
+                <Link to="/inbox" className="px-14 py-6 bg-pink-500 text-white rounded-[28px] font-black text-sm uppercase tracking-widest shadow-xl transition-all hover:scale-105 active:scale-95">Check Inbox</Link>
             </div>
             
-            <div className="w-full max-w-none mt-16 space-y-6">
-                {answers.length === 0 ? <div className="py-20 text-center text-zinc-400 font-bold">No whispers found.</div> : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="w-full mt-24">
+                <div className="flex items-center gap-8 mb-16"><h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight shrink-0">My Whisper History</h3><div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div></div>
+                {answers.length === 0 ? <div className="py-32 text-center text-zinc-400 font-black text-xl opacity-40 uppercase tracking-widest">No whispers found.</div> : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                       {answers.map(ans => (
-                        <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-white/5 rounded-[32px] p-8 shadow-sm">
-                            <div className="flex items-center gap-3 mb-4"><span className="text-[9px] font-black text-pink-500 uppercase tracking-widest">Question</span><div className={clsx("px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border", ans.isPublic ? "bg-pink-500/10 text-pink-500 border-pink-500/20" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500")}>{ans.isPublic ? 'Public' : 'Hidden'}</div></div>
-                            <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight mb-6 leading-tight">{ans.questionText}</h3>
-                            <div className="pt-6 border-t border-zinc-100 dark:border-white/5"><p className="text-zinc-600 dark:text-zinc-300 font-bold italic text-lg opacity-80 leading-relaxed">"{ans.answerText}"</p></div>
+                        <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-white/5 rounded-[44px] p-10 shadow-sm transition-all hover:shadow-lg">
+                            <div className="flex items-center gap-4 mb-6"><span className="text-[10px] font-black text-pink-500 uppercase tracking-widest">Question</span><div className={clsx("px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border", ans.isPublic ? "bg-pink-500/10 text-pink-500 border-pink-500/20" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500")}>{ans.isPublic ? 'Public' : 'Hidden'}</div></div>
+                            <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight mb-8 leading-tight">{ans.questionText}</h3>
+                            <div className="pt-8 border-t border-zinc-100 dark:border-white/5"><p className="text-zinc-600 dark:text-zinc-300 font-bold italic text-xl opacity-80 leading-relaxed">"{ans.answerText}"</p></div>
                         </div>
                       ))}
                     </div>
