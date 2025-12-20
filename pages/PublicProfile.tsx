@@ -90,17 +90,17 @@ const PublicProfile = () => {
       const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], `askme-${profile.username}.png`, { type: 'image/png' });
       
+      const shareData: ShareData = {
+        title: `Ask @${profile.username} Anything!`,
+        text: invitationText,
+        url: shareUrl,
+      };
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        shareData.files = [file];
+      }
+
       if (navigator.share) {
-        const shareData: ShareData = {
-          title: `Ask @${profile.username} Anything!`,
-          text: invitationText,
-          url: shareUrl,
-        };
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          shareData.files = [file];
-        }
-
         try {
           await navigator.share(shareData);
           setShowShareStudio(false);
@@ -169,7 +169,7 @@ const PublicProfile = () => {
 
       <div className="w-full flex flex-col items-center pt-8 md:pt-12 px-6">
         <ProfileHeader profile={profile} onShareRequest={() => setShowShareStudio(true)} />
-        <div className="w-full mt-10 max-w-7xl mx-auto">
+        <div className="w-full mt-10 max-w-none">
             {isOwner ? <OwnerView profile={profile} /> : <VisitorView profile={profile} />}
         </div>
       </div>
@@ -178,7 +178,7 @@ const PublicProfile = () => {
         {showShareStudio && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-zinc-950/90 backdrop-blur-md" onClick={() => !isSharing && setShowShareStudio(false)} />
-            <motion.div initial={{ scale: 0.98, opacity: 0, y: 15 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.98, opacity: 0, y: 15 }} className="relative bg-white dark:bg-zinc-900 w-full max-w-md rounded-[40px] shadow-2xl overflow-hidden flex flex-col border border-white/10">
+            <motion.div initial={{ scale: 0.98, opacity: 0, y: 15 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.98, opacity: 0, y: 15 }} className="relative bg-white dark:bg-zinc-900 w-full max-md:max-w-sm max-w-md rounded-[40px] shadow-2xl overflow-hidden flex flex-col border border-white/10">
                 <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-xl bg-pink-500 text-white flex items-center justify-center shadow-lg"><Palette size={18} /></div>
@@ -221,7 +221,7 @@ const PublicProfile = () => {
 };
 
 const ProfileHeader = ({ profile, onShareRequest }: { profile: UserProfile, onShareRequest: () => void }) => (
-    <div className="flex flex-col items-center text-center w-full">
+    <div className="flex flex-col items-center text-center w-full max-w-4xl mx-auto">
         <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative mb-6 group">
             <div className="absolute inset-0 rounded-full bg-pink-500 blur-2xl opacity-10 group-hover:opacity-25 transition-opacity duration-700"></div>
             <img src={profile.avatar} alt={profile.username} className="relative w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-[4px] border-white dark:border-zinc-900 shadow-xl" />
@@ -263,7 +263,7 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
     };
 
     return (
-        <div className="w-full flex flex-col items-center">
+        <div className="w-full flex flex-col items-center max-w-7xl mx-auto">
             <AnimatePresence mode='wait'>
                 {!sent ? (
                     <motion.div key="form" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-3xl">
@@ -302,8 +302,8 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
             </AnimatePresence>
 
             <div className="w-full mt-24">
-                <div className="flex items-center gap-8 mb-16"><h3 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white tracking-tight shrink-0">Studio Feed</h3><div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="flex items-center gap-8 mb-16 px-1"><h3 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white tracking-tight shrink-0">Studio Feed</h3><div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-1">
                     {answers.map(ans => (
                         <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-white/5 rounded-[44px] p-10 shadow-sm transition-all hover:shadow-lg relative overflow-hidden group">
                             {!ans.isPublic ? <div className="py-16 text-center opacity-30"><Lock size={32} className="mx-auto mb-4" /><p className="text-[11px] font-black uppercase tracking-widest">Private Whisper</p></div> : (
@@ -333,7 +333,7 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
     if (loading) return <div className="py-20 flex justify-center w-full"><Loader2 className="animate-spin text-pink-500" size={32} /></div>;
 
     return (
-        <div className="w-full flex flex-col items-center">
+        <div className="w-full flex flex-col items-center max-w-7xl mx-auto">
             <div className="w-full bg-zinc-950 dark:bg-white rounded-[56px] p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-10 shadow-2xl">
                 <div className="text-center md:text-left">
                     <h3 className="text-3xl md:text-4xl font-black text-white dark:text-black tracking-tight leading-none mb-3">Studio Activity</h3>
@@ -343,9 +343,9 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
             </div>
             
             <div className="w-full mt-24">
-                <div className="flex items-center gap-8 mb-16"><h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight shrink-0">My Whisper History</h3><div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div></div>
+                <div className="flex items-center gap-8 mb-16 px-1"><h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight shrink-0">My Whisper History</h3><div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div></div>
                 {answers.length === 0 ? <div className="py-32 text-center text-zinc-400 font-black text-xl opacity-40 uppercase tracking-widest">No whispers found.</div> : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-1">
                       {answers.map(ans => (
                         <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-white/5 rounded-[44px] p-10 shadow-sm transition-all hover:shadow-lg">
                             <div className="flex items-center gap-4 mb-6"><span className="text-[10px] font-black text-pink-500 uppercase tracking-widest">Question</span><div className={clsx("px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border", ans.isPublic ? "bg-pink-500/10 text-pink-500 border-pink-500/20" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500")}>{ans.isPublic ? 'Public' : 'Hidden'}</div></div>

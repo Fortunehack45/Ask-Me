@@ -77,44 +77,42 @@ const Feed: React.FC = () => {
     setSharing(true);
     
     try {
-      // Step 1: Warm up render to ensure fonts and external images (avatars) are loaded
+      // Stage 1: Pre-render to load resources (fonts, images)
       await toPng(shareCaptureRef.current, { cacheBust: true, pixelRatio: 1 });
       
-      // Step 2: High quality capture for sharing
+      // Stage 2: Final High-Quality Export
       const dataUrl = await toPng(shareCaptureRef.current, { 
         pixelRatio: 2, 
         width: 1080, 
         height: 1920,
         cacheBust: true,
         style: {
-          transform: 'scale(1)',
           opacity: '1',
-          visibility: 'visible'
+          visibility: 'visible',
+          transform: 'scale(1)'
         }
       });
 
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
+      const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], `askme-${userProfile.username}.png`, { type: 'image/png' });
       
-      // Mobile & modern desktop share attempt
+      const shareData: ShareData = {
+        title: 'Ask Me Anything!',
+        text: invitationText,
+        url: shareUrl,
+      };
+
+      // Check if file sharing is supported on this browser/OS
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        shareData.files = [file];
+      }
+
       if (navigator.share) {
-        const shareData: ShareData = {
-          title: 'Ask Me Anything!',
-          text: invitationText,
-          url: shareUrl,
-        };
-
-        // Try adding the file if supported
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          shareData.files = [file];
-        }
-
         try {
           await navigator.share(shareData);
           setShowStudio(false);
         } catch (shareErr: any) {
-          // If the user cancelled, don't fallback to clipboard unless it's a real error
+          // If the user cancelled the share sheet, don't trigger fallback
           if (shareErr.name !== 'AbortError') {
             await handleCopyOnly();
           }
@@ -123,7 +121,7 @@ const Feed: React.FC = () => {
         await handleCopyOnly();
       }
     } catch (err) {
-      console.error("Capture or Share failed:", err);
+      console.error("Capture engine failed:", err);
       await handleCopyOnly();
     } finally {
       setSharing(false);
@@ -136,9 +134,8 @@ const Feed: React.FC = () => {
     <div className="w-full space-y-10 animate-in fade-in duration-1000 min-h-screen">
       
       {/* 
-        CAPTURING NODE: Securely rendered but hidden from viewport. 
-        Note: We use absolute positioning and low opacity rather than display:none 
-        to ensure html-to-image can actually calculate dimensions and paint.
+        ROBUST CAPTURE NODE: 
+        Rendered but moved off-screen to ensure html-to-image captures all styling and remote images.
       */}
       <div className="fixed top-0 left-0 pointer-events-none opacity-0 z-[-100] overflow-hidden" style={{ width: '1080px', height: '1920px' }}>
           <div ref={shareCaptureRef} className={clsx("w-[1080px] h-[1920px] flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
@@ -163,12 +160,12 @@ const Feed: React.FC = () => {
         {showToast && (
           <motion.div initial={{ opacity: 0, y: -20, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: -20, x: '-50%' }} className="fixed top-24 left-1/2 -translate-x-1/2 z-[150] bg-zinc-950 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-4 border border-white/10 backdrop-blur-2xl">
             <Check size={20} className="text-emerald-500" />
-            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Invitation & Link Copied</span>
+            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Invitation Text & Link Copied</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4 px-1">
         <div className="space-y-2">
           <h1 className="text-5xl md:text-7xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-4">
             Dashboard <Sparkles className="text-pink-500" size={36} />
@@ -184,7 +181,7 @@ const Feed: React.FC = () => {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start px-1">
         <div className="lg:col-span-4 space-y-8">
             <motion.div 
                 whileHover={{ y: -6, scale: 1.01 }}
