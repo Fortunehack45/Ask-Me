@@ -71,28 +71,30 @@ const PublicProfile = () => {
     const shareUrl = window.location.href;
 
     try {
-      // 1. Warm up render
+      // Stage 1: Warm up render
       await toPng(shareCaptureRef.current, { cacheBust: true, pixelRatio: 1 });
       
-      // 2. High Quality Export (Pixel ratio 2 for stability)
+      // Stage 2: HQ Capture
       const dataUrl = await toPng(shareCaptureRef.current, { 
         pixelRatio: 2, 
         cacheBust: true, 
         width: 1080, 
         height: 1920,
-        style: { visibility: 'visible', transform: 'scale(1)' }
+        backgroundColor: '#000000'
       });
 
       const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], `askme-${profile.username}.png`, { type: 'image/png' });
       
+      const sharePayload = {
+        title: `Ask @${profile.username} Anything!`,
+        text: invitationText,
+        url: shareUrl,
+        files: [file]
+      };
+
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ 
-          title: `Ask @${profile.username} Anything!`, 
-          text: invitationText, 
-          url: shareUrl, 
-          files: [file] 
-        });
+        await navigator.share(sharePayload);
       } else if (navigator.share) {
         await navigator.share({ 
           title: `Ask @${profile.username}`, 
@@ -129,11 +131,11 @@ const PublicProfile = () => {
   return (
     <div className="min-h-screen w-full flex flex-col items-center pb-24 relative">
       
-      {/* IMPROVED EXPORT NODE: Hidden securely but rendered in layout for capture tools */}
+      {/* Immersive Capture Node */}
       <div className="fixed top-0 left-0 opacity-0 pointer-events-none z-[-100] overflow-hidden" style={{ width: '1080px', height: '1920px' }}>
           <div ref={shareCaptureRef} className={clsx("w-[1080px] h-[1920px] flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
               <div className="relative z-10 flex flex-col items-center w-full">
-                  <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl">
+                  <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl bg-zinc-800">
                       <img 
                         src={profile.avatar} 
                         className="w-full h-full object-cover" 
@@ -180,7 +182,7 @@ const PublicProfile = () => {
                 <div className="p-8 flex flex-col items-center gap-8 bg-zinc-50 dark:bg-zinc-950/50">
                     <div className="relative shadow-2xl rounded-[32px] overflow-hidden" style={{ height: '320px', width: '180px' }}>
                         <div className={clsx("w-full h-full flex flex-col items-center justify-center p-6 text-center relative bg-gradient-to-br transition-all duration-700", shareTheme.gradient)}>
-                             <div className="w-16 h-16 rounded-full border-[6px] border-white/30 mb-6 shadow-xl overflow-hidden">
+                             <div className="w-16 h-16 rounded-full border-[6px] border-white/30 mb-6 shadow-xl overflow-hidden bg-zinc-800">
                                 <img 
                                   src={profile.avatar} 
                                   className="w-full h-full object-cover" 
@@ -199,7 +201,7 @@ const PublicProfile = () => {
                 </div>
                 <div className="p-8 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col gap-4">
                     <button onClick={handleNativeShare} disabled={isSharing} className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-5 rounded-[24px] shadow-xl flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 text-lg">
-                        {isSharing ? <Loader2 className="animate-spin" size={20} /> : <Share2 size={20} />} {isSharing ? 'Generating...' : 'Share Profile Asset'}
+                        {isSharing ? <Loader2 className="animate-spin" size={20} /> : <Share2 size={20} />} {isSharing ? 'Generating...' : 'Share Profile'}
                     </button>
                     <button onClick={handleCopyLink} className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-pink-500 transition-colors">Copy Invitation & Link</button>
                 </div>

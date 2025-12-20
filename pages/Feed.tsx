@@ -73,47 +73,44 @@ const Feed: React.FC = () => {
     if (!userProfile || !shareCaptureRef.current) return;
     setSharing(true);
     
-    const fullShareText = invitationText;
-
     try {
-      // 1. Warm up/Pre-render call to ensure fonts and images are ready
+      // Stage 1: Warm up call to ensure styles and fonts are captured
       await toPng(shareCaptureRef.current, { cacheBust: true, pixelRatio: 1 });
       
-      // 2. Main High-Quality Export (Lowering pixel ratio to 2 for better mobile stability)
+      // Stage 2: Final High-Res Capture
       const dataUrl = await toPng(shareCaptureRef.current, { 
         pixelRatio: 2, 
         width: 1080, 
         height: 1920,
         cacheBust: true,
-        style: { transform: 'scale(1)', visibility: 'visible' }
+        backgroundColor: '#000000'
       });
 
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
+      const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], `askme-${userProfile.username}.png`, { type: 'image/png' });
       
-      // 3. Attempt Native Share with File + Text + URL
+      const fullSharePayload = {
+        title: 'Ask Me Anything!',
+        text: invitationText,
+        url: shareUrl,
+        files: [file]
+      };
+
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ 
-          title: 'Ask Me!', 
-          text: fullShareText, 
-          url: shareUrl, 
-          files: [file] 
-        });
+        await navigator.share(fullSharePayload);
       } else if (navigator.share) {
-        // Fallback to text-only share if files aren't supported
+        // Text-only fallback for older mobile OS
         await navigator.share({ 
           title: 'Ask Me', 
-          text: fullShareText, 
+          text: invitationText, 
           url: shareUrl 
         });
       } else {
-        // Ultimate fallback: Copy to clipboard
         await handleCopyOnly();
       }
       setShowStudio(false);
     } catch (err) {
-      console.error("Share engine failed, falling back to clipboard", err);
+      console.error("Share engine failed", err);
       await handleCopyOnly();
     } finally {
       setSharing(false);
@@ -125,11 +122,11 @@ const Feed: React.FC = () => {
   return (
     <div className="w-full space-y-10 animate-in fade-in duration-1000">
       
-      {/* IMPROVED EXPORT NODE: Rendered but hidden securely for capture reliability */}
+      {/* Hidden Capture Node - Robust Mobile Strategy */}
       <div className="fixed top-0 left-0 opacity-0 pointer-events-none z-[-100] overflow-hidden" style={{ width: '1080px', height: '1920px' }}>
           <div ref={shareCaptureRef} className={clsx("w-[1080px] h-[1920px] flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
               <div className="relative z-10 flex flex-col items-center w-full">
-                  <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl">
+                  <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl bg-zinc-800">
                       <img 
                         src={userProfile?.avatar} 
                         className="w-full h-full object-cover" 
@@ -255,7 +252,6 @@ const Feed: React.FC = () => {
         </div>
       </div>
 
-      {/* STUDIO ASSET MODAL */}
       <AnimatePresence>
         {showStudio && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
@@ -272,7 +268,7 @@ const Feed: React.FC = () => {
                 <div className="p-12 flex flex-col items-center gap-12 bg-zinc-50 dark:bg-zinc-950/40">
                     <div className="relative shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] rounded-[48px] overflow-hidden" style={{ height: '480px', width: '270px' }}>
                         <div className={clsx("w-full h-full flex flex-col items-center justify-center p-10 text-center relative bg-gradient-to-br transition-all duration-1000", shareTheme.gradient)}>
-                             <div className="w-24 h-24 rounded-full border-[8px] border-white/30 mb-10 overflow-hidden shadow-2xl ring-4 ring-black/5">
+                             <div className="w-24 h-24 rounded-full border-[8px] border-white/30 mb-10 overflow-hidden shadow-2xl ring-4 ring-black/5 bg-zinc-800">
                                 <img 
                                   src={userProfile?.avatar} 
                                   className="w-full h-full object-cover" 
@@ -292,7 +288,7 @@ const Feed: React.FC = () => {
 
                 <div className="p-10 bg-white dark:bg-zinc-900 border-t border-zinc-100 dark:border-white/5 flex flex-col gap-4">
                     <button onClick={handleShareLink} disabled={sharing} className="w-full bg-pink-500 text-white font-black py-6 rounded-[40px] shadow-[0_30px_60px_-10px_rgba(236,72,153,0.5)] flex items-center justify-center gap-6 transition-all active:scale-95 disabled:opacity-50 text-2xl">
-                        {sharing ? <Loader2 className="animate-spin" size={32} /> : <Share2 size={32} />} {sharing ? 'Rendering...' : 'Share Profile Asset'}
+                        {sharing ? <Loader2 className="animate-spin" size={32} /> : <Share2 size={32} />} {sharing ? 'Rendering...' : 'Share Profile'}
                     </button>
                     <button onClick={handleCopyOnly} className="w-full py-5 text-sm font-black uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 hover:text-pink-500 transition-colors flex items-center justify-center gap-3">
                       <Copy size={16} /> Copy Invitation & Link
