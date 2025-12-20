@@ -72,41 +72,49 @@ const Feed: React.FC = () => {
   const handleShareLink = async () => {
     if (!userProfile || !shareCaptureRef.current) return;
     setSharing(true);
+    
+    const fullShareText = invitationText;
+
     try {
-      // Warm up call for html-to-image fonts/images
-      await toPng(shareCaptureRef.current, { cacheBust: true });
+      // 1. Warm up/Pre-render call to ensure fonts and images are ready
+      await toPng(shareCaptureRef.current, { cacheBust: true, pixelRatio: 1 });
       
+      // 2. Main High-Quality Export (Lowering pixel ratio to 2 for better mobile stability)
       const dataUrl = await toPng(shareCaptureRef.current, { 
         pixelRatio: 2, 
         width: 1080, 
         height: 1920,
-        cacheBust: true
+        cacheBust: true,
+        style: { transform: 'scale(1)', visibility: 'visible' }
       });
 
       const response = await fetch(dataUrl);
       const blob = await response.blob();
       const file = new File([blob], `askme-${userProfile.username}.png`, { type: 'image/png' });
       
+      // 3. Attempt Native Share with File + Text + URL
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ 
           title: 'Ask Me!', 
-          text: invitationText, 
+          text: fullShareText, 
           url: shareUrl, 
           files: [file] 
         });
       } else if (navigator.share) {
+        // Fallback to text-only share if files aren't supported
         await navigator.share({ 
           title: 'Ask Me', 
-          text: invitationText, 
+          text: fullShareText, 
           url: shareUrl 
         });
       } else {
-        handleCopyOnly();
+        // Ultimate fallback: Copy to clipboard
+        await handleCopyOnly();
       }
       setShowStudio(false);
     } catch (err) {
-      console.error("Share failed", err);
-      handleCopyOnly();
+      console.error("Share engine failed, falling back to clipboard", err);
+      await handleCopyOnly();
     } finally {
       setSharing(false);
     }
@@ -117,12 +125,17 @@ const Feed: React.FC = () => {
   return (
     <div className="w-full space-y-10 animate-in fade-in duration-1000">
       
-      {/* EXPORT NODE (HIDDEN OFF-SCREEN BUT RENDERED) */}
-      <div className="fixed top-0 left-[-2000px] pointer-events-none" style={{ width: '1080px', height: '1920px' }}>
+      {/* IMPROVED EXPORT NODE: Rendered but hidden securely for capture reliability */}
+      <div className="fixed top-0 left-0 opacity-0 pointer-events-none z-[-100] overflow-hidden" style={{ width: '1080px', height: '1920px' }}>
           <div ref={shareCaptureRef} className={clsx("w-[1080px] h-[1920px] flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
               <div className="relative z-10 flex flex-col items-center w-full">
                   <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl">
-                      <img src={userProfile?.avatar} className="w-full h-full object-cover" alt="Profile" />
+                      <img 
+                        src={userProfile?.avatar} 
+                        className="w-full h-full object-cover" 
+                        alt="Profile" 
+                        crossOrigin="anonymous"
+                      />
                   </div>
                   <div className={clsx("p-24 rounded-[100px] shadow-2xl w-full max-w-4xl border", shareTheme.card)}>
                       <h2 className={clsx("font-black text-8xl tracking-tight text-center", shareTheme.text)}>Send me anonymous messages!</h2>
@@ -136,16 +149,15 @@ const Feed: React.FC = () => {
         {showToast && (
           <motion.div initial={{ opacity: 0, y: -20, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: -20, x: '-50%' }} className="fixed top-24 left-1/2 -translate-x-1/2 z-[150] bg-zinc-950 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-4 border border-white/10 backdrop-blur-2xl">
             <Check size={20} className="text-emerald-500" />
-            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Invitation Copied</span>
+            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Invitation Text & Link Copied</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* DASHBOARD TOP ACTION BAR */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
         <div className="space-y-2">
           <h1 className="text-5xl md:text-7xl font-black text-zinc-900 dark:text-white tracking-tighter flex items-center gap-4">
-            Dashboard <span className="text-pink-500" size={36} />
+            Dashboard <Sparkles className="text-pink-500" size={36} />
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 font-bold text-xl opacity-80 leading-relaxed">
             Welcome back, <span className="text-pink-600 dark:text-pink-500 font-black">{userProfile?.fullName}</span>
@@ -158,10 +170,7 @@ const Feed: React.FC = () => {
         </div>
       </header>
 
-      {/* FULL SCREEN DENSE GRID SYSTEM */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start">
-        
-        {/* LEFT COLUMN: Growth & Identity (4/12) */}
         <div className="lg:col-span-4 space-y-8">
             <motion.div 
                 whileHover={{ y: -6, scale: 1.01 }}
@@ -197,24 +206,8 @@ const Feed: React.FC = () => {
                   <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400 mt-4">Hearts</span>
                </div>
             </div>
-
-            <div className="bg-white/60 dark:bg-zinc-900/40 backdrop-blur-[50px] border border-zinc-200 dark:border-white/5 p-10 rounded-[48px] space-y-6 shadow-sm">
-                <div className="flex items-center gap-4 text-zinc-900 dark:text-white font-black text-sm uppercase tracking-[0.4em]">
-                  <TrendingUp size={20} className="text-emerald-500" /> Portal Insights
-                </div>
-                <div className="space-y-4">
-                   <div className="h-2 w-full bg-zinc-200 dark:bg-white/5 rounded-full overflow-hidden">
-                      <motion.div initial={{ width: 0 }} animate={{ width: '65%' }} transition={{ duration: 1.5 }} className="h-full bg-pink-500 rounded-full" />
-                   </div>
-                   <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-zinc-500">
-                     <span>Profile Strength</span>
-                     <span className="text-zinc-900 dark:text-white">65%</span>
-                   </div>
-                </div>
-            </div>
         </div>
 
-        {/* RIGHT COLUMN: Activity Feed (expanded - 8/12) */}
         <div className="lg:col-span-8 space-y-8">
             <div className="flex items-center gap-6 mb-2">
                 <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter shrink-0">Recent Activity Feed</h3>
@@ -280,7 +273,12 @@ const Feed: React.FC = () => {
                     <div className="relative shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] rounded-[48px] overflow-hidden" style={{ height: '480px', width: '270px' }}>
                         <div className={clsx("w-full h-full flex flex-col items-center justify-center p-10 text-center relative bg-gradient-to-br transition-all duration-1000", shareTheme.gradient)}>
                              <div className="w-24 h-24 rounded-full border-[8px] border-white/30 mb-10 overflow-hidden shadow-2xl ring-4 ring-black/5">
-                                <img src={userProfile?.avatar} className="w-full h-full object-cover" alt="" />
+                                <img 
+                                  src={userProfile?.avatar} 
+                                  className="w-full h-full object-cover" 
+                                  alt="" 
+                                  crossOrigin="anonymous"
+                                />
                              </div>
                              <div className={clsx("p-10 rounded-[44px] border shadow-2xl w-full text-lg font-black leading-tight", shareTheme.card, shareTheme.text)}>Send me anonymous messages!</div>
                         </div>
@@ -294,10 +292,10 @@ const Feed: React.FC = () => {
 
                 <div className="p-10 bg-white dark:bg-zinc-900 border-t border-zinc-100 dark:border-white/5 flex flex-col gap-4">
                     <button onClick={handleShareLink} disabled={sharing} className="w-full bg-pink-500 text-white font-black py-6 rounded-[40px] shadow-[0_30px_60px_-10px_rgba(236,72,153,0.5)] flex items-center justify-center gap-6 transition-all active:scale-95 disabled:opacity-50 text-2xl">
-                        {sharing ? <Loader2 className="animate-spin" size={32} /> : <Share2 size={32} />} {sharing ? 'Rendering...' : 'Share Profile'}
+                        {sharing ? <Loader2 className="animate-spin" size={32} /> : <Share2 size={32} />} {sharing ? 'Rendering...' : 'Share Profile Asset'}
                     </button>
                     <button onClick={handleCopyOnly} className="w-full py-5 text-sm font-black uppercase tracking-[0.3em] text-zinc-500 dark:text-zinc-400 hover:text-pink-500 transition-colors flex items-center justify-center gap-3">
-                      <Copy size={16} /> Copy Invitation Instead
+                      <Copy size={16} /> Copy Invitation & Link
                     </button>
                 </div>
             </motion.div>

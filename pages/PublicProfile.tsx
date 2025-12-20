@@ -68,19 +68,24 @@ const PublicProfile = () => {
   const handleNativeShare = async () => {
     if (!profile || !shareCaptureRef.current) return;
     setIsSharing(true);
+    const shareUrl = window.location.href;
+
     try {
-      await toPng(shareCaptureRef.current, { cacheBust: true });
+      // 1. Warm up render
+      await toPng(shareCaptureRef.current, { cacheBust: true, pixelRatio: 1 });
+      
+      // 2. High Quality Export (Pixel ratio 2 for stability)
       const dataUrl = await toPng(shareCaptureRef.current, { 
         pixelRatio: 2, 
         cacheBust: true, 
         width: 1080, 
-        height: 1920 
+        height: 1920,
+        style: { visibility: 'visible', transform: 'scale(1)' }
       });
 
       const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], `askme-${profile.username}.png`, { type: 'image/png' });
       
-      const shareUrl = window.location.href;
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ 
           title: `Ask @${profile.username} Anything!`, 
@@ -95,12 +100,12 @@ const PublicProfile = () => {
           url: shareUrl 
         });
       } else {
-        handleCopyLink();
+        await handleCopyLink();
       }
       setShowShareStudio(false);
     } catch (err) { 
-      console.error("Share failed", err);
-      handleCopyLink();
+      console.error("Share engine error", err);
+      await handleCopyLink();
     } finally { setIsSharing(false); }
   };
 
@@ -124,12 +129,17 @@ const PublicProfile = () => {
   return (
     <div className="min-h-screen w-full flex flex-col items-center pb-24 relative">
       
-      {/* HIDDEN CAPTURE NODE */}
-      <div className="fixed top-0 left-[-2000px] pointer-events-none" style={{ width: '1080px', height: '1920px' }}>
+      {/* IMPROVED EXPORT NODE: Hidden securely but rendered in layout for capture tools */}
+      <div className="fixed top-0 left-0 opacity-0 pointer-events-none z-[-100] overflow-hidden" style={{ width: '1080px', height: '1920px' }}>
           <div ref={shareCaptureRef} className={clsx("w-[1080px] h-[1920px] flex flex-col items-center justify-center p-20 text-center relative bg-gradient-to-br", shareTheme.gradient)}>
               <div className="relative z-10 flex flex-col items-center w-full">
                   <div className="w-80 h-80 rounded-full border-[12px] border-white/30 mb-20 overflow-hidden shadow-2xl">
-                      <img src={profile.avatar} className="w-full h-full object-cover" alt="" />
+                      <img 
+                        src={profile.avatar} 
+                        className="w-full h-full object-cover" 
+                        alt="" 
+                        crossOrigin="anonymous"
+                      />
                   </div>
                   <div className={clsx("p-24 rounded-[100px] shadow-2xl w-full max-w-4xl border", shareTheme.card)}>
                       <h2 className={clsx("font-black text-8xl tracking-tight text-center", shareTheme.text)}>Send me anonymous messages!</h2>
@@ -143,7 +153,7 @@ const PublicProfile = () => {
         {copyFeedback && (
           <motion.div initial={{ opacity: 0, y: -20, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: -20, x: '-50%' }} className="fixed top-24 left-1/2 -translate-x-1/2 z-[150] bg-zinc-950 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-4 border border-white/10 backdrop-blur-2xl">
             <Check size={20} className="text-emerald-500" />
-            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Invitation Copied</span>
+            <span className="font-black text-[11px] uppercase tracking-[0.2em]">Invitation & Link Copied</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -171,7 +181,12 @@ const PublicProfile = () => {
                     <div className="relative shadow-2xl rounded-[32px] overflow-hidden" style={{ height: '320px', width: '180px' }}>
                         <div className={clsx("w-full h-full flex flex-col items-center justify-center p-6 text-center relative bg-gradient-to-br transition-all duration-700", shareTheme.gradient)}>
                              <div className="w-16 h-16 rounded-full border-[6px] border-white/30 mb-6 shadow-xl overflow-hidden">
-                                <img src={profile.avatar} className="w-full h-full object-cover" alt="" />
+                                <img 
+                                  src={profile.avatar} 
+                                  className="w-full h-full object-cover" 
+                                  alt="" 
+                                  crossOrigin="anonymous"
+                                />
                              </div>
                              <div className={clsx("p-6 rounded-[24px] border shadow-xl w-full text-[12px] font-black leading-tight", shareTheme.card, shareTheme.text)}>Send me anonymous messages!</div>
                         </div>
@@ -184,9 +199,9 @@ const PublicProfile = () => {
                 </div>
                 <div className="p-8 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col gap-4">
                     <button onClick={handleNativeShare} disabled={isSharing} className="w-full bg-pink-500 hover:bg-pink-600 text-white font-black py-5 rounded-[24px] shadow-xl flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 text-lg">
-                        {isSharing ? <Loader2 className="animate-spin" size={20} /> : <Share2 size={20} />} {isSharing ? 'Generating...' : 'Share Profile'}
+                        {isSharing ? <Loader2 className="animate-spin" size={20} /> : <Share2 size={20} />} {isSharing ? 'Generating...' : 'Share Profile Asset'}
                     </button>
-                    <button onClick={handleCopyLink} className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-pink-500 transition-colors">Copy Invitation Instead</button>
+                    <button onClick={handleCopyLink} className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-pink-500 transition-colors">Copy Invitation & Link</button>
                 </div>
             </motion.div>
           </div>
@@ -197,7 +212,7 @@ const PublicProfile = () => {
 };
 
 const ProfileHeader = ({ profile, onShareRequest }: { profile: UserProfile, onShareRequest: () => void }) => (
-    <div className="flex flex-col items-center text-center px-6 w-full max-w-4xl">
+    <div className="flex flex-col items-center text-center px-6 w-full max-w-none">
         <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative mb-6 group">
             <div className="absolute inset-0 rounded-full bg-pink-500 blur-2xl opacity-10 group-hover:opacity-25 transition-opacity duration-700"></div>
             <img src={profile.avatar} alt={profile.username} className="relative w-24 h-24 md:w-28 md:h-28 rounded-full object-cover border-[4px] border-white dark:border-zinc-900 shadow-xl" />
@@ -206,7 +221,7 @@ const ProfileHeader = ({ profile, onShareRequest }: { profile: UserProfile, onSh
         <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="space-y-2 flex flex-col items-center">
             <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">{profile.fullName}</h1>
             <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm tracking-tight">@{profile.username}</p>
-            {profile.bio && <p className="text-zinc-600 dark:text-zinc-400 text-base font-medium max-w-md mx-auto leading-relaxed">{profile.bio}</p>}
+            {profile.bio && <p className="text-zinc-600 dark:text-zinc-400 text-base font-medium max-w-2xl mx-auto leading-relaxed">{profile.bio}</p>}
             <div className="pt-5 w-full flex justify-center">
                 <button 
                   onClick={onShareRequest} 
@@ -242,9 +257,9 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
         <div className="w-full flex flex-col items-center px-6">
             <AnimatePresence mode='wait'>
                 {!sent ? (
-                    <motion.div key="form" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-xl">
+                    <motion.div key="form" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl">
                         <div className="relative bg-zinc-950 rounded-[40px] p-1 shadow-2xl">
-                            <div className={clsx("rounded-[36px] p-10 min-h-[280px] flex flex-col bg-gradient-to-br transition-all duration-700", theme.gradient)}>
+                            <div className={clsx("rounded-[36px] p-10 min-h-[320px] flex flex-col bg-gradient-to-br transition-all duration-700", theme.gradient)}>
                                 <div className="flex justify-between items-center mb-6 relative z-10">
                                     <div className="flex items-center gap-2 bg-black/40 backdrop-blur-xl rounded-full px-4 py-1.5 border border-white/10">
                                         <Shield size={12} className="text-white" />
@@ -252,7 +267,7 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
                                     </div>
                                     <button onClick={() => setText(placeholders[Math.floor(Math.random() * placeholders.length)])} className="text-white/70 hover:text-white transition-all"><Dice5 size={20} /></button>
                                 </div>
-                                <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask anything anonymously..." className="w-full bg-transparent text-white placeholder-white/30 text-2xl font-black border-none focus:ring-0 resize-none flex-1 leading-tight p-0" maxLength={300} />
+                                <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask anything anonymously..." className="w-full bg-transparent text-white placeholder-white/30 text-3xl font-black border-none focus:ring-0 resize-none flex-1 leading-tight p-0" maxLength={300} />
                                 <div className="flex justify-between items-end mt-6 relative z-10">
                                     <div className="flex gap-2 p-1.5 bg-black/20 backdrop-blur-xl rounded-full border border-white/5">
                                         {THEMES.map(t => (
@@ -268,7 +283,7 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
                         </button>
                     </motion.div>
                 ) : (
-                    <motion.div key="success" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-lg text-center py-16 px-10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-[50px] border border-zinc-100 dark:border-white/5 rounded-[40px] shadow-2xl">
+                    <motion.div key="success" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-xl text-center py-16 px-10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-[50px] border border-zinc-100 dark:border-white/5 rounded-[40px] shadow-2xl">
                         <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white shadow-xl ring-8 ring-emerald-500/10"><Check size={40} strokeWidth={4} /></div>
                         <h2 className="text-3xl font-black text-zinc-900 dark:text-white mb-2 tracking-tighter">Whisper Sent!</h2>
                         <p className="text-zinc-500 font-bold mb-8">Your message is now in @{profile.username}'s portal.</p>
@@ -277,9 +292,9 @@ const VisitorView = ({ profile }: { profile: UserProfile }) => {
                 )}
             </AnimatePresence>
 
-            <div className="w-full max-w-4xl mt-20">
+            <div className="w-full max-w-none mt-20">
                 <div className="flex items-center gap-6 mb-10"><h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight shrink-0">Studio Feed</h3><div className="h-px bg-zinc-100 dark:bg-zinc-800 flex-1"></div></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {answers.map(ans => (
                         <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-white/5 rounded-[32px] p-8 shadow-sm transition-all hover:shadow-lg relative overflow-hidden">
                             {!ans.isPublic ? <div className="py-10 text-center opacity-30"><Lock size={24} className="mx-auto mb-2" /><p className="text-[10px] font-black uppercase tracking-widest">Private</p></div> : (
@@ -309,7 +324,7 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
 
     return (
         <div className="w-full flex flex-col items-center px-6">
-            <div className="w-full max-w-4xl bg-zinc-950 dark:bg-white rounded-[40px] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+            <div className="w-full max-w-none bg-zinc-950 dark:bg-white rounded-[40px] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
                 <div className="text-center md:text-left">
                     <h3 className="text-2xl font-black text-white dark:text-black tracking-tight leading-none mb-2">Studio Activity</h3>
                     <p className="text-zinc-400 dark:text-zinc-500 font-bold text-sm">Manage your whispers and public presence.</p>
@@ -317,14 +332,18 @@ const OwnerView = ({ profile }: { profile: UserProfile }) => {
                 <Link to="/inbox" className="px-10 py-4 bg-pink-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl transition-all hover:scale-105 active:scale-95">Check Inbox</Link>
             </div>
             
-            <div className="w-full max-w-4xl mt-16 space-y-6">
-                {answers.length === 0 ? <div className="py-20 text-center text-zinc-400 font-bold">No whispers found.</div> : answers.map(ans => (
-                    <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-white/5 rounded-[32px] p-8 shadow-sm">
-                        <div className="flex items-center gap-3 mb-4"><span className="text-[9px] font-black text-pink-500 uppercase tracking-widest">Question</span><div className={clsx("px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border", ans.isPublic ? "bg-pink-500/10 text-pink-500 border-pink-500/20" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500")}>{ans.isPublic ? 'Public' : 'Hidden'}</div></div>
-                        <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight mb-6 leading-tight">{ans.questionText}</h3>
-                        <div className="pt-6 border-t border-zinc-100 dark:border-white/5"><p className="text-zinc-600 dark:text-zinc-300 font-bold italic text-lg opacity-80 leading-relaxed">"{ans.answerText}"</p></div>
+            <div className="w-full max-w-none mt-16 space-y-6">
+                {answers.length === 0 ? <div className="py-20 text-center text-zinc-400 font-bold">No whispers found.</div> : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {answers.map(ans => (
+                        <div key={ans.id} className="bg-white dark:bg-zinc-900/40 border border-zinc-100 dark:border-white/5 rounded-[32px] p-8 shadow-sm">
+                            <div className="flex items-center gap-3 mb-4"><span className="text-[9px] font-black text-pink-500 uppercase tracking-widest">Question</span><div className={clsx("px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border", ans.isPublic ? "bg-pink-500/10 text-pink-500 border-pink-500/20" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500")}>{ans.isPublic ? 'Public' : 'Hidden'}</div></div>
+                            <h3 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight mb-6 leading-tight">{ans.questionText}</h3>
+                            <div className="pt-6 border-t border-zinc-100 dark:border-white/5"><p className="text-zinc-600 dark:text-zinc-300 font-bold italic text-lg opacity-80 leading-relaxed">"{ans.answerText}"</p></div>
+                        </div>
+                      ))}
                     </div>
-                ))}
+                )}
             </div>
         </div>
     );
