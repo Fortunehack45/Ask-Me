@@ -41,4 +41,4 @@ Ask Me uses an adaptive layout that "fills the screen" to ensure professional de
 - **Contrast**: Intelligent color management (Zinc-900 on Light / White on Dark) for maximum accessibility and readability.
 
 ---
-Built with ❤️ by [Esho Fortune Adebayo](https://wa.me/2349167689200)
+Built by [Esho Fortune Adebayo](https://wa.me/2349167689200)
